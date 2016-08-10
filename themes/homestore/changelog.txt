@@ -1,0 +1,44 @@
+*** Homestore Changelog ***
+
+2016.07.15 - version 2.0.10
+* Fix - Homepage content sections visibility.
+* Fix - Storefront Footer Bar compatibility.
+
+2016.07.07 - version 2.0.9
+ * Fix - Parallax Hero padding at certain screen sizes.
+ * Fix - Parallax Hero title color on handheld devices.
+
+2016.06.27 - version 2.0.8
+ * Fix - Sticky navigation option in Storefront Designer.
+
+2016.05.11 - version 2.0.7
+ * Tweak - Adopt Storefront 2.0's methods for applying default settings.
+ * Fix - Support for WordPress 4.5's custom logo feature.
+
+2016.04.13 - version 2.0.6
+ * Fix - Adds a version number to the product title template.
+
+2016.04.04 - version 2.0.5
+* Fix - Fix compatibility with Storefront Blog Extension.
+* Fix - Fix button colors not being changed from Customizer.
+* Fix - Mobile navigation style fixes.
+
+2016.04.01 - version 2.0.4
+* Fix - Accent color correctly applied to active menu items.
+
+2016.03.17 - version 2.0.3
+ * Fix - Remove duplicate long description from being displayed in single post pages.
+ * Tweak - Storefront 2.0.0 compatibility.
+
+2016.03.09 - version 2.0.2
+ * Fix - Fix static call of `Homestore_Template::section_tabs()`
+
+2016.02.23 - version 2.0.1
+ * Fix - Resetting header image after removing or replacing it.
+
+2016.02.22 - version 2.0.0
+ * New - Underlying code structure rewritten to use a more efficient class structure.
+ * New - Full RTL support.
+
+2016.01.28 - version 1.0.0
+ * Initial release.
