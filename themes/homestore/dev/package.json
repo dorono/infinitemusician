@@ -1,0 +1,35 @@
+{
+  "author": "Doron Orenstein",
+  "dependencies": {
+    "bower": "*",
+    "grunt": "^1.0.1",
+    "grunt-autoprefixer": "^3.0.4",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "load-grunt-tasks": "^3.5.2",
+    "node-sass": "^3.8.0"
+  },
+  "description": "",
+  "devDependencies": {
+    "grunt-autoprefixer": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-compass": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*",
+    "load-grunt-tasks": "*",
+    "time-grunt": "*"
+  },
+  "license": "ISC",
+  "main": "Gruntfile.js",
+  "name": "ClientSource",
+  "scripts": {},
+  "version": "0.0.0"
+}
