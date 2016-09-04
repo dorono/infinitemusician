@@ -1,5 +1,7 @@
 jQuery(document).ready(function ($) {
-    $('.product-remove .remove').on('click', function () {
-      console.log('test');
-    }); 
+    $(document).on('click', function (evt) {
+      console.log('evt', evt.target.className);
+      var anchorEl = $(this).find('.product-remove a');
+      console.log('this is it yo', anchorEl.attr('class'));
+    });
 });
