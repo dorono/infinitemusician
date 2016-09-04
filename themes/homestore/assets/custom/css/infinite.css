@@ -11,16 +11,17 @@
 .postid-11.single-product .wc-tabs-wrapper,
 .postid-11.single-product .price,
 .postid-11.single-product div.product_meta,
-.postid-11.single-product div.product .single_variation .price {
+.postid-11.single-product div.product .single_variation .price,
+.woocommerce-shipping-fields {
   display: none;
 }
 
-/* line 16, ../../scss/infinite.scss */
+/* line 17, ../../scss/infinite.scss */
 #hero {
   margin-bottom: 20px;
 }
 
-/* line 20, ../../scss/infinite.scss */
+/* line 21, ../../scss/infinite.scss */
 .woocommerce-error,
 .woocommerce-info,
 .woocommerce-message,
@@ -29,8 +30,13 @@ p.no-comments {
   padding: 7px;
 }
 
+/* line 30, ../../scss/infinite.scss */
+.opc_order_review .product-details {
+  width: 69%;
+}
+
 @media (min-width: 768px) {
-  /* line 29, ../../scss/infinite.scss */
+  /* line 36, ../../scss/infinite.scss */
   .postid-11.storefront-full-width-content.single-product div.product .images {
     margin-bottom: 0;
   }

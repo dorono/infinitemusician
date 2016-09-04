@@ -9,7 +9,8 @@
 .postid-11.single-product .wc-tabs-wrapper,
 .postid-11.single-product .price,
 .postid-11.single-product div.product_meta,
-.postid-11.single-product div.product .single_variation .price {
+.postid-11.single-product div.product .single_variation .price,
+.woocommerce-shipping-fields {
 	display: none;
 }
 
@@ -23,6 +24,12 @@
 .woocommerce-noreviews,
 p.no-comments {
 	padding: 7px;
+}
+
+.opc_order_review {
+		.product-details {
+			width: 69%;
+		}
 }
 
 @media (min-width: 768px) {
