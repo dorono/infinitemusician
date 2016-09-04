@@ -1,0 +1,239 @@
+/**
+ * Quick Checkout Frontend CSS
+ */
+
+.qc-clearfix {
+	*zoom: 1
+}
+
+.qc-clearfix:before, .qc-clearfix:after {
+	display: table;
+	line-height: 0;
+	content: ""
+}
+
+.qc-clearfix:after {
+	clear: both
+}
+
+div[id^="quick-checkout-"] {
+	position: relative;
+	display: none;
+	clear: both;
+}
+
+.mfp-content div[id^="quick-checkout-"] {
+	display: block;
+}
+
+.quick-checkout-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: url('../img/disabled-bg.png') repeat 0 0 transparent;
+}
+
+.quick-checkout-overlay.disabled {
+	background: none;
+}
+
+a.quick-checkout-button-image-overlay {
+	font: 12px/14px Arial, Helvetica, sans-serif;
+	color: #FFF;
+	text-decoration: none;
+	padding: 6px 24px 8px;
+	border: 1px solid #474747;
+	-moz-border-radius: 50px;
+	-webkit-border-radius: 50px;
+	border-radius: 50px;
+	outline: none;
+	background: #222;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#1A1A1A), to(#434343));
+	background: -webkit-linear-gradient(top, #434343, #1A1A1A);
+	background: -moz-linear-gradient(top, #434343, #1a1a1a);
+	background: -ms-linear-gradient(top, #434343, #1a1a1a);
+	background: -o-linear-gradient(top, #434343, #1a1a1a);
+	background: linear-gradient(top, #434343, #1a1a1a);
+	z-index: 9999;
+}
+
+.woocommerce a.quick-checkout-button-image-overlay.loading:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	margin: 0;
+	padding: 0;
+	background: url('../img/ajax-loader.gif') center no-repeat rgba(128, 128, 128, 0.95);
+	border: 1px solid #757575;
+	display: block;
+	-moz-border-radius: 50px;
+	-webkit-border-radius: 50px;
+	border-radius: 50px;
+}
+
+.woocommerce a.quick-checkout-button-image-overlay:hover {
+	color: #FFF;
+	text-decoration: none !important;
+}
+
+.loading-quick-checkout {
+	background: url('../img/ajax-loader@2x.gif') no-repeat center center rgba(0, 0, 0, 0.05);
+	min-height: 200px;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+}
+
+.qc-loading, .mfp-preloader {
+	background: url('../img/ajax-loader@2x.gif') no-repeat center center #fff;
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	margin: 0 auto;
+	display: block;
+	text-indent: -500%;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.qc-loading .mfp-close {
+	display: none !important;
+}
+
+.qc-trigger-autoload.quick-checkout-button,
+.qc-trigger-autoload.quick-checkout-button.button {
+	display: none !important;
+}
+
+/* Ensure Stripe Modal Displays over Quick Checkout Modal */
+.stripe_checkout_app {
+	z-index: 2147483646 !important;
+}
+
+/*----------------------------
+Shop Pages
+-----------------------------*/
+
+.woocommerce a.quick-checkout-button-image-overlay {
+	position: absolute;
+	display: none;
+}
+
+/* Buy Now button hover on product images */
+.woocommerce-shop div.product:hover a.qc-buy-now-centered,
+.woocommerce li.product:hover a.qc-buy-now-centered,
+.single-product .images:hover a.qc-buy-now-centered,
+.woocommerce .quick-checkout-active-loading a.qc-buy-now-centered,
+.woocommerce a.quick-checkout-button-image-overlay.loading {
+	display: block;
+}
+
+.quick-checkout-now.loading:after {
+	width: 15px;
+	height: 12px;
+	background: url('../img/ajax-loader.gif') no-repeat center center rgba(0, 0, 0, 0);
+	content: "";
+	display: inline-block;
+	padding-left: 5px;
+}
+
+.quick-checkout-button, .quick-checkout-product {
+	position: relative;
+}
+
+body.woocommerce button.quick-checkout-product.loading:before, body.woocommerce a.quick-checkout-product.loading:before, body.woocommerce button.quick-checkout-product.loading:before, body.woocommerce a.quick-checkout-product.loading:before, .quick-checkout-button.loading:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	background: url('../img/ajax-loader.gif') center no-repeat rgba(255, 255, 255, 0.65);
+}
+
+/* Prevent other themes from adding a psuedo after which would result in two loading animations on one button */
+body.woocommerce button.quick-checkout-product.loading:after, body.woocommerce a.quick-checkout-product.loading:after, body.woocommerce button.quick-checkout-product.loading:after, body.woocommerce a.quick-checkout-product.loading:after, .quick-checkout-button.loading:after {
+	display: none;
+}
+
+/*------------------------------
+Product Pages
+-------------------------------*/
+
+.woocommerce button.button.quick-checkout-product-before {
+	margin-right: 4px;
+}
+
+.woocommerce button.button.quick-checkout-product-after {
+	margin-left: 4px;
+}
+
+div.images:hover button.qc-buy-now-centered {
+	display: block;
+}
+
+/*------------------------------
+Shortcode QC Buttons
+-------------------------------*/
+.quick-checkout-button-shortcode {
+	display: inline-block;
+	margin: 0 0 15px;
+}
+
+/*------------------------------
+iFrame
+-------------------------------*/
+body.quick-checkout-frame {
+	display: none;
+	height:auto !important;
+}
+
+body.quick-checkout-frame, html {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+body.quick-checkout-frame div.woocommerce {
+	background-color: white;
+	padding: 20px;
+}
+
+/*------------------------------
+Themes
+-------------------------------*/
+
+body.quick-checkout-frame .fusion-header-wrapper {
+	display: none;
+}
+
+body.quick-checkout-frame #main {
+	padding: 0;
+}
+
+body.quick-checkout-frame #main-content .container {
+	padding: 0 !important;
+	margin: 0 auto !important;
+	width: 100%;
+}
+
+body.quick-checkout-frame #page-container {
+	padding-top: 0 !important;
+}
+
+body.quick-checkout-frame .entry-content {
+	margin-top: 0;
+}
+
+body.quick-checkout-frame .col-full {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+/* Hide any Woo widgets */
+body.quick-checkout-frame .widget.woocommerce {
+	display:none !important;
+}

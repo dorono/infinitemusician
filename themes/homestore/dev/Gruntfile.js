@@ -17,9 +17,9 @@ module.exports = function(grunt) {
             app: '../',
             temp: '.tmp',
             cssSrc: 'scss',
-            cssDest: 'assets/custom/css',
+            cssDest: '../../plugins/theme-customisations-master/custom',
             jsSrc: 'js',
-            jsDest: 'assets/custom/js',
+            jsDest: '../../plugins/theme-customisations-master/custom',
             imgSrc: 'img',
             imgDest: 'assets/custom/img'
         },
@@ -63,7 +63,7 @@ module.exports = function(grunt) {
         concat: {
             scripts: {
                 files: {
-                    '<%= config.app %>/<%= config.jsDest %>/infinite.js': [
+                    '<%= config.app %>/<%= config.jsDest %>/custom.js': [
                         '<%= config.jsSrc %>/main.js'
                     ]
                 }
@@ -76,7 +76,7 @@ module.exports = function(grunt) {
             },
             my_target: {
                 files: {
-                    '<%= config.app %>/<%= config.jsDest %>/infinite.js': ['<%= config.app %>/<%= config.jsDest %>/infinite.js']
+                    '<%= config.app %>/<%= config.jsDest %>/custom.js': ['<%= config.app %>/<%= config.jsDest %>/custom.js']
                 }
             }
         },
@@ -90,7 +90,7 @@ module.exports = function(grunt) {
                 dest: '<%= config.app %>/<%= config.cssDest %>/',
                 src: '**/*.css',
                 rename: function(dest, src) {
-                    return dest + src.replace(/master.css/, 'infinite.css');
+                    return dest + src.replace(/master.css/, 'style.css');
                 }
             },
 

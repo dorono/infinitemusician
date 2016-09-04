@@ -1,0 +1,475 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Quick Checkout\n"
+"POT-Creation-Date: 2015-03-04 20:11-0800\n"
+"PO-Revision-Date: 2015-03-04 20:51-0800\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.7.4\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:55
+#: classes/class-woocommerce-quick-checkout-admin.php:56
+#: classes/class-woocommerce-quick-checkout-admin.php:310
+msgid "Quick Checkout"
+msgstr "Quick Checkout"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:70
+msgid "Quick Checkout License"
+msgstr "Licencia de Quick Checkout"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:72
+#, php-format
+msgid ""
+"This settings page is where you manage your license for Quick Checkout. If "
+"you are looking for the plugin options page <a href=\"%s\">click here</a> to "
+"be taken to that page."
+msgstr ""
+"Esta página de configuración es donde gestionar tu licencia para Quick "
+"Checkout. Si usted está buscando el plugin Opciones página <a href=\"%s"
+"\">haga clic aquí</a> ingresar a esa página."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:179
+#: classes/class-woocommerce-quick-checkout-admin.php:488
+msgid "Checkout position"
+msgstr "Posición de comprobación"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:180
+#: classes/class-woocommerce-quick-checkout-admin.php:489
+msgid ""
+"This controls where the checkout will be revealed once the user chooses to "
+"checkout using the quick cart button. This only applies to when the \"Reveal "
+"checkout on product post\" option is enabled."
+msgstr ""
+"Controla donde la extracción será revelada una vez que el usuario elige "
+"checkout usando el botón carrito rápido. Esto sólo se aplica cuando está "
+"habilitada la opción \"Reveal verificación de entrada de producto\"."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:185
+#: classes/class-woocommerce-quick-checkout-admin.php:495
+msgid "After single product"
+msgstr "Opciones de visualización de página de tienda"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:189
+#: classes/class-woocommerce-quick-checkout-admin.php:496
+msgid "Before single product"
+msgstr "Antes solo producto"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:193
+#: classes/class-woocommerce-quick-checkout-admin.php:497
+msgid "After single product summary"
+msgstr "﻿Después del resumen del producto"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:197
+#: classes/class-woocommerce-quick-checkout-admin.php:498
+msgid "Before single product summary"
+msgstr "Antes solo producto Resumen"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:200
+#: classes/class-woocommerce-quick-checkout-admin.php:499
+msgid "After main content"
+msgstr "Después del Contenido"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:201
+#: classes/class-woocommerce-quick-checkout-admin.php:500
+msgid "Before main content"
+msgstr "Antes del Contenido"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:203
+#: classes/class-woocommerce-quick-checkout-admin.php:501
+msgid "After add to cart form"
+msgstr "Después de  \"Añadir al Carrito\""
+
+#: classes/class-woocommerce-quick-checkout-admin.php:207
+#: classes/class-woocommerce-quick-checkout-admin.php:502
+msgid "Within product summary"
+msgstr "Resumen de producto"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:285
+msgid "Go to the settings page"
+msgstr "Ir a la página de configuración"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:285
+msgid "Settings"
+msgstr "Ajustes"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:323
+msgid "Shop Page Display Options"
+msgstr "Opciones de visualización de página de tienda"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:325
+msgid ""
+"Manage how Quick Checkout displays on your website's shop page. The shop "
+"page displays the entire catalog of products."
+msgstr ""
+"Gestionar cómo Quick Checkout muestra en su página de tienda. La página de "
+"la tienda muestra todo el catálogo de productos."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:329
+msgid "Shop Page"
+msgstr "Página de la tienda"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:330
+msgid "Enable Quick Checkout on the WooCommerce shop page"
+msgstr "Habilitar comprobación rápida en la página de la tienda de WooCommerce"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:335
+msgid "Check to enable the Quick Checkout option for WooCommerce shop pages."
+msgstr ""
+"Asegúrese de activar la opción de comprobación rápida para páginas de tienda "
+"WooCommerce."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:339
+#: classes/class-woocommerce-quick-checkout-admin.php:449
+msgid "Clear user's cart before opening checkout"
+msgstr "Borrar carrito del usuario antes de comprobación de apertura"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:347
+#: classes/class-woocommerce-quick-checkout-admin.php:457
+msgid "Quick Checkout Display"
+msgstr "Comprobación rápida visualización"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:348
+#: classes/class-woocommerce-quick-checkout-admin.php:470
+msgid "Display Quick Checkout button on product image hover"
+msgstr "Mostrar botón Quick Checkout en hover imagen de producto"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:349
+msgid ""
+"Shows a Quick Checkout button upon product image hover; only supports the "
+"simple product type"
+msgstr ""
+"Muestra un botón Quick Checkout al suspender de la imagen de producto; Sólo "
+"es compatible con el tipo de producto simple"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:356
+msgid "Reveal Quick Checkout link after product added to cart"
+msgstr "Revelan enlace Quick Checkout después producto añadido a la cesta"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:360
+#, php-format
+msgid ""
+"Enable AJAX add to cart buttons on archives option must be enabled in <a "
+"href=\"%s\" target=\"_blank\">WooCommerce Product Settings</a>."
+msgstr ""
+"Habilitar AJAX añadir al carro de los botones de opción de archivos debe "
+"estar habilitada en la <a href=\"%s\" target=\"_blank\">Configuración del "
+"producto WooCommerce</a>."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:364
+msgid "Hover Button Text"
+msgstr "Texto botón activable"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:367
+#: classes/class-woocommerce-quick-checkout-admin.php:510
+#: classes/class-woocommerce-quick-checkout-shortcodes.php:44
+#: classes/class-woocommerce-quick-checkout-shortcodes.php:122
+msgid "Buy Now"
+msgstr "Comprar Ahora"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:372
+msgid "Reveal Link Text"
+msgstr "Revelar el texto de enlace"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:375
+#: classes/class-woocommerce-quick-checkout-shortcodes.php:47
+#: classes/class-woocommerce-quick-checkout-shortcodes.php:263
+msgid "Checkout Now"
+msgstr "Pagar Ahora"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:380
+msgid "Shop Action"
+msgstr "Tienda Acción"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:385
+msgid ""
+"This option is important as it will affect how Quick Checkout functions on "
+"the shop page."
+msgstr ""
+"Esta opción es importante pues afectará cómo funciona Quick Checkout en la "
+"página de la tienda."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:387
+msgid "Open checkout in a responsive lightbox"
+msgstr "Caja abierta en un lightbox responsivo"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:388
+msgid "Reveal checkout on shop page"
+msgstr "Revelan desprotección en la página de la tienda"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:392
+msgid "Checkout Position"
+msgstr "Posición de Comprobación"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:393
+msgid ""
+"This controls where the checkout will be revealed once the user chooses to "
+"checkout using the Quick Checkout button. This only applies to when the "
+"\"Reveal checkout on shop page\" option is enabled."
+msgstr ""
+"Controla donde la extracción será revelada una vez que el usuario elige "
+"checkout usando el botón Quick Checkout. Esto sólo se aplica cuando está "
+"habilitada la opción \"Verificación de revelar en la página de la tienda\"."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:399
+msgid "Above shop loop"
+msgstr "Por encima de bucle de tienda"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:400
+msgid "Below shop loop"
+msgstr "Debajo de bucle de tienda"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:407
+msgid "Individual Product Post Display Options"
+msgstr "Opciones de visualización de correos producto individual"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:409
+msgid ""
+"Provides full control over Quick Checkout on single product posts. Options "
+"set on the individual product post level override global settings."
+msgstr ""
+"Proporciona control completo sobre Quick Checkout en solo producto postes. "
+"Opciones establecidas en el producto individual de correos anulación nivel "
+"configuración global."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:413
+msgid "Single Products"
+msgstr "Cada producto"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:414
+msgid "Enable Quick Checkout Metabox for the WooCommerce Product Type"
+msgstr ""
+"Habilitar Metabox de comprobación rápida para el tipo de producto WooCommerce"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:419
+#, php-format
+msgid ""
+"Check to enable the Quick Checkout metabox for WooCommerce <a href=\"%s"
+"\">single product posts</a>."
+msgstr ""
+"Compruebe para habilitar la comprobación rápida metabox para WooCommerce <a "
+"href=\"%s\">solo producto entradas</a>."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:425
+msgid "Global Product Post Display Options"
+msgstr "Opciones de visualización de producto global Post"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:427
+msgid ""
+"Manage how Quick Checkout displays globally for WooCommerce single product "
+"posts. Individual product Quick Checkout settings will override global "
+"settings."
+msgstr ""
+"Gestionar cómo Quick Checkout muestra globalmente para puestos solo producto "
+"WooCommerce. Configuración del producto individual Quick Checkout anulará la "
+"configuración global."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:431
+msgid "All Products"
+msgstr "Todos los Productos"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:432
+msgid "Enable Quick Checkout globally for individual product posts"
+msgstr ""
+"Habilitar comprobación rápida a nivel mundial para productos individuales "
+"puestos"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:437
+msgid "Check to enable Quick Checkout on all WooCommerce single product posts."
+msgstr ""
+"Marque si desea habilitar la comprobación rápida en todos los mensajes de "
+"WooCommerce solo producto."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:441
+msgid "Display Quick Checkout on Related Products"
+msgstr "Mostrar Quick Checkout en productos relacionados"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:462
+msgid ""
+"This option is important as it will affect how the quick cart functions on "
+"the shop page."
+msgstr ""
+"Esta opción es importante pues afectará cómo funciona el carro rápido en la "
+"página de la tienda."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:464
+msgid "Add Quick Checkout button after the Add to Cart button "
+msgstr "Botón Quick Checkout agregar después el botón Añadir a carro"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:465
+msgid "Add Quick Checkout button before the Add to Cart button "
+msgstr "Añadir botón Quick Checkout antes de añadir al carrito"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:466
+msgid "Replace the Add to Cart button with Quick Checkout button"
+msgstr "Vuelva a colocar el botón Añadir a carro con botón Quick Checkout"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:476
+msgid "Quick Checkout Action"
+msgstr "Quick Checkout acción"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:481
+msgid ""
+"This option is important as it will affect how the quick checkout functions "
+"when a user clicks it on the product post."
+msgstr ""
+"Esta opción es importante pues afectará cómo funciona la extracción rápida "
+"cuando un usuario hace clic en él en el post de producto."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:483
+msgid "Open checkout in a WooCommerce lightbox"
+msgstr "Caja abierta en una caja de luz WooCommerce"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:484
+msgid "Reveal checkout within product post content"
+msgstr "Revelan desprotección dentro del contenido del post de producto"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:507
+msgid "Product Button Text"
+msgstr "Texto botón activable"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:517
+msgid "Shortcode Display Options"
+msgstr "Opciones de visualización de página de tienda"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:519
+msgid ""
+"WooCommerce includes a number of shortcodes that many page builders use to "
+"output products. If you are using a popular theme such as Divi or X theme "
+"then be sure to enable support for shortcodes if you wish to use Quick "
+"Checkout. "
+msgstr ""
+"WooCommerce incluye una serie de códigos cortos que muchos constructores de "
+"página se utilizan para productos de salida. Si usted está usando un tema "
+"popular como Divi o tema X Asegúrese de habilitar el soporte para códigos "
+"cortos Si desea utilizar Quick Checkout."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:519
+#, php-format
+msgid ""
+"The following shortcodes are supported by Quick Checkout. Read more about  "
+"<a href=\"%s\" target=\"_blank\" class=\"new-window\">WooCommerce "
+"shortcodes</a>. If enabled, the shortcodes will display a \"Buy Now\" button "
+"display on hover which opens Quick Checkout in a modal window upon click."
+msgstr ""
+"Los siguientes códigos cortos son apoyados por Quick Checkout. Leer más "
+"sobre <a href=\"%s\" target=\"_blank\" class=\"new-window\">WooCommerce "
+"shortcodes</a>. Si está habilitado, los shortcodes mostrará una pantalla "
+"\"Compre ahora\" botón en hover que abre una ventana modal sobre haga clic "
+"en comprobación rápida."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:523
+msgid "Display for Shortcodes"
+msgstr "Pantalla para Shortcodes"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:524
+msgid ""
+"Recent Products - Example: <code>[recent_products per_page=\"12\" columns="
+"\"4\"]</code>"
+msgstr ""
+"Productos recientes - ejemplo:<code>[recent_products per_page=\"12\" columns="
+"\"4\"]</code>"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:531
+msgid ""
+"Featured Products - Example: <code>[featured_products per_page=\"12\" "
+"orderby=\"menu_order\"]</code>"
+msgstr ""
+"Productos destacados - ejemplo:<code>[featured_products per_page=\"12\" "
+"orderby=\"menu_order\"]</code>"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:538
+msgid ""
+"Best Selling Products - Example: <code>[best_selling_products per_page="
+"\"12\" orderby=\"menu_order\"]</code>"
+msgstr ""
+"Mejor venta de productos - ejemplo:<code>[best_selling_products per_page="
+"\"12\" orderby=\"menu_order\"]</code>"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:545
+msgid ""
+"Top Rated Products - Example: <code>[top_rated_products per_page=\"12\" "
+"orderby=\"menu_order\"]</code>"
+msgstr ""
+"Los mejores productos - ejemplo:<code>[top_rated_products per_page=\"12\" "
+"orderby=\"menu_order\"]</code>"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:552
+msgid ""
+"Sale Products - Example: <code>[sale_products per_page=\"12\" orderby="
+"\"menu_order\"]</code>"
+msgstr ""
+"Venta productos - ejemplo:<code>[sale_products per_page=\"12\" orderby="
+"\"menu_order\"]</code>"
+
+#: classes/class-woocommerce-quick-checkout-admin.php:573
+msgid "You do not have sufficient permissions to access this page."
+msgstr "No tienes los permisos necesarios para acceder a esta página."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:585
+msgid ""
+"Welcome to Quick Checkout for WooCommerce! This plugin speeds up the "
+"WooCommerce checkout process by allowing users to purchase products on "
+"virtually any page with fewer clicks and no page reload. Insert checkout "
+"forms directly on single product posts, on the product listing page (also "
+"called the catalog/shop page), as well as any other page or post."
+msgstr ""
+"¡Bienvenido a Quick Checkout para WooCommerce! Este plugin acelera el "
+"proceso de compra, permitiendo a los usuarios a comprar productos en "
+"prácticamente cualquier página con pocos tecleos y ninguna página de recarga "
+"de WooCommerce. Insertar formas de pago directamente en puestos solo "
+"producto, el producto listado página (también llamado la página Catálogo/"
+"tienda), así como cualquier otra página o post."
+
+#: classes/class-woocommerce-quick-checkout-admin.php:587
+#, php-format
+msgid ""
+"For more information and instructions please visit <a href=\"%1s\" target="
+"\"_blank\" class=\"new-window\">Quick Checkout Documentation</a>. We "
+"appreciate your purchase and stand by supporting our product. If you require "
+"<a href=\"%2s\" target=\"_blank\" class=\"new-window\">support</a> please "
+"first consult the documentation and if your answer is not found then feel "
+"free to post a support topic."
+msgstr ""
+"Para más información e instrucciones, visite <a href=\"%1s\" target=\"_blank"
+"\" class=\"new-window\">Quick Checkout documentación</a>. Agradecemos su "
+"compra y soporte mediante el apoyo a nuestro producto. Si necesita <a href="
+"\"%2s\" target=\"_blank\" class=\"new-window\">ayuda</a> consulte primero la "
+"documentación y si su respuesta no se encuentra entonces se sienten libres "
+"para publicar un tema de ayuda."
+
+#: woocommerce-quick-checkout.php:54
+msgid "WooCommerce Quick Checkout"
+msgstr "WooCommerce Quick Checkout"
+
+#: woocommerce-quick-checkout.php:105
+#, php-format
+msgid ""
+"The <strong>WooCommerce Quick Checkout</strong> extension requires at least "
+"WooCommerce %s in order to function properly. Please install or upgrade the "
+"WooCommerce plugin in order to use the WooCommerce Quick Checkout plugin."
+msgstr ""
+"La extensión <strong>WooCommerce Quick Checkout</strong> requiere por lo "
+"menos WooCommerce %s para poder funcionar correctamente. Por favor, instalar "
+"o actualizar el plugin WooCommerce para poder utilizar el plugin WooCommerce "
+"Quick Checkout."
+
+#~ msgid "Select Color"
+#~ msgstr "Seleccionar Color"
+
+#~ msgid "Current Color"
+#~ msgstr "Color Actual"
+
+#~ msgid "Save"
+#~ msgstr "Ahorrar"

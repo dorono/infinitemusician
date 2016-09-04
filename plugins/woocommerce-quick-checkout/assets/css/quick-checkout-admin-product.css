@@ -1,0 +1,20 @@
+/**
+ * Quick Checkout Admin CSS
+ */
+
+
+/*-----------------------------
+Metabox
+-------------------------------*/
+
+.cmb_id_qc_single_product_checkout_display_position {
+	display: none;
+}
+
+.cmb_id_qc_global_info .cmb_metabox_title {
+	font-size: 14px;
+}
+
+.cmb_id_qc_global_info .cmb_metabox_description {
+	font-size:13px;
+}
