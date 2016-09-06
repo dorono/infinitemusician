@@ -20,3 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  function jk_remove_sticky_checkout() {
    wp_dequeue_script( 'storefront-sticky-payment' );
  }
+
+// Possible future use for overriding jump to top of page 
+ // add_action( 'wp_enqueue_scripts', 'remove_onepage_checkout_js', 99 );
+ //
+ // function remove_onepage_checkout_js() {
+ //  wp_dequeue_script('woocommerce-one-page-checkout');
+ // }
