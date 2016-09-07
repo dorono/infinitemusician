@@ -1,6 +1,15 @@
+
 jQuery(document).ready(function($) {
   $( 'body' ).on( 'updated_checkout', function () {
-    console.log('this one is working!');
+    if ($(this).hasClass('just-removed')) {
+      console.log('it is happening');
+      $(this).removeClass('just-removed');
+
+      $(this).unbind('updated_checkout');
+      setTimeout(function () {
+        $(this).bind('updated_checkout');
+      }, 600);
+    }
   });
 
 
@@ -8,10 +17,7 @@ jQuery(document).ready(function($) {
     var $woocommerceCheckout = $(document).find('.woocommerce-checkout');
     var $productInfo = $('.postid-11.single-product div.product').find('.images, .entry-summary');
 
-    console.log("$woocommerceCheckout.find('.product-remove a')", $woocommerceCheckout.find('.product-remove a'));
-
     if ($woocommerceCheckout.find('.product-remove a').length < 1) {
-      console.log('we should show it');
       $productInfo.show();
     }
 
@@ -22,6 +28,7 @@ jQuery(document).ready(function($) {
         if (linkClass === anchorEl) {
           $productInfo.show();
           window.scrollTo(0, 0);
+          $('body').addClass('just-removed');
         }
 
     });

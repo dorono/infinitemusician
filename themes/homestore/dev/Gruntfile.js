@@ -56,6 +56,8 @@ module.exports = function(grunt) {
             },
             all: [
                 '<%= config.jsSrc %>/{,*/}*.js',
+                '<%= config.jsSrc %>/main.js',
+                '!<%= config.jsSrc %>/one-page-checkout-custom.js',
                 '!<%= config.app %>/<%= config.jsSrc %>/global.js'
             ]
         },
@@ -64,7 +66,8 @@ module.exports = function(grunt) {
             scripts: {
                 files: {
                     '<%= config.app %>/<%= config.jsDest %>/custom.js': [
-                        '<%= config.jsSrc %>/main.js'
+                      '<%= config.jsSrc %>/one-page-checkout-custom.js',
+                      '<%= config.jsSrc %>/main.js'
                     ]
                 }
             }
