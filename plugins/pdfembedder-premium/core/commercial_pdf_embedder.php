@@ -201,6 +201,12 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
             }
 
             echo '<br class="clear" />';
+
+	        if (isset($license_status['download_link'])) {
+		        echo '<p>Download latest plugin ZIP <a href="'.$license_status['download_link'].'" target="_blank">here</a></p>';
+		        echo '<br class="clear" />';
+	        }
+
         }
 
         echo '</div>';
@@ -213,13 +219,13 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
             $license_key = $options['pdfemb_license_key'];
         }
 
-        if( !class_exists( 'EDD_SL_Plugin_Updater9' ) ) {
+        if( !class_exists( 'EDD_SL_Plugin_Updater10' ) ) {
             // load our custom updater
             include( dirname( __FILE__ ) . '/EDD_SL_Plugin_Updater.php' );
         }
 
         // setup the updater
-        $edd_updater = new EDD_SL_Plugin_Updater9( $this->WPPDF_STORE_URL, $this->my_plugin_basename(),
+        $edd_updater = new EDD_SL_Plugin_Updater10( $this->WPPDF_STORE_URL, $this->my_plugin_basename(),
             array(
                 'version' 	=> $this->PLUGIN_VERSION,
                 'license' 	=> $license_key,

@@ -422,8 +422,6 @@ jQuery(document).ready(function ($) {
             canvas.css('width', wantCanvasWidth);
             canvas.css('height', wantCanvasHeight);
 
-            canvas[0].getContext("2d").setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
-
             canvas.css('left', canvasHMargin).css('top', canvasVMargin);
 		      
             // Need to pan?
@@ -469,14 +467,10 @@ jQuery(document).ready(function ($) {
                     .attr("width", canvasImg.width)
                     .attr("height", canvasImg.height)[0];
 
-                // newCanvas.getContext("2d").setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
-
                 newCanvas.getContext("2d").putImageData(canvasImg, 0, 0);
 
-                canvasCxt.scale(wantCanvasWidth/(oldCanvasWidth*PIXEL_RATIO), wantCanvasHeight/(oldCanvasHeight*PIXEL_RATIO));
+                canvasCxt.scale(wantCanvasWidth/(oldCanvasWidth), wantCanvasHeight/(oldCanvasHeight));
                 canvasCxt.drawImage(newCanvas, 0, 0);
-
-
 
                 return;
             }
@@ -485,8 +479,14 @@ jQuery(document).ready(function ($) {
             var ctx = canvas[0].getContext('2d');
             var renderContext = {
                 canvasContext: ctx,
-                viewport: viewport
+                viewport: viewport,
+                transform: [PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0]
             };
+
+            // No longer set transform on ctx explicitly
+            // ctx.setTransform(PIXEL_RATIO, 0, 0, PIXEL_RATIO, 0, 0);
+            // This was not always being picked up first time on some browsers - set via renderContext instead above
+
             var renderTask = page.render(renderContext);
 
             // Wait for rendering to finish

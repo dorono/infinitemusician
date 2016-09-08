@@ -1,5 +1,6 @@
 
 var pdfembGrabToPan = (function GrabToPanClosure() {
+
     /**
      * Construct a GrabToPan instance for a given HTML element.
      * @param options.element {Element}

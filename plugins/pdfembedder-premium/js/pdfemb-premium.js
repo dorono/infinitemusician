@@ -595,6 +595,7 @@ function pdfembPremiumPreRenderCanvas($, ctx, watermark_map, zoom) {
     var xmargin=5, y=10;
     var xalign = 'center';
     var rotate = 45;
+    var fontsize = 20;
     for (var i=0 ; i < watermark_map.length ; ++i) {
         var thisMap = watermark_map[i];
         if ($.isArray(thisMap) && thisMap.length >= 1) {
@@ -605,7 +606,7 @@ function pdfembPremiumPreRenderCanvas($, ctx, watermark_map, zoom) {
             ctx.fillStyle = "#444444";
             ctx.lineStyle = "#111111";
             ctx.textAlign = 'left';
-            ctx.font = '40pt sans-serif';
+            ctx.font = '20pt sans-serif';
             ctx.globalAlpha = 0.1;
             if (thisMap.length >= 2) {
                 xmargin = thisMap[1];
@@ -619,10 +620,16 @@ function pdfembPremiumPreRenderCanvas($, ctx, watermark_map, zoom) {
                         if (thisMap.length >= 5) {
                             rotate = thisMap[4];
 
-                            if (thisMap.length >= 6 && typeof(thisMap[5]) == 'object') {
-                                var styleList = thisMap[5];
-                                for (var prop in styleList) {
-                                    ctx[prop] = styleList[prop];
+                            if (thisMap.length >= 6) {
+                                fontsize = thisMap[5];
+
+                                ctx.font = (Math.round(100*fontsize*(ctx.canvas.width/1000))/100)+'pt sans-serif';
+
+                                if (thisMap.length >= 7 && typeof(thisMap[6]) == 'object') {
+                                    var styleList = thisMap[6];
+                                    for (var prop in styleList) {
+                                        ctx[prop] = styleList[prop];
+                                    }
                                 }
                             }
                         }
@@ -633,25 +640,32 @@ function pdfembPremiumPreRenderCanvas($, ctx, watermark_map, zoom) {
             var mtwidth = ctx.measureText(text).width;
             var mtheight = 10;
 
-            var drawx, drawy = ctx.canvas.clientHeight * y / 100;
+            var drawx, drawy = ctx.canvas.height * y / 100;
+            var textx, texty;
 
             if (xalign == 'left') {
-                drawx = ctx.canvas.clientWidth * xmargin / 100;
+                drawx = ctx.canvas.width * xmargin / 100;
+                textx = 0;
+                texty = 0;
             }
             else if (xalign == 'right') {
-                drawx = ctx.canvas.clientWidth * ( 1 - xmargin / 100 ) - mtwidth;
+                drawx = ctx.canvas.width * ( 1 - xmargin / 100 );
+                textx = -mtwidth;
+                texty = 0;
             }
             else {
-                drawx = (ctx.canvas.clientWidth - mtwidth) / 2;
+                drawx = (ctx.canvas.width) / 2;
+                textx =  -mtwidth / 2;
+                texty = 0;
             }
 
-            ctx.translate(drawx + mtwidth / 2, drawy + mtheight / 2);
+            ctx.translate(drawx, drawy);
 
             ctx.rotate(-Math.PI * rotate / 360);
 
-            ctx.scale(zoom/100, zoom/100);
+            //ctx.scale(zoom/100, zoom/100);
 
-            ctx.fillText(text, -mtwidth / 2, - mtheight / 2);
+            ctx.fillText(text, textx, texty);
 
             ctx.restore();
 

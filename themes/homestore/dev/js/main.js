@@ -1,13 +1,9 @@
 jQuery(document).ready(function($) {
   $( 'body' ).on( 'updated_checkout', function () {
+    console.log('test');
     if ($(this).hasClass('just-removed')) {
-      console.log('it is happening');
-      $(this).removeClass('just-removed');
-
-      $(this).unbind('updated_checkout');
-      setTimeout(function () {
-        $(this).bind('updated_checkout');
-      }, 600);
+      console.log('clear it');
+      $(this).clearQueue();
     }
   });
 

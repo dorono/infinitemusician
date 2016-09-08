@@ -13,9 +13,9 @@
  * Allows plugins to use their own update API.
  *
  * @author Pippin Williamson and Dan Lester
- * @version 9
+ * @version 10
  */
-class EDD_SL_Plugin_Updater9 {
+class EDD_SL_Plugin_Updater10 {
 	private $api_url  = '';
 	private $api_data = array();
 	private $name     = '';
@@ -46,7 +46,7 @@ class EDD_SL_Plugin_Updater9 {
 		$this->name     = plugin_basename( $_plugin_file );
 		$this->slug     = basename( $_plugin_file, '.php');
 		$this->version  = $_api_data['version'];
-        $this->display_warnings = $display_warnings;
+		$this->display_warnings = $display_warnings;
 
 		if (is_null($license_status_optname)) {
 			$license_status_optname = 'eddsl_'.$this->slug;
@@ -301,6 +301,7 @@ class EDD_SL_Plugin_Updater9 {
 		$license_status['expires_time'] = null;
 		$license_status['expires_day'] = null;
 		$license_status['renewal_link'] = null;
+		$license_status['download_link'] = null;
 		if (isset($api_response->expires)) {
 			$expires_time = strtotime($api_response->expires);
 
@@ -312,6 +313,9 @@ class EDD_SL_Plugin_Updater9 {
 		}
 		if (isset($api_response->renewal_link)) {
 			$license_status['renewal_link'] = $api_response->renewal_link;
+		}
+		if (isset($api_response->download_link)) {
+			$license_status['download_link'] = $api_response->download_link;
 		}
 
 		// Compare to existing option if any
