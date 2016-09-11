@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
   $( 'body' ).on( 'updated_checkout', function () {
-    console.log('test');
+    console.log('test yo');
     if ($(this).hasClass('just-removed')) {
       console.log('clear it');
       $(this).clearQueue();

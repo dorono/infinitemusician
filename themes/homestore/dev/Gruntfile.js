@@ -19,10 +19,10 @@ module.exports = function(grunt) {
           cssSrc: 'scss',
           cssDest: '../../plugins/theme-customisations-master/custom',
           jsSrc: 'js',
-          jsDest: '../../plugins/theme-customisations-master/custom',
+          jsDest: '../../../../../plugins/theme-customisations-master/custom',
           imgSrc: 'img',
           imgDest: 'assets/custom/img',
-          OnePageCheckoutDest: '../../plugins/woocommerce-one-page-checkout/js',
+          OnePageCheckoutDest: '../../../../../plugins/woocommerce-one-page-checkout/js',
         },
 
         // enable SASS and Compass
@@ -79,7 +79,7 @@ module.exports = function(grunt) {
           },
           my_target: {
             files: {
-              '<%= config.app %>/<%= config.jsDest %>/custom.js': ['<%= config.app %>/<%= config.jsDest %>/custom.js']
+              ['<%= config.app %>/<%= config.jsDest %>/custom.js']: ['<%= config.app %>/<%= config.jsDest %>/custom.js']
             }
           }
         },
@@ -96,24 +96,14 @@ module.exports = function(grunt) {
               return dest + src.replace(/master.css/, 'style.css');
             }
           },
-
           scripts: {
-              expand: true,
-              dot: true,
-              files: [
-                {
-                  src: [
-                    '<%= config.jsSrc %>/**/*.js',
-                    '!one-page-checkout-custom.js'
-                  ],
-                  dest: '<%= config.jsDest %>'
-                }, {
-                  src: ['<%= config.jsSrc %>/one-page-checkout-custom.js'],
-                  dest: '<%= config.OnePageCheckoutDest %>'
-                }]
-              }
+            expand: true,
+            dot: true,
+            cwd: '<%= config.jsSrc %>',
+            dest: '../../../plugins/woocommerce-one-page-checkout/js',
+            src: ['one-page-checkout-custom.js']
           },
-
+        },
           // Empties folders to start fresh
           clean: {
             temp: {
