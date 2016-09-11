@@ -58,7 +58,7 @@ module.exports = function(grunt) {
           all: [
             '<%= config.jsSrc %>/{,*/}*.js',
             '<%= config.jsSrc %>/main.js',
-            '!<%= config.jsSrc %>/one-page-checkout-custom.js',
+            '!<%= config.jsSrc %>/one-page-checkout.js',
             '!<%= config.app %>/<%= config.jsSrc %>/global.js'
           ]
         },
@@ -99,17 +99,11 @@ module.exports = function(grunt) {
 
           scripts: {
             files: [
-              // {
-              //   expand: true,
-              //   cwd: '<%= config.jsSrc %>',
-              //   dest: '<%= config.jsDest %>/',
-              //   src: ['**/*.js']
-              // },
               {
                 expand: true,
                 dot: true,
                 cwd: '<%= config.jsSrc %>',
-                src: ['one-page-checkout-custom.js'],
+                src: ['one-page-checkout.js'],
                 dest: '../../../plugins/woocommerce-one-page-checkout/js/'
               }
             ]
