@@ -96,45 +96,51 @@ module.exports = function(grunt) {
               return dest + src.replace(/master.css/, 'style.css');
             }
           },
+
           scripts: {
-            expand: true,
-            dot: true,
-            cwd: '<%= config.jsSrc %>',
-            dest: '../../../plugins/woocommerce-one-page-checkout/js',
-            src: ['one-page-checkout-custom.js']
+            files: [
+              {
+                expand: true,
+                dot: true,
+                cwd: '<%= config.jsSrc %>',
+                src: ['one-page-checkout-custom.js'],
+                dest: '../../../plugins/woocommerce-one-page-checkout/js/'
+              }
+            ]
           },
         },
-          // Empties folders to start fresh
-          clean: {
-            temp: {
-              dot: true,
-              src: [
-                '<%= config.temp %>'
-              ]
-            }
-          },
 
-          watch: {
-            options: {
-              debounceDelay: 500,
-              livereload: true
-            },
-            gruntfile: {
-              files: 'Gruntfile.js'
-            },
-            styles: {
-              files: '<%= config.cssSrc %>/**/*.scss',
-              tasks: ['compass', 'copy:styles']
-            },
-            html: {
-              files: '<%= config.app %>/**/*.{html,php}'
-            },
-            scripts: {
-              files: '<%= config.jsSrc %>/**/*.js',
-              tasks: ['jshint', 'concat']
-            }
+        // Empties folders to start fresh
+        clean: {
+          temp: {
+            dot: true,
+            src: [
+              '<%= config.temp %>'
+            ]
           }
-        });
+        },
+
+        watch: {
+          options: {
+            debounceDelay: 500,
+            livereload: true
+          },
+          gruntfile: {
+            files: 'Gruntfile.js'
+          },
+          styles: {
+            files: '<%= config.cssSrc %>/**/*.scss',
+            tasks: ['compass', 'copy:styles']
+          },
+          html: {
+            files: '<%= config.app %>/**/*.{html,php}'
+          },
+          scripts: {
+            files: '<%= config.jsSrc %>/**/*.js',
+            tasks: ['jshint', 'concat']
+          }
+        }
+      });
 
       grunt.registerTask('default', [
         'clean:temp',
