@@ -19,10 +19,10 @@ module.exports = function(grunt) {
           cssSrc: 'scss',
           cssDest: '../../plugins/theme-customisations-master/custom',
           jsSrc: 'js',
-          jsDest: '../../../../../plugins/theme-customisations-master/custom',
+          jsDest: '../../../plugins/theme-customisations-master/custom',
           imgSrc: 'img',
           imgDest: 'assets/custom/img',
-          OnePageCheckoutDest: '../../../../../plugins/woocommerce-one-page-checkout/js',
+          OnePageCheckoutDest: '../../../plugins/woocommerce-one-page-checkout/js',
         },
 
         // enable SASS and Compass
@@ -66,7 +66,7 @@ module.exports = function(grunt) {
         concat: {
           scripts: {
             files: {
-              '<%= config.app %>/<%= config.jsDest %>/custom.js': [
+              '<%= config.jsDest %>/custom.js': [
                 '<%= config.jsSrc %>/main.js'
               ]
             }
@@ -99,6 +99,12 @@ module.exports = function(grunt) {
 
           scripts: {
             files: [
+              // {
+              //   expand: true,
+              //   cwd: '<%= config.jsSrc %>',
+              //   dest: '<%= config.jsDest %>/',
+              //   src: ['**/*.js']
+              // },
               {
                 expand: true,
                 dot: true,
@@ -137,7 +143,7 @@ module.exports = function(grunt) {
           },
           scripts: {
             files: '<%= config.jsSrc %>/**/*.js',
-            tasks: ['jshint', 'concat']
+            tasks: ['jshint', 'concat', 'copy:scripts']
           }
         }
       });
