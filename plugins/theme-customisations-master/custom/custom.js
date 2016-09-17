@@ -1,8 +1,4 @@
 jQuery(document).ready(function($) {
-  console.log('BLAH');
-
-
-
     var $woocommerceCheckout = $(document).find('.woocommerce-checkout');
     var $productInfo = $('.postid-11.single-product div.product').find('.images, .entry-summary');
 
@@ -16,9 +12,7 @@ jQuery(document).ready(function($) {
 
         if (linkClass === anchorEl) {
           $productInfo.show();
-          window.scrollTo(0, 0);
           $('body').addClass('just-removed');
         }
-
     });
 });
