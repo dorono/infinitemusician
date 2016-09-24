@@ -80,9 +80,9 @@ do_action( 'woocommerce_email_header', $email_heading );
 			<table cellspacing="0" cellpadding="0" class="order_items_table" border="0" >
 				<thead>
 					<tr>
-						<th scope="col" class="order_items_table_th_style order_items_table_td order_items_table_td_left order_items_table_th_bg_color order_items_table_td_top"><?php _e( 'Product', 'email-control' ); ?></th>
-						<th scope="col" class="order_items_table_th_style order_items_table_td order_items_table_th_bg_color order_items_table_td_top"><?php _e( 'Quantity', 'email-control' ); ?></th>
-						<th scope="col" class="order_items_table_th_style order_items_table_td order_items_table_td_right order_items_table_th_bg_color order_items_table_td_top" style="text-align:right"><?php _e( 'Price', 'email-control' ); ?></th>
+						<th scope="col" class="order_items_table_th_style order_items_table_td order_items_table_td_left order_items_table_td_top"><?php _e( 'Product', 'email-control' ); ?></th>
+						<th scope="col" class="order_items_table_th_style order_items_table_td order_items_table_td_top"><?php _e( 'Quantity', 'email-control' ); ?></th>
+						<th scope="col" class="order_items_table_th_style order_items_table_td order_items_table_td_right order_items_table_td_top" style="text-align:right"><?php _e( 'Price', 'email-control' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -96,10 +96,10 @@ do_action( 'woocommerce_email_header', $email_heading );
 						if ( $refund && $refund->get_refund_amount() > 0 ) {
 							?>
 							<tr>
-								<th scope="row" colspan="2" class="order_items_table_totals_style order_items_table_td order_items_table_td_left order_items_table_th_bg_color">
+								<th scope="row" colspan="2" class="order_items_table_totals_style order_items_table_td order_items_table_td_left">
 									<?php _e( 'Amount Refunded', 'email-control' ); ?>:
 								</th>
-								<td class="order_items_table_totals_style order_items_table_td order_items_table_td_right order_items_table_th_bg_color" style="text-align:right;" >
+								<td class="order_items_table_totals_style order_items_table_td order_items_table_td_right" style="text-align:right;" >
 									<?php echo $refund->get_formatted_refund_amount(); ?>
 								</td>
 							</tr>
@@ -111,10 +111,10 @@ do_action( 'woocommerce_email_header', $email_heading );
 							$i++;
 							?>
 							<tr class="order_items_table_total_row order_items_table_total_row_<?php echo esc_attr( sanitize_title( $total['label'] ) ) ?>">
-								<th scope="row" colspan="2" class="order_items_table_totals_style order_items_table_td order_items_table_td_left order_items_table_th_bg_color">
+								<th scope="row" colspan="2" class="order_items_table_totals_style order_items_table_td order_items_table_td_left">
 									<?php _e( $total['label'], 'email-control' ); ?>
 								</th>
-								<td class="order_items_table_totals_style order_items_table_td order_items_table_td_right order_items_table_th_bg_color" style="text-align:right;" >
+								<td class="order_items_table_totals_style order_items_table_td order_items_table_td_right" style="text-align:right;" >
 									<?php _e( $total['value'], 'email-control' ); ?>
 								</td>
 							</tr>

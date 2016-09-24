@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php echo ec_special_title( __( "Customer details", 'email-control'), array("border_position" => "center", "text_position" => "center") ); ?>
 
 			<?php foreach ( $fields as $field ) : ?>
-			    <p><strong><?php echo wp_kses_post( $field['label'] ); ?>:</strong> <span class="text"><?php echo wp_kses_post( $field['value'] ); ?></span></p>
+				<p><strong><?php echo wp_kses_post( $field['label'] ); ?>:</strong> <span class="text"><?php echo wp_kses_post( $field['value'] ); ?></span></p>
 			<?php endforeach; ?>
 		
 		</td>

@@ -266,7 +266,7 @@ class WC_Email_Template_WooCommerce {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_full",
 			"type"				=> "textarea",
 			"default"			=> __( "Hi there. Your order on [ec_site_name] has been refunded.", "email-control" ),
@@ -288,7 +288,7 @@ class WC_Email_Template_WooCommerce {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_partial",
 			"type"				=> "textarea",
 			"default"			=> __( "Hi there. Your order on [ec_site_name] has been partially refunded.", "email-control" ),
@@ -313,7 +313,7 @@ class WC_Email_Template_WooCommerce {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_pending",
 			"type"				=> "textarea",
 			"default"			=> __( "An order has been created for you on [ec_site_link]. To pay for this order please use the following link: [ec_pay_link]", 'email-control' ),
@@ -335,7 +335,7 @@ class WC_Email_Template_WooCommerce {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_complete",
 			"type"				=> "textarea",
 			"default"			=> "",
@@ -482,6 +482,21 @@ class WC_Email_Template_WooCommerce {
 			// "class"				=> "ec-half",
 			"section"			=> "appearance_section",
 		);
+		
+		$settings[] =array(
+			"name"				=> __( "Product Images", "email-control" ),
+			"id"				=> "product_thumbnail",
+			"type"				=> 'checkbox',
+			"default"			=> 'no',
+			"desc"				=> '',
+			"tip"				=> '',
+			"group"				=> "all",
+			"class"				=> "ec-half",
+			"section"			=> "appearance_section",
+		);
+		
+		
+		
 		
 		
 		

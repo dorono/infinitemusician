@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: cxThemes
 Tags: woocommerce, email, customize, customise, edit, colors, text, preview, template, communication, send, test
-Stable tag: 2.41
+Stable tag: 3.01
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,24 @@ Please see the included PDF for full instructions on how to use this plugin.
  
  
 == Changelog ==
+
+= 3.01 =
+* Fixed curl notice in the email preview when using Email Customizer with 3rd party email sending plugins.
+* Fixed notice about `get_image_id()` when using product images in the email templates.
+* Fixed issue when sending test emails in the customizer where email would erroneously send to the order email address and not the test email address.
+
+= 3.00 =
+* We're excited to announce a new template called Vanilla. It's modern, clean and bold and brings with it responsive layouts so it looks great on mobile email clients that support it. It also brings with it Product Images so your customers can see and get excited about what they're buying. And we didn't just add these features to Vanilla, we've added them to all our templates. We hope you like our new look.
+* Added Responsive layouts to all the email templates so they look great on mobile email clients that support it.
+* Added Product Images to all the email templates with an option to toggle them on or off.
+* Replace tip-tip js plugin with simpler and more conventional 'title' attributes which leads to quicker loading & simpler interface.
+* Fixed persistent bug showing a notice about `plain_text` in some versions of WC.
+
+= 2.42 =
+* Fix issue where template would show undefined variable `plain_text` when using WC2.5.4 and lower.
+* Fixed the Links panel not being able to scroll to the lower links with smaller windows sizes.
+* Fixed double slash in the preview URL that would result in the customizer not loading for some people.
+* Changed to a new method to render the emails in the preview that uses the email trigger method to capture the rendered email.
 
 = 2.41 =
 * Start using WooCommerce Emogrifier class, exclusively, to merge the CSS into the Email HTML. Previously we needed our own version of this class as it was not yet available in older versions of WooCommerce. This means that the emails will be more consistently rendered. It also means you'll need WC version 2.3 or higher.

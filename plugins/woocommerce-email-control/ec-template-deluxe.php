@@ -182,7 +182,7 @@ class WC_Email_Template_Deluxe {
 			"name"				=> __( "Heading", "email-control" ),
 			"id"				=> "heading",
 			"type"				=> "textarea",
-			"default"			=> __( "The order [ec_order] has been cancelled", "email-control" ),
+			"default"			=> __( "Cancelled order", "email-control" ),
 			"desc"				=> "",
 			"tip"				=> "",
 			"group"				=> "cancelled_order",
@@ -233,7 +233,7 @@ class WC_Email_Template_Deluxe {
 		$settings[] = array(
 			"name"				=> __( "Heading", "email-control" ),
 			"id"				=> "heading",
-			"type"				=> "text",
+			"type"				=> "textarea",
 			"default"			=> __( "Thank you for your order", "email-control" ),
 			"desc"				=> "",
 			"tip"				=> "",
@@ -319,7 +319,7 @@ class WC_Email_Template_Deluxe {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_full",
 			"type"				=> "textarea",
 			"default"			=> __( "Your order [ec_order] has been refunded. Thanks", "email-control" ),
@@ -342,7 +342,7 @@ class WC_Email_Template_Deluxe {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_partial",
 			"type"				=> "textarea",
 			"default"			=> __( "Your order [ec_order] has been partially refunded. Thanks", "email-control" ),
@@ -368,7 +368,7 @@ class WC_Email_Template_Deluxe {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_pending",
 			"type"				=> "textarea",
 			"default"			=> __( "Thanks for your order on [ec_site_link].\n\nTo pay for this order please use the following link: [ec_pay_link]", "email-control" ),
@@ -391,7 +391,7 @@ class WC_Email_Template_Deluxe {
 			"section"			=> "text_section",
 		);
 		$settings[] = array(
-			"name"				=> __( "Textarea", "email-control" ),
+			"name"				=> __( "Main Text", "email-control" ),
 			"id"				=> "main_text_complete",
 			"type"				=> "textarea",
 			"default"			=> "",
@@ -1013,6 +1013,23 @@ class WC_Email_Template_Deluxe {
 			"class"				=> "ec-half",
 			"section"			=> "order_items_table_section",
 		);
+		
+		$settings[] =array(
+			"name"				=> __( "Product Images", "email-control" ),
+			"id"				=> "order_item_table_thumbnail",
+			"type"				=> 'checkbox',
+			"default"			=> 'yes',
+			"desc"				=> '',
+			"tip"				=> '',
+			"group"				=> "all",
+			"class"				=> "ec-half",
+			"section"			=> "order_items_table_section",
+		);
+		
+		
+		
+		
+		
 		
 		
 		

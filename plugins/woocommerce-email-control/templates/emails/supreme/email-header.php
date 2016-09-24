@@ -3,15 +3,13 @@
  * Email Header
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 
 /**
  * Get Settings.
  */
 $header_img_src = esc_url_raw( get_option( 'ec_supreme_all_header_logo' ) );
-if ( !isset($header_img_src) || $header_img_src=='' )
+if ( ! isset( $header_img_src ) || '' == $header_img_src )
 	$header_img_src = esc_url_raw( get_option( 'woocommerce_email_header_image' ) );
 
 $header_logo_alignment = get_option( "ec_supreme_all_logo_position" );
@@ -365,8 +363,7 @@ ob_start();
 		
 		<table class="wrapper" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">
 			<tr>
-				<td align="center" valign="top">
-					
+				<td class="wrapper-td" align="center" valign="top">
 					
 					<table class="main-body" border="0" cellpadding="0" cellspacing="0">
 						<tr>

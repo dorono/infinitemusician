@@ -5,7 +5,7 @@
  * Author: cxThemes
  * Author URI: http://codecanyon.net/user/cxThemes
  * Plugin URI: http://codecanyon.net/item/email-customizer-for-woocommerce/8654473
- * Version: 2.41
+ * Version: 3.01
  * Text Domain: email-control
  * Domain Path: /languages/
  *
@@ -22,7 +22,7 @@ if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Define Constants
  */
-define( 'WC_EMAIL_CONTROL_VERSION', '2.41' );
+define( 'WC_EMAIL_CONTROL_VERSION', '3.01' );
 define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', '2.3' );
 define( 'WC_EMAIL_CONTROL_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
@@ -57,6 +57,7 @@ include_once( 'includes/ec-woo-back-compat-functions.php' );
 include_once( 'includes/ec-functions.php' );
 include_once( 'includes/class-ec-settings.php' );
 include_once( 'ec-template-woocommerce.php' ); // Template
+include_once( 'ec-template-vanilla.php' ); // Template
 include_once( 'ec-template-deluxe.php' ); // Template
 include_once( 'ec-template-supreme.php' ); // Template
 
@@ -170,7 +171,7 @@ class WC_Email_Control {
 		// due to WooCommerce having applied wordwrap 60 to the html before
 		// our css is applied, whcih results in some of the CSS not applying.
 		add_filter( 'wc_get_template', array( $this, 'ec_globalize_email_object' ), 10, 5 );
-		add_action( 'woocommerce_mail_content', array( $this, 'ec_style_inline' ) );
+		add_action( 'woocommerce_mail_content', array( $this, 'ec_style_inline' ), 85 );
 		
 		// Other simpler WooCommerce emails - Content.
 		// add_filter( 'woocommerce_email_content_low_stock', array( $this, 'woocommerce_simple_email_content' ), 10, 2 );
@@ -290,10 +291,6 @@ class WC_Email_Control {
 			
 			// For image uplaoder on settings page_link
 			wp_enqueue_media();
-			
-			// Notification Systsem
-			wp_register_style( 'cx-notification', WC_EMAIL_CONTROL_URI . '/assets/css/notification.css', array(), WC_EMAIL_CONTROL_VERSION, 'screen' );
-			wp_enqueue_style( 'cx-notification' );
 			
 			/**
 			 * Fontello.
@@ -422,13 +419,12 @@ class WC_Email_Control {
 	*  @since	1.0
 	*/
 	public function send_email() {
+		global $order, $woocommerce, $cxec_email_control;
 		
-		global $order, $woocommerce;
-		
-		$email_type			= $_REQUEST['ec_email_type'];
-		$email_order		= $_REQUEST['ec_email_order'];
-		// $email_addresses	= $_REQUEST['ec_email_addresses'];
-		// $email_template_id	= $_REQUEST['ec_email_template'];
+		$email_type = $_REQUEST['ec_email_type'];
+		$order_id   = $_REQUEST['ec_email_order'];
+		// $email_addresses = $_REQUEST['ec_email_addresses'];
+		// $email_template_id = $_REQUEST['ec_email_template'];
 		
 		// Handle button actions
 		if ( !empty( $_REQUEST['ec_email_type'] ) ) {
@@ -447,16 +443,21 @@ class WC_Email_Control {
 				foreach ( $mails as $mail ) {
 					if ( $mail->id == $email_to_send ) {
 						
-						// Old method - used our own Sedning function
-						//$this->trigger_send_email( $order->id, $mail, $email_addresses);
+						// Get the chosen order.
+						$order = new WC_Order( $order_id );
 						
-						// New method - filters the recicpeint address and used the respective mails own sending function to send
-						add_filter( 'woocommerce_email_recipient_' . $mail->id, array( $this, 'woocommerce_email_recipient' ) );
-						$mail->trigger( $email_order );
+						// Add the new custom recipient email address.
+						// add_filter( 'woocommerce_email_recipient_' . $mail->id, array( $this, 'woocommerce_email_recipient' ) ); // Old method.
+						$mail->recipient = ( isset( $_REQUEST['ec_email_addresses'] ) ? $_REQUEST['ec_email_addresses'] : NULL );
+						
+						// Init the mail.
+						$cxec_email_control->populate_mail_object( $order, $mail );
+						
+						// Send the mail.
+						$mail->send( $mail->get_recipient(), $mail->get_subject(), $mail->get_content(), $mail->get_headers(), $mail->get_attachments() );
 					}
 				}
 			}
-				
 		}
 		
 		die();
@@ -523,7 +524,7 @@ class WC_Email_Control {
 		$email_type		= ($_REQUEST['ec_email_type']) ? $_REQUEST['ec_email_type'] : false ;
 		$email_id		= ($_REQUEST['ec_email_id']) ? $_REQUEST['ec_email_id'] : false ;
 		
-		$settings = ec_get_settings($email_id);
+		$settings = ec_get_settings( $email_id );
 		
 		EC_Settings::save_fields( $settings );
 		
@@ -1002,6 +1003,169 @@ class WC_Email_Control {
 			}
 		}
 		return $content;
+	}
+	
+	/**
+	 *
+	 */
+	public function populate_mail_object( $order, &$mail ) {
+		global $cxec_cache_email_message;
+		
+		// New method of gathering email HTML by pushing the data up into a global.
+		add_action( 'woocommerce_mail_content', array( $this, 'ec_cancel_email_send' ), 90 );
+		
+		// Force the email to seem enabled in-case it has been tuned off programmatically.
+		$mail->enabled = 'yes';
+		
+		/**
+		 * Get a User ID for the preview.
+		 */
+		
+		// Get the Customer user from the order, or the current user ID if guest.
+		if ( 0 === ( $user_id = (int) get_post_meta( $order->id, '_customer_user', TRUE ) ) ) {
+			$user_id = get_current_user_id();
+		}
+		$user = get_user_by( 'id', $user_id );
+		
+		/**
+		 * Get a Product ID for the preview.
+		 */
+		
+		// Get a product from the order. If it doesnt exist anymore then get the latest product.
+		$items = $order->get_items();
+		foreach ( $items as $item ) {
+			$product_id = $item['product_id'];
+			if ( NULL !== get_post( $product_id ) ) break;
+			//$product_variation_id = $item['variation_id'];
+		}
+		
+		if ( NULL === get_post( $product_id ) ){
+			
+			$products_array = get_posts( array(
+				'posts_per_page'   => 1,
+				'orderby'          => 'date',
+				'post_type'        => 'product',
+				'post_status'      => 'publish',
+			) );
+			
+			if ( isset( $products_array[0]->ID ) ){
+				$product_id = $products_array[0]->ID;
+			}
+		}
+		
+		/**
+		 * Generate the required email for use with Sending or Previewing.
+		 *
+		 * All the email types in all the varying plugins require specific
+		 * properties to be set before they generate the email for our
+		 * preview, or send a test email.
+		 */
+		
+		$compatabiltiy_warning = FALSE; // Default.
+		
+		switch ( $mail->id ) {
+			
+			/**
+			 * WooCommerce (default transactional mails).
+			 */
+			
+			case 'new_order':
+			case 'cancelled_order':
+			case 'customer_processing_order':
+			case 'customer_completed_order':
+			case 'customer_refunded_order':
+			case 'customer_on_hold_order':
+			case 'customer_invoice':
+			case 'failed_order':
+				
+				$mail->object                  = $order;
+				$mail->find['order-date']      = '{order_date}';
+				$mail->find['order-number']    = '{order_number}';
+				$mail->replace['order-date']   = date_i18n( wc_date_format(), strtotime( $mail->object->order_date ) );
+				$mail->replace['order-number'] = $mail->object->get_order_number();
+				break;
+			
+			case 'customer_new_account':
+				
+				$mail->object             = $user;
+				$mail->user_pass          = '{user_pass}';
+				$mail->user_login         = stripslashes( $mail->object->user_login );
+				$mail->user_email         = stripslashes( $mail->object->user_email );
+				$mail->recipient          = $mail->user_email;
+				$mail->password_generated = TRUE;
+				break;
+			
+			case 'customer_note':
+				
+				$mail->object                  = $order;
+				$mail->customer_note           = 'Hello';
+				$mail->find['order-date']      = '{order_date}';
+				$mail->find['order-number']    = '{order_number}';
+				$mail->replace['order-date']   = date_i18n( wc_date_format(), strtotime( $mail->object->order_date ) );
+				$mail->replace['order-number'] = $mail->object->get_order_number();
+				break;
+			
+			case 'customer_reset_password':
+				
+				$mail->object     = $user;
+				$mail->user_login = $user->user_login;
+				$mail->reset_key  = '{{reset-key}}';
+				break;
+			
+			/**
+			 * WooCommerce Wait-list Plugin (from WooCommerce).
+			 */
+			
+			case 'woocommerce_waitlist_mailout':
+				
+				$mail->object    = get_product( $product_id );
+				$mail->find[]    = '{product_title}';
+				$mail->replace[] = $mail->object->get_title();
+				break;
+				
+			/**
+			 * WooCommerce Subscriptions Plugin (from WooCommerce).
+			 */
+			
+			case 'new_renewal_order':
+			case 'new_switch_order':
+			case 'customer_processing_renewal_order':
+			case 'customer_completed_renewal_order':
+			case 'customer_completed_switch_order':
+			case 'customer_renewal_invoice':
+				
+				$mail->object = $order;
+				break;
+				
+			case 'cancelled_subscription':
+				
+				$mail->object = FALSE;
+				$compatabiltiy_warning = TRUE;
+				break;
+			
+			/**
+			 * Everything else, including all default WC emails.
+			 */
+			
+			default:
+				
+				$mail->object = $order;
+				$compatabiltiy_warning = TRUE;
+				break;
+		}
+		
+		return $compatabiltiy_warning;
+	}
+	
+	/**
+	 * New method of previewing emails.
+	 * Stores the email message up in a global, then return an
+	 * empty string message which prevents the email sending.
+	 */
+	function ec_cancel_email_send( $message ) {
+		global $cxec_cache_email_message;
+		$cxec_cache_email_message = $message;
+		return $message;
 	}
 	
 	/**

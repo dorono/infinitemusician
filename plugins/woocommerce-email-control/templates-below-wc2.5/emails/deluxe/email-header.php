@@ -3,17 +3,17 @@
  * Email Header
  */
 
-if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
-$header_img_src					= esc_url_raw( get_option( 'ec_deluxe_all_header_logo' ) );
-if ( !isset($header_img_src) || $header_img_src=='' )
-	$header_img_src = esc_url_raw( get_option( 'woocommerce_email_header_image' ) );
+if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 
 /**
  * Get Settings.
  */
-$header_logo_alignment			= get_option( "ec_deluxe_all_logo_position" );
-$top_nav_position		= ( $header_logo_alignment == 'center' ) ? 'center' : 'right' ;
+$header_img_src = esc_url_raw( get_option( 'ec_deluxe_all_header_logo' ) );
+if ( ! isset( $header_img_src ) || '' == $header_img_src )
+	$header_img_src = esc_url_raw( get_option( 'woocommerce_email_header_image' ) );
+
+$header_logo_alignment = get_option( "ec_deluxe_all_logo_position" );
+$top_nav_position = ( $header_logo_alignment == 'center' ) ? 'center' : 'right' ;
 
 /**
  * EC Special Title
@@ -363,8 +363,7 @@ ob_start();
 		
 		<table class="wrapper" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">
 			<tr>
-				<td align="center" valign="top">
-					
+				<td class="wrapper-td" align="center" valign="top">
 					
 					<table class="main-body" border="0" cellpadding="0" cellspacing="0">
 						<tr>

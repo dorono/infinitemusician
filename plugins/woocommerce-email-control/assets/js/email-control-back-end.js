@@ -4,23 +4,6 @@
 		// Preview Email General Stuff
 		// ----------------------------------------
 		
-		// Tooltips
-		jQuery(".help_tip_new").tipTip({
-			'attribute' : 'data-tip',
-			'fadeIn' : 300,
-			'fadeOut' : 300,
-			'delay' : 200,
-			'defaultPosition' : "top",
-			'edgeOffset' : 3,
-			'maxWidth' : "300px"
-			//'enter' : function() {
-			//	//jQuery("#tiptip_holder").addClass("cx_tip_tip");
-			//	jQuery("#tiptip_holder #tiptip_content").addClass('cx_tip_tip');
-			//}
-			//'keepAlive' : true,
-			//'activation' : 'click'
-		});
-		
 		/**
 		 * Preview Email Main Admin Page
 		 */
@@ -119,9 +102,6 @@
 				url:		woocommerce_email_control.ajaxurl,
 				data:		form_data,
 				success: function( data ) {
-					
-					console.log( data );
-					
 					ec_loading_end();
 					ec_notify("Email Sent!", {id: "second-thing", size: "medium"});
 				},
@@ -173,8 +153,14 @@
 			
 		}, 300);
 		
-		jQuery('.ec_settings_form .main-controls-element input, .ec_settings_form .main-controls-element textarea').keyup( update_preview );
-		jQuery('.ec_settings_form .main-controls-element select').change( update_preview );
+		// OLD.
+		// jQuery('.ec_settings_form .main-controls-element input, .ec_settings_form .main-controls-element textarea').keyup( update_preview );
+		// jQuery('.ec_settings_form .main-controls-element select').change( update_preview );
+		
+		// NEW.
+		jQuery('.ec_settings_form .main-controls-element')
+			.find(' select,  input,  textarea')
+			.on( 'keyup change', update_preview );
 		
 		var edited = false;
 		function set_edited(element) {
@@ -443,17 +429,27 @@
 		});
 		
 		// Handle Default re-populating
-		jQuery('.reset-to-default').on("click", function () {
+		jQuery('.reset-to-default').on( 'click', function () {
+			
+			// Get elements.
+			$input = jQuery(this).closest('.main-controls-element').find('input, textarea');
 
-			jQuery(this).closest(".main-controls-element").find("input, textarea")
-			.val( jQuery(this).attr("data-default") )
-			.keyup();
+			if ( $input.is(':checkbox') ) {
+				$input = $input.filter(':checkbox');
+				$input
+					.prop( 'checked', 'checked' )
+					.keyup();
+			}
+			else {
+				$input
+					.val( jQuery(this).attr("data-default") )
+					.keyup();
+			}
 
 			return false;
-			
 		});
 		
-		//Initialise Color Pickers
+		// Initialise Color Pickers
 		jQuery('.ec-colorpick').iris({
 			change: function(a, b) {
 				jQuery(this).css({ backgroundColor: b.color.toString() }).keyup();
@@ -488,13 +484,13 @@
 
 			event.preventDefault();
 
-			//If the uploader object has already been created, reopen the dialog
+			// If the uploader object has already been created, reopen the dialog
 			if (custom_uploader) {
 				custom_uploader.open();
 				return;
 			}
 
-			//Extend the wp.media object
+			// Extend the wp.media object
 			custom_uploader = wp.media.frames.file_frame = wp.media({
 				title: 'Choose Image',
 				button: {
@@ -503,7 +499,7 @@
 				multiple: false
 			});
 
-			//When a file is selected, grab the URL and set it as the text field's value
+			// When a file is selected, grab the URL and set it as the text field's value
 			custom_uploader.on('select', function() {
 				attachment = custom_uploader.state().get('selection').first().toJSON();
 				console.log( attachment.url, this_field );
@@ -514,7 +510,7 @@
 				
 			});
 
-			//Open the uploader dialog
+			// Open the uploader dialog
 			custom_uploader.open();
 
 			return false;
@@ -532,7 +528,8 @@
 		});
 		
 		// Open all links in the preview in a new tab.
-		jQuery('#ec-template .main-content a').attr( 'target', 'wc_email_customizer_window' );
+		jQuery('#ec-template .main-content a:not("#ec_approve_preview_button")')
+			.attr( 'target', 'wc_email_customizer_window' );
 		
 		// Dismiss compatability warning in email template.
 		jQuery("#ec_approve_preview_button").on('click', function(event) {
@@ -549,7 +546,7 @@
 		// Open-Close the header info
 		jQuery(".hide-icon").on('click', function(event) {
 
-			//jQuery(".header_info_userspecifc").click();
+			// jQuery(".header_info_userspecifc").click();
 			jQuery( parent.document ).find( ".header_info_userspecifc" ).click();
 			
 			return false;
@@ -557,7 +554,7 @@
 		
 		function ec_notify(content, options) {
 			
-			// set up default options
+			// Set up default options
 			var defaults = {
 				id:				false,
 				display_time:	5000,
@@ -566,10 +563,10 @@
 			options = jQuery.extend({}, defaults, options);
 			
 			
-			if ( !jQuery("#cx-notification-holder").length )
-				jQuery("body").append( '<div id="cx-notification-holder"></div>' );
+			if ( !jQuery("#cxectrl-notification-holder").length )
+				jQuery("body").append( '<div id="cxectrl-notification-holder"></div>' );
 			
-			var current_element = jQuery(".cx-notification-" + options.id );
+			var current_element = jQuery(".cxectrl-notification-" + options.id );
 			
 			if ( current_element.length ) {
 				current_element.animate({ "margin-top": - current_element.outerHeight(true) +"px", "top": (current_element.outerHeight(true) / 1.5 ) +"px", opacity: 0 }, { duration:300, complete: function() {
@@ -579,13 +576,13 @@
 			
 			var new_element = jQuery('<div/>', {
 				style: 'display:none;',
-				class: "cx-notification cx-notification-" + options.id,
+				class: "cxectrl-notification cxectrl-notification-" + options.id,
 				text: content
 			});
 			
-			jQuery("#cx-notification-holder").append(new_element);
+			jQuery("#cxectrl-notification-holder").append(new_element);
 			
-			new_element.addClass('cx-notification-' + options.size );
+			new_element.addClass('cxectrl-notification-' + options.size );
 			
 			new_element.css({ "top": (new_element.outerHeight(true) / 1.5 ) + "px", opacity:0, marginLeft: - (new_element.outerWidth(true) /2 ) });
 			new_element.animate({"top": "0px", opacity:1, display:"block" }, 300);
@@ -619,37 +616,52 @@
 			setTimeout(function() { /* ec_notify("Sixth thing done!", {id: "sixth-thing"} ); */ }, 7 * time_interval);
 		}
 		
-		//Close all the panels to start
-		jQuery('.section-inner').slideUp();
-		
-		//Accordion
-		jQuery('.section h3').click(function() {
-			
-			section = jQuery(this).parent('.section');
-			section_inner = jQuery(this).parent('.section').find('.section-inner');
-			section_holder = jQuery(this).parent('.section').parent('.ec_settings_form_sub');
+		/**
+		 * Customizer Accordions.
+		 */
 
-			jQuery('.section-inner').not(section_inner).slideUp();
-			jQuery('.section').not(section).removeClass('ec-active');
-			//document.location.hash = 'customize';
-
-			if ( section.hasClass('ec-active') ) {
+			// Accordions open/close
+			jQuery(document).on( 'click', '.section h3', function() {
 				
-				section.removeClass('ec-active');
-				section_inner.slideUp();
+				// Get elements.
+				$section = jQuery(this).parent('.section');
+				$section_inner = jQuery(this).parent('.section').find('.section-inner');
+				$section_holdr = jQuery(this).parent('.section').parent('.ec_settings_form_sub');
+				$edit_content_panel = jQuery('.ec-admin-panel-edit-content');
+				
+				// Set the max hight of the panel.
+				if ( ! $edit_content_panel.data( 'closed-height' ) ) {
+					$edit_content_panel.data( 'closed-height', $edit_content_panel.height() );
+				}
+				$remaining_height = jQuery(window).height() - $edit_content_panel.data( 'closed-height' );
+				$section_inner.css( 'max-height', $remaining_height );
 
+				jQuery('.section-inner').not($section_inner).slideUp();
+				jQuery('.section').not($section).removeClass('ec-active');
 				//document.location.hash = 'customize';
-			}
-			else{
 
-				section.addClass('ec-active');
-				section_inner.slideDown();
+				if ( $section.hasClass('ec-active') ) {
 
-				//document.location.hash = 'customize/' + section_holder.attr('id');
-			}
-						
-		});
+					$section.removeClass('ec-active');
+					$section_inner.slideUp();
+
+					//document.location.hash = 'customize';
+				}
+				else{
+
+					$section.addClass('ec-active');
+					$section_inner.slideDown();
+
+					//document.location.hash = 'customize/' + $section_holder.attr('id');
+				}
+
+			});
+
+			// Close all the panels to start
+			jQuery('.section-inner').slideUp();
+			
 		
+		// Deep link to the cusomizer panel on startup.
 		if ( document.location.hash ) {
 
 			location_array = document.location.hash.split('/');
@@ -675,7 +687,7 @@ function reload_preview() {
 	// Reload the Preview src
 	var new_src = "";
 	new_src += woocommerce_email_control.admin_url;
-	new_src += "/admin.php?";
+	new_src += "admin.php?";
 	new_src += "page=woocommerce_email_control";
 	new_src += "&";
 	new_src += "ec_render_email=true";
@@ -717,18 +729,18 @@ function ec_loading(options) {
 	};
 	options = jQuery.extend({}, defaults, options);
 	
-	if ( !jQuery(".cx-loading-holder").length ) {
-		jQuery("body").append('<div class="cx-loading-holder" style="display: none; background-color:' + options.backgroundColor + '; "><div class="cx-loading-inner-holder"><div class="cx-loading-graphic"></div><div class="cx-loading-text"></div></div></div>' );
+	if ( !jQuery(".cxectrl-loading-holder").length ) {
+		jQuery("body").append('<div class="cxectrl-loading-holder" style="display: none; background-color:' + options.backgroundColor + '; "><div class="cxectrl-loading-inner-holder"><div class="cxectrl-loading-graphic"></div><div class="cxectrl-loading-text"></div></div></div>' );
 	}
 	
-	jQuery(".cx-loading-text").append( options.content );
-	jQuery(".cx-loading-holder").fadeIn(300);
+	jQuery(".cxectrl-loading-text").append( options.content );
+	jQuery(".cxectrl-loading-holder").fadeIn(300);
 }
 
 
 function ec_loading_end() {
 	
-	jQuery(".cx-loading-holder").fadeOut(300, function() {
+	jQuery(".cxectrl-loading-holder").fadeOut(300, function() {
 		jQuery(this).remove();
 	});
 }

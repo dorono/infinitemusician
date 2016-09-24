@@ -29,6 +29,8 @@ foreach ( $items as $item_id => $item ) :
 			<td class="td" style="text-align:left; vertical-align:middle; border: 1px solid #eee; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; word-wrap:break-word;"><?php
 
 				// Show title/image etc
+				$show_image = ( 'yes' == get_option( "ec_woocommerce_all_product_thumbnail" ) );
+				$image_size = array( 70, 70 );
 				if ( $show_image ) {
 					echo apply_filters( 'woocommerce_order_item_thumbnail', '<div style="margin-bottom: 5px"><img src="' . ( $_product->get_image_id() ? current( wp_get_attachment_image_src( $_product->get_image_id(), 'thumbnail') ) : wc_placeholder_img_src() ) .'" alt="' . esc_attr__( 'Product Image', 'woocommerce' ) . '" height="' . esc_attr( $image_size[1] ) . '" width="' . esc_attr( $image_size[0] ) . '" style="vertical-align:middle; margin-right: 10px;" /></div>', $item );
 				}
@@ -42,6 +44,7 @@ foreach ( $items as $item_id => $item ) :
 				}
 
 				// allow other plugins to add additional product information here
+				$plain_text = ( isset( $plain_text ) ? $plain_text : FALSE );
 				do_action( 'woocommerce_order_item_meta_start', $item_id, $item, $order, $plain_text );
 
 				// Variation
@@ -55,7 +58,8 @@ foreach ( $items as $item_id => $item ) :
 				}
 
 				// allow other plugins to add additional product information here
-				do_action( 'woocommerce_order_item_meta_end', $item_id, $item, $order, $plain_text );
+				// plain_text check is required as was only passed as an arg to `order-items` since WC2.5.4
+				do_action( 'woocommerce_order_item_meta_end', $item_id, $item, $order, ( isset( $plain_text ) ? $plain_text : FALSE ) );
 
 			?></td>
 			<td class="td" style="text-align:left; vertical-align:middle; border: 1px solid #eee; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;"><?php echo apply_filters( 'woocommerce_email_order_item_quantity', $item['qty'], $item ); ?></td>

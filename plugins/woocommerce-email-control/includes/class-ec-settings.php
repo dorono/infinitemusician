@@ -132,10 +132,10 @@ class EC_Settings {
 							}
 
 							if ( $tip && in_array( $value['type'], array( 'checkbox' ) ) ) {
-								$tip = '<span class="help-icon help_tip_new" data-tip="' . esc_attr($tip) . '" >&nbsp;</span>';
+								$tip = '<span class="help-icon" title="' . esc_attr($tip) . '" >&nbsp;</span>';
 							}
 							elseif ( $tip ) {
-								$tip = '<span class="help-icon help_tip_new" data-tip="' . esc_attr($tip) . '" >&nbsp;</span>';
+								$tip = '<span class="help-icon" title="' . esc_attr($tip) . '" >&nbsp;</span>';
 							}
 							
 
@@ -161,24 +161,24 @@ class EC_Settings {
 											<div class="controls-inner-row">
 												
 												<?php if ($value['default']): ?>
-													<span class="reset-to-default help_tip_new" data-tip="<?php echo esc_attr( __( "Reset to - ", 'email-control' ) . ' ' . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
+													<span class="reset-to-default" title="<?php echo esc_attr( __( "Reset to:", 'email-control' ) . "\n" . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
 														<?php _e( 'Reset to default', 'email-control' ) ?> <i class="cxectrl-icon-arrows-cw"></i>
 													</span>
 												<?php endif ?>
-				                                
-				                                <input
-				                                    name="<?php echo esc_attr( $value['id'] ); ?>"
-				                                    id="<?php echo esc_attr( $value['id'] ); ?>"
-				                                    type="text"
-				                                    style="<?php echo esc_attr( $value['css'] ); ?>"
-				                                    value="<?php echo esc_attr( $option_value ); ?>"
-				                                    placeholder="http://"
-				                                    
-				                                    class="upload_image <?php echo esc_attr( $value['field_class'] ); ?>"
-				                                    autocomplete="off"
-				                                    <?php echo implode( ' ', $custom_attributes ); ?>
-				                                />
-				                                <input class="upload_image_button button" type="button" value="Upload" />
+												
+												<input
+													name="<?php echo esc_attr( $value['id'] ); ?>"
+													id="<?php echo esc_attr( $value['id'] ); ?>"
+													type="text"
+													style="<?php echo esc_attr( $value['css'] ); ?>"
+													value="<?php echo esc_attr( $option_value ); ?>"
+													placeholder="http://"
+													
+													class="upload_image <?php echo esc_attr( $value['field_class'] ); ?>"
+													autocomplete="off"
+													<?php echo implode( ' ', $custom_attributes ); ?>
+												/>
+												<input class="upload_image_button button" type="button" value="Upload" />
 												
 												<?php // echo $description; ?>
 											</div>
@@ -217,7 +217,7 @@ class EC_Settings {
 											<div class="controls-inner-row">
 												
 												<?php if ($value['default']): ?>
-													<span class="reset-to-default help_tip_new" data-tip="<?php echo esc_attr( __( "Reset to - ", 'email-control' ) . ' ' . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
+													<span class="reset-to-default" title="<?php echo esc_attr( __( "Reset to:", 'email-control' ) . "\n" . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
 														<?php _e( 'Reset to default', 'email-control' ) ?> <i class="cxectrl-icon-arrows-cw"></i>
 													</span>
 												<?php endif ?>
@@ -272,7 +272,7 @@ class EC_Settings {
 											<div class="controls-inner-row">
 												
 												<?php if ($value['default']): ?>
-													<span class="reset-to-default help_tip_new" data-tip="<?php echo esc_attr( __( "Reset to - ", 'email-control' ) . ' ' . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
+													<span class="reset-to-default" title="<?php echo esc_attr( __( "Reset to:", 'email-control' ) . "\n" . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
 														<?php _e( 'Reset to default', 'email-control' ) ?> <i class="cxectrl-icon-arrows-cw"></i>
 													</span>
 												<?php endif ?>
@@ -340,7 +340,7 @@ class EC_Settings {
 											<div class="controls-inner-row">
 												
 												<?php if ($value['default']): ?>
-													<span class="reset-to-default help_tip_new" data-tip="<?php echo esc_attr( __( "Reset to - ", 'email-control' ) . ' ' . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
+													<span class="reset-to-default" title="<?php echo esc_attr( __( "Reset to:", 'email-control' ) . "\n" . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
 														<?php _e( 'Reset to default', 'email-control' ) ?> <i class="cxectrl-icon-arrows-cw"></i>
 													</span>
 												<?php endif ?>
@@ -414,6 +414,8 @@ class EC_Settings {
 
 								// Checkbox input
 								case 'checkbox' :
+								
+									$option_value = self::get_option( $value['id'], $value['default'] );
 									?>
 									<div class="main-controls-element forminp-<?php echo sanitize_title( $value['type'] ) ?> <?php echo esc_attr( $value['class'] ); ?>">
 										<label class="controls-label">
@@ -425,19 +427,27 @@ class EC_Settings {
 											<div class="controls-inner-row">
 												
 												<?php if ($value['default']): ?>
-													<span class="reset-to-default help_tip_new" data-tip="<?php echo esc_attr( __( "Reset to - ", 'email-control' ) . ' ' . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
+													<span class="reset-to-default" title="<?php echo esc_attr( __( "Reset to:", 'email-control' ) . "\n" . $value['default'] ); ?>" data-default="<?php echo esc_attr( $value['default'] ); ?>">
 														<?php _e( 'Reset to default', 'email-control' ) ?> <i class="cxectrl-icon-arrows-cw"></i>
 													</span>
 												<?php endif ?>
+												
+												<input
+													name="<?php echo esc_attr( $value['id'] ); ?>"
+													type="hidden"
+													value="no"
+												/>
 												<input
 													name="<?php echo esc_attr( $value['id'] ); ?>"
 													id="<?php echo esc_attr( $value['id'] ); ?>"
 													type="checkbox"
 													style="<?php echo esc_attr( $value['css'] ); ?>"
-													value="<?php echo esc_attr( $option_value ); ?>"
+													value="yes"
+													<?php echo checked( 'yes', $option_value ); ?>
 													class="<?php echo esc_attr( $value['field_class'] ); ?>"
 													<?php echo implode( ' ', $custom_attributes ); ?>
 												/>
+												
 												<?php // echo $description; ?>
 											</div>
 										</div>
@@ -579,7 +589,10 @@ class EC_Settings {
 		
 		if ( strstr( $option_name, '[' ) ) {
 			
-			// Array value
+			/**
+			 * Array value
+			 */
+			
 			parse_str( $option_name, $option_array );
 
 			// Option name is first key
@@ -590,22 +603,30 @@ class EC_Settings {
 
 			$key = key( $option_array[ $option_name ] );
 
-			if ( isset( $option_values[ $key ] ) )
+			if ( isset( $option_values[ $key ] ) ) {
 				$option_value = $option_values[ $key ];
-			else
+			}
+			else {
 				$option_value = null;
-
+			}
 		}
 		else {
 			
-			// Single value
+			/**
+			 * Single value
+			 */
+			
 			$option_value = get_option( $option_name, null );
 		}
 
-		if ( is_array( $option_value ) )
+		if ( is_array( $option_value ) ) {
+			
 			$option_value = array_map( 'stripslashes', $option_value );
-		elseif ( !is_null( $option_value ) )
+		}
+		elseif ( ! is_null( $option_value ) ) {
+			
 			$option_value = stripslashes( $option_value );
+		}
 
 		return $option_value === null ? $default : $option_value;
 	}
@@ -621,8 +642,8 @@ class EC_Settings {
 	 */
 	public static function save_fields( $options ) {
 		
-		// if ( empty( $_POST ) )
-		// 	return false;
+		// Bail if empty.
+		// if ( empty( $_POST ) ) return false;
 
 		// Options to update will be stored here
 		$update_options = array();
@@ -642,15 +663,22 @@ class EC_Settings {
 				
 				// CX
 				
+				case 'checkbox' :
+
+					if ( isset( $_POST[ $value['id'] ] ) && 'yes' == $_POST[ $value['id'] ] )
+						$option_value = 'yes';
+					else
+						$option_value = 'no';
+
+				break;
+				
 				case 'textarea' :
 
-					if ( isset( $_POST[$value['id']] ) ) {
+					if ( isset( $_POST[$value['id']] ) )
 						$option_value = wp_kses_post( trim( stripslashes( $_POST[ $value['id'] ] ) ) );
-					}
-					else {
+					else
 						$option_value = '';
-					}
-
+					
 				break;
 
 				case 'text' :
@@ -664,70 +692,14 @@ class EC_Settings {
 				case 'radio' :
 				case 'image_upload' :
 
-					if ( $value['id'] == 'woocommerce_price_thousand_sep' || $value['id'] == 'woocommerce_price_decimal_sep' ) {
-
-						// price separators get a special treatment as they should allow a spaces (don't trim)
-						if ( isset( $_POST[ $value['id'] ] )  ) {
-							$option_value = wp_kses_post( stripslashes( $_POST[ $value['id'] ] ) );
-						}
-						else {
-							$option_value = '';
-						}
-
-					}
-					elseif ( $value['id'] == 'woocommerce_price_num_decimals' ) {
-
-						// price separators get a special treatment as they should allow a spaces (don't trim)
-						if ( isset( $_POST[ $value['id'] ] )  ) {
-							$option_value = absint( $_POST[ $value['id'] ] );
-						}
-						else {
-						   $option_value = 2;
-						}
-
-					}
-					elseif ( $value['id'] == 'woocommerce_hold_stock_minutes' ) {
-
-						// Allow > 0 or set to ''
-						if ( !empty( $_POST[ $value['id'] ] )  ) {
-							$option_value = absint( $_POST[ $value['id'] ] );
-						}
-						else {
-							$option_value = '';
-						}
-
-						wp_clear_scheduled_hook( 'woocommerce_cancel_unpaid_orders' );
-
-						if ( $option_value != '' )
-							wp_schedule_single_event( time() + ( absint( $option_value ) * 60 ), 'woocommerce_cancel_unpaid_orders' );
-
-					}
-					else {
-
-					   if ( isset( $_POST[$value['id']] ) ) {
+						if ( isset( $_POST[$value['id']] ) )
 							$option_value = wc_clean( stripslashes( $_POST[ $value['id'] ] ) );
-						}
-						else {
+						else
 							$option_value = '';
-						}
-
-					}
-
+						
 				break;
 				
-				// /CX
-
-				// Standard types
-				case 'checkbox' :
-
-					if ( isset( $_POST[ $value['id'] ] ) ) {
-						$option_value = 'yes';
-					}
-					else {
-						$option_value = 'no';
-					}
-
-				break;
+				// / CX
 
 				// Special types
 				case 'multiselect' :
@@ -773,9 +745,12 @@ class EC_Settings {
 
 			}
 
-			if ( !is_null( $option_value ) ) {
-				// Check if option is an array
+			if ( ! is_null( $option_value ) ) {
 				if ( strstr( $value['id'], '[' ) ) {
+					
+					/**
+					 * Option is an Array.
+					 */
 
 					parse_str( $value['id'], $option_array );
 
@@ -793,10 +768,13 @@ class EC_Settings {
 					$key = key( $option_array[ $option_name ] );
 
 					$update_options[ $option_name ][ $key ] = $option_value;
-
-				// Single value
 				}
 				else {
+					
+					/**
+					 * Option is an Single.
+					 */
+					
 					$update_options[ $value['id'] ] = $option_value;
 				}
 			}
@@ -807,11 +785,18 @@ class EC_Settings {
 
 		// Now save the options
 		foreach( $update_options as $name => $value ) {
-			if ( str_replace( PHP_EOL, "\n", $value ) != str_replace(PHP_EOL, "\n", self::get_option_array( $name, 'default' ) ) ) {
+			
+			if (
+					str_replace( PHP_EOL, "\n", $value )
+					!=
+					str_replace( PHP_EOL, "\n", self::get_option_array( $name, 'default' ) )
+				) {
+				
 				update_option( $name, $value );
 				//update_option( $name, self::get_option_array($name, 'default') );
 			}
 			else{
+				
 				delete_option( $name );
 			}
 		}
@@ -872,7 +857,6 @@ class EC_Settings {
 		);
 		
 		$return_value = wp_parse_args( $return_value, $defaults );
-		
 		
 		if ( $option_key ) {
 			if ( isset( $return_value[ $option_key ] ) )

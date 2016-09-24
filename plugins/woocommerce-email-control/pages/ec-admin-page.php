@@ -76,7 +76,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 					
 					<div class="main-controls-element">
 						<label class="controls-label">
-							<?php _e( "Email to show","email-control") ; ?> <span class="help-icon help_tip_new" data-tip="<?php _e( 'Choose which email to preview or send.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+							<?php _e( "Email to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Choose which email to preview or send.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -108,7 +108,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 						?>
 						<div class="main-controls-element">
 							<label class="controls-label">
-								<?php _e( "Template to show","email-control") ; ?> <span class="help-icon help_tip_new" data-tip="<?php _e( 'Edit the email.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+								<?php _e( "Template to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Edit the email.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 							</label>
 							<div class="controls-field">
 								<div class="controls-inner-row">
@@ -146,7 +146,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 					
 					<div class="main-controls-element" id="ec_edit_content_controls">
 						<label class="controls-label">
-							<?php _e( "Customize Template","email-control") ; ?> <span class="help-icon help_tip_new" data-tip="<?php _e( 'Customize the email that you are showing.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+							<?php _e( "Customize Template","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Customize the email that you are showing.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -165,7 +165,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 					
 					<div class="main-controls-element">
 						<label class="controls-label">
-							<?php _e( "Order to show","email-control") ; ?> <span class="help-icon help_tip_new" data-tip="<?php _e( 'Choose which order to use to populate the email template preview.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+							<?php _e( "Order to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Choose which order to use to populate the email template preview.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -213,7 +213,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 					
 					<div class="main-controls-element">
 						<label class="controls-label">
-							<?php _e( "Show Header Info", 'email-control' ) ; ?> <span class="help-icon help_tip_new" data-tip="<?php _e( 'Display the email header information.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+							<?php _e( "Show Header Info", 'email-control' ) ; ?> <span class="help-icon" title="<?php _e( 'Display the email header information.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -241,7 +241,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 						$order = new WC_Order( $show_order );
 						?>
 						<label class="controls-label">
-							<?php _e( "Send a Test", 'email-control' ) ; ?> <span class="help-icon help_tip_new" data-tip="<?php _e( 'Send a test email to any address. Use a comma separated list to send to multiple addresses', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+							<?php _e( "Send a Test", 'email-control' ) ; ?> <span class="help-icon" title="<?php _e( 'Send a test email to any address. Use a comma separated list to send to multiple addresses', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -328,7 +328,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 							<div class="main-controls-element forminp-tags ec-allowed-tags">
 								<label class="controls-label">
 									<?php _e( 'Allowed Shortcodes:', 'email-control' ) ?>
-									<span class="help-icon help_tip_new" data-tip="<?php echo esc_attr( __( 'Copy & Paste any of these [shortcodes] to use dynamic text in your text.', 'email-control' ) ) ?>" >&nbsp;</span>
+									<span class="help-icon" title="<?php echo esc_attr( __( 'Copy & Paste any of these [shortcodes] to use dynamic text in your text.', 'email-control' ) ) ?>" >&nbsp;</span>
 								</label>
 								<div class="controls-field">
 									<div class="controls-inner-row">

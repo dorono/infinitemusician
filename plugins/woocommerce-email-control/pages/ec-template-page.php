@@ -117,104 +117,12 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 			foreach ( $mails as $mail ) {
 				if ( $mail->id == $email_type ) {
 					
-					/**
-					 * Get a User ID for the preview.
-					 */
+					// Important Step: populates the $mail object with the necessary properties for it to Preview (or Send a test).
+					// It also returns a BOOLEAN for whether we have checked this email types preview with our plugin.
+					$compat_warning = $cxec_email_control->populate_mail_object( $order, $mail );
 					
-					// Get the Customer user_id from the order, or the current user ID if guest.
-					if ( 0 === ( $user_id = (int) get_post_meta( $order_id_to_show, '_customer_user', TRUE ) ) ) {
-						$user_id = get_current_user_id();
-					}
-					
-					/**
-					 * Get a Product ID for the preview.
-					 */
-					
-					// Get a product from the order. If it doesnt exist anymore then get the latest product.
-					$items = $order->get_items();
-					foreach ( $items as $item ) {
-						$product_id = $item['product_id'];
-						if ( NULL !== get_post( $product_id ) ) break;
-						//$product_variation_id = $item['variation_id'];
-					}
-					
-					if ( NULL === get_post( $product_id ) ){
-						
-						$products_array = get_posts( array(
-							'posts_per_page'   => 1,
-							'orderby'          => 'date',
-							'post_type'        => 'product',
-							'post_status'      => 'publish',
-						) );
-						
-						if ( isset( $products_array[0]->ID ) ){
-							$product_id = $products_array[0]->ID;
-						}
-					}
-					
-					// Disable trigger sending mail - empty recipients so wp_mail doesn't send anything on next step.
-					add_filter( 'woocommerce_email_recipient_' . $mail->id, '__return_empty_string', 100 );
-					
-					/**
-					 * Handle compatability with other plugins.
-					 */
-					$compatabiltiy_warning = FALSE;
-					// trigger() is the only way to init a mail, there is no other init method.
-					switch ( $mail->id ) {
-						
-						// WooCommerce Waitlist (from WooCommerce).
-						case 'woocommerce_waitlist_mailout':
-							$mail->trigger( $user_id, $product_id );
-							break;
-							
-						// WooCommerce Subscriptions (from WooCommerce).
-						case 'new_renewal_order':
-						case 'new_switch_order':
-						case 'customer_processing_renewal_order':
-						case 'customer_completed_renewal_order':
-						case 'customer_completed_switch_order':
-						case 'customer_renewal_invoice':
-							$mail->object = $order;
-							break;
-						
-						case 'cancelled_subscription':
-							$mail->object = FALSE;
-							$compatabiltiy_warning = TRUE;
-						
-						// All the default WooCommerce Emails.
-						case 'new_order':
-						case 'cancelled_order':
-						case 'customer_processing_order':
-						case 'customer_completed_order':
-						case 'customer_refunded_order':
-						case 'customer_on_hold_order':
-						case 'customer_invoice':
-						case 'customer_note':
-						case 'customer_reset_password':
-						case 'customer_new_account':
-						case 'failed_order':
-							$mail->object = $order;
-							break;
-						
-						// Everything else, including all default WC emails.
-						default:
-							$mail->object = $order;
-							$compatabiltiy_warning = TRUE;
-							break;
-					}
-					
-					// Testing:
-					// $compatabiltiy_warning = TRUE;
-					
-					$mail_url_id = 'wc_email_'.$mail->id;
-					
-					// Info Meta Swicth on /off
-					$field_default = "off";
-					$field_value = get_user_meta( $current_user->ID, "header_info_userspecifc", true);
-					$field_value = ( $field_value ) ? $field_value : $field_default ;
-					
-					if ( $field_value == "on" ) $header = true;
-					else $header = false;
+					// Info Meta Swicth on/off
+					$header = ( get_user_meta( $current_user->ID, 'header_info_userspecifc', true) ) ? get_user_meta( $current_user->ID, 'header_info_userspecifc', true ) : 'off' ;
 					?>
 					
 					<div class="email-template-preview pe-in-admin-page">
@@ -236,7 +144,7 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 								
 								<!-- ---------- / WooCommerce Version Warning ---------- -->
 								
-							<?php elseif ( $compatabiltiy_warning && ( $mail->id !== $_REQUEST['ec_approve_preview'] ) ) : ?>
+							<?php elseif ( $compat_warning && ( $mail->id !== $_REQUEST['ec_approve_preview'] ) ) : ?>
 								
 								<!-- ---------- Compatability Warning ---------- -->
 								
@@ -257,11 +165,11 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 								
 								<!-- ---------- Header Info ---------- -->
 								
-								<div class="header-info" <?php if ( $header ) { ?> style="display:block" <?php } ?> >
+								<div class="header-info" style="<?php if ( 'on' == $header ) echo 'display: block;'; ?>">
 									
 									<div class="header-info-label-block">
 										<div class="header-info-meta-heading">
-											<?php _e( "Header Info", 'email-control' ) ; ?> <span class="help-icon help_tip_new" data-tip="<?php _e( 'The header infomration that will be sent with the current Template. This can be changed in WooCommerce Settings > Emails, or simply click Edit next to the relevant field to be taken there.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+											<?php _e( "Header Info", 'email-control' ) ; ?> <span class="help-icon" title="<?php _e( 'The header infomration that will be sent with the current Template. This can be changed in WooCommerce Settings > Emails, or simply click Edit next to the relevant field to be taken there.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 										</div>
 									</div>
 									
@@ -274,7 +182,7 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 											<div class="header-info-meta">
 												<span class="meta-value"><?php echo $mail->get_subject() ?></span> 
 												<span class="meta-divider">|</span> 
-												<a class="edit-meta" target="wc-settings" href="<?php echo admin_url('admin.php?page=wc-settings&tab=email&section=' . $mail_url_id) ?>"><?php _e( "Edit", 'email-control' ) ; ?></a>
+												<a class="edit-meta" target="wc-settings" href="<?php echo admin_url( 'admin.php?page=wc-settings&tab=email&section=' . "wc_email_{$mail->id}" ); ?>"><?php _e( "Edit", 'email-control' ) ; ?></a>
 											</div>
 										</div>
 										
@@ -323,26 +231,18 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 								<!-- ----------  Email Template ---------- -->
 								
 								<?php
-								// Get the email contents. using @ to block any error messages from showing.
-								// $email_render = $mail->get_content();
-								@ $email_render = $mail->get_content_html();
-								// $email_render = $mail->get_content_html();
-								
-								// Remove this filter that is usally removed at send time send time during this filter `woocommerce_mail_content`.
-								remove_filter( 'woocommerce_email_styles', array( $cxec_email_control, 'ec_temporarily_empty_css' ) );
-								
-								// Apply inline styling again for saftey purposes.
-								$email_render = $mail->style_inline( $email_render );
-								
-								// Convert shortcodes again for saftey purposes.
-								$email_render = do_shortcode( $email_render );
+								// Get the email contents. using @ to block ugly error messages showing in the preview.
+								// The following mimics what WooCommerce does in it's `->send` method of WC_Email.
+								@ $email_message = $mail->get_content();
+								$email_message   = $mail->style_inline( $email_message );
+								$email_message   = apply_filters( 'woocommerce_mail_content', $email_message );
 								
 								// Convert line breaks to <br>'s if the mail is type 'plain'.
 								if ( 'plain' === $mail->email_type )
-									$email_render = '<div style="padding: 35px 40px; background-color: white;">' . str_replace( "\n", '<br/>', $mail->get_content() ) . '</div>';
+									$email_message = '<div style="padding: 35px 40px; background-color: white;">' . str_replace( "\n", '<br/>', $email_message ) . '</div>';
 								
 								// Display the email.
-								echo $email_render;
+								echo $email_message;
 								?>
 								
 								<!-- ----------  / Email Template ---------- -->

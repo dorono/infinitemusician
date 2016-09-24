@@ -3,17 +3,17 @@
  * Email Header
  */
 
-if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 
 /**
  * Get Settings.
  */
-$header_img_src					= esc_url_raw( get_option( 'ec_supreme_all_header_logo' ) );
-if ( !isset($header_img_src) || $header_img_src=='' )
+$header_img_src = esc_url_raw( get_option( 'ec_supreme_all_header_logo' ) );
+if ( ! isset( $header_img_src ) || '' == $header_img_src )
 	$header_img_src = esc_url_raw( get_option( 'woocommerce_email_header_image' ) );
 
-$header_logo_alignment			= get_option( "ec_supreme_all_logo_position" );
-$top_nav_position		= ( $header_logo_alignment == 'center' ) ? 'center' : 'right' ;
+$header_logo_alignment = get_option( "ec_supreme_all_logo_position" );
+$top_nav_position = ( $header_logo_alignment == 'center' ) ? 'center' : 'right' ;
 
 /**
  * EC Special Title
@@ -22,10 +22,10 @@ if ( ! function_exists( 'ec_special_title' ) ) :
 	function ec_special_title ($pass_heading_text, $args) {
 		
 		$defaults = array (
-			'text_position'		=> 'left',	// text_position = center, left, right
-			'border_position'	=> 'right',	// border_position = center, bottom, none
-			'space_before'		=> '',		// 6px or 6 (px will get added automatically)
-			'space_after'		=> '',		// 6px or (px will get added automatically)
+			'text_position'     => 'left',  // text_position = center, left, right
+			'border_position'   => 'right', // border_position = center, bottom, none
+			'space_before'      => '',      // 6px or 6 (px will get added automatically)
+			'space_after'       => '',      // 6px or (px will get added automatically)
 		);
 		
 		// Parse incoming $args into an array and merge it with $defaults
@@ -177,31 +177,31 @@ if ( ! function_exists( 'ec_nav_bar' ) ) :
 		
 		$return = false;
 		
-		$link_text_1	= get_option('ec_supreme_all_link_1_text');
-		$link_image_1	= get_option('ec_supreme_all_link_1_image');
-		$link_url_1		= get_option('ec_supreme_all_link_1_url');
+		$link_text_1    = get_option('ec_supreme_all_link_1_text');
+		$link_image_1   = get_option('ec_supreme_all_link_1_image');
+		$link_url_1     = get_option('ec_supreme_all_link_1_url');
 		
-		$link_text_2	= get_option('ec_supreme_all_link_2_text');
-		$link_image_2	= get_option('ec_supreme_all_link_2_image');
-		$link_url_2		= get_option('ec_supreme_all_link_2_url');
+		$link_text_2    = get_option('ec_supreme_all_link_2_text');
+		$link_image_2   = get_option('ec_supreme_all_link_2_image');
+		$link_url_2     = get_option('ec_supreme_all_link_2_url');
 		
-		$link_text_3	= get_option('ec_supreme_all_link_3_text');
-		$link_image_3	= get_option('ec_supreme_all_link_3_image');
-		$link_url_3		= get_option('ec_supreme_all_link_3_url');
+		$link_text_3    = get_option('ec_supreme_all_link_3_text');
+		$link_image_3   = get_option('ec_supreme_all_link_3_image');
+		$link_url_3     = get_option('ec_supreme_all_link_3_url');
 		
-		$link_text_4	= get_option('ec_supreme_all_link_4_text');
-		$link_image_4	= get_option('ec_supreme_all_link_4_image');
-		$link_url_4		= get_option('ec_supreme_all_link_4_url');
+		$link_text_4    = get_option('ec_supreme_all_link_4_text');
+		$link_image_4   = get_option('ec_supreme_all_link_4_image');
+		$link_url_4     = get_option('ec_supreme_all_link_4_url');
 		
-		$link_text_5	= get_option('ec_supreme_all_link_5_text');
-		$link_image_5	= get_option('ec_supreme_all_link_5_image');
-		$link_url_5		= get_option('ec_supreme_all_link_5_url');
+		$link_text_5    = get_option('ec_supreme_all_link_5_text');
+		$link_image_5   = get_option('ec_supreme_all_link_5_image');
+		$link_url_5     = get_option('ec_supreme_all_link_5_url');
 		
-		$link_text_6	= get_option('ec_supreme_all_link_6_text');
-		$link_image_6	= get_option('ec_supreme_all_link_6_image');
-		$link_url_6		= get_option('ec_supreme_all_link_6_url');
+		$link_text_6    = get_option('ec_supreme_all_link_6_text');
+		$link_image_6   = get_option('ec_supreme_all_link_6_image');
+		$link_url_6     = get_option('ec_supreme_all_link_6_url');
 		
-		if 	( $link_text_1 || $link_image_1 || $link_text_2 || $link_image_2 || $link_text_3 || $link_image_3 || $link_text_4 || $link_image_4 || $link_text_5 || $link_image_5 || $link_text_6 || $link_image_6 ) {
+		if  ( $link_text_1 || $link_image_1 || $link_text_2 || $link_image_2 || $link_text_3 || $link_image_3 || $link_text_4 || $link_image_4 || $link_text_5 || $link_image_5 || $link_text_6 || $link_image_6 ) {
 		
 			ob_start();
 			?>
@@ -363,8 +363,7 @@ ob_start();
 		
 		<table class="wrapper" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">
 			<tr>
-				<td align="center" valign="top">
-					
+				<td class="wrapper-td" align="center" valign="top">
 					
 					<table class="main-body" border="0" cellpadding="0" cellspacing="0">
 						<tr>
