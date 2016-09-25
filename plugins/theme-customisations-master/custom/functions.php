@@ -21,6 +21,8 @@ function jk_remove_sticky_checkout() {
  wp_dequeue_script( 'storefront-sticky-payment' );
 }
 
+
+
 //Possible future use for overriding jump to top of page
 // add_action( 'wp_enqueue_scripts', 'swap_onepage_checkout_js', 100 );
 //

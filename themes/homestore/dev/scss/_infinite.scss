@@ -39,3 +39,11 @@ p.no-comments {
 		margin-bottom: 0;
 	}
 }
+
+/* HOMEPAGE */
+#homepage-feature {
+	> div {
+		width: 49%;
+		float: left
+	}
+}
