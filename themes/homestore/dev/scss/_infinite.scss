@@ -41,9 +41,27 @@ p.no-comments {
 }
 
 /* HOMEPAGE */
+.info-box {
+	background: #f3dfa3;
+	border: 1px solid #000;
+	padding: 15px;
+	margin: 15px 0;
+	width: 100%;
+	clear: both;
+}
+
 #homepage-feature {
 	> div {
 		width: 49%;
-		float: left
+		float: left;
+
+		a {
+			display: block;
+			text-align: center;
+
+			img {
+				display: inline;
+			}
+		}
 	}
 }

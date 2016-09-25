@@ -8,38 +8,38 @@
  * https://wordpress.org/plugins/homepage-control/
  *
  * Template name: Homepage
- *
- * @package storefront
  */
-
 get_header(); ?>
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
+			<?php if ( is_active_sidebar( 'homepage-top-info-box' ) ) : ?>
+				<?php dynamic_sidebar('homepage-top-info-box'); ?>
+			<?php endif; ?>
 			<div id="homepage-feature">
 				<div>
-					test
+					<a href="http://www.bulletproofsaxophoneplaying.com"><img src="<?php get_home_url() ?>/wp-content/uploads/bsp-graphicshouse-multiwidth-300.jpg" /></a>
 				</div>
 				<div>
-					test
+					<a href="http://www.jazzlessonswithgiants.com"><img src="<?php get_home_url() ?>/wp-content/uploads/jlwg-300x-250-may-2015.jpg" /></a>
 				</div>
 			</div>
 
 
 			<?php
-			/**
-			 * Functions hooked in to homepage action
-			 *
-			 * @hooked test      - 12
-			 * @hooked storefront_homepage_content      - 10
-			 * @hooked storefront_product_categories    - 20
-			 * @hooked storefront_recent_products       - 30
-			 * @hooked storefront_featured_products     - 40
-			 * @hooked storefront_popular_products      - 50
-			 * @hooked storefront_on_sale_products      - 60
-			 * @hooked storefront_best_selling_products - 70
-			 */
-			do_action( 'homepage' );
- 		?>
+            /**
+             * Functions hooked in to homepage action.
+             *
+             * @hooked test      - 12
+             * @hooked storefront_homepage_content      - 10
+             * @hooked storefront_product_categories    - 20
+             * @hooked storefront_recent_products       - 30
+             * @hooked storefront_featured_products     - 40
+             * @hooked storefront_popular_products      - 50
+             * @hooked storefront_on_sale_products      - 60
+             * @hooked storefront_best_selling_products - 70
+             */
+            do_action('homepage');
+        ?>
 
 		</main><!-- #main -->
 	</div><!-- #primary -->

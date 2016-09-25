@@ -44,8 +44,27 @@ p.no-comments {
   }
 }
 /* HOMEPAGE */
-/* line 45, ../../scss/_infinite.scss */
+/* line 44, ../../scss/_infinite.scss */
+.info-box {
+  background: #f3dfa3;
+  border: 1px solid #000;
+  padding: 15px;
+  margin: 15px 0;
+  width: 100%;
+  clear: both;
+}
+
+/* line 54, ../../scss/_infinite.scss */
 #homepage-feature > div {
   width: 49%;
   float: left;
+}
+/* line 58, ../../scss/_infinite.scss */
+#homepage-feature > div a {
+  display: block;
+  text-align: center;
+}
+/* line 62, ../../scss/_infinite.scss */
+#homepage-feature > div a img {
+  display: inline;
 }
