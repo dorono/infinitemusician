@@ -469,10 +469,22 @@
 			jQuery('.iris-picker').hide();
 		});
 
-		jQuery('.ec-colorpick').click(function(a) {
-			a.stopPropagation();
+		jQuery('.ec-colorpick').click(function(e) {
+			
+			// Get elements.
+			var $parent_element = $(this).parents('.main-controls-element.forminp-color.ec-half');
+			
+			// If color-picker-panel is far to the right, then mov eit to the left, so it fit's inside the scroll panel.
+			if ( $parent_element.length ) {
+				var offset = $parent_element.position();
+				if ( 100 < offset.left ) {
+					$parent_element.addClass('ec-half-right');
+				}
+			}
+			
+			// This is important - stops the color picker opening, then closing.
+			e.stopPropagation();
 		});
-
 		
 		// Preview Email Upload Image
 		// ----------------------------------------

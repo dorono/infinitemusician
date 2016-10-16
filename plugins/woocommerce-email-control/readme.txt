@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: cxThemes
 Tags: woocommerce, email, customize, customise, edit, colors, text, preview, template, communication, send, test
-Stable tag: 3.01
+Stable tag: 3.02
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,9 @@ Please see the included PDF for full instructions on how to use this plugin.
  
  
 == Changelog ==
+
+= 3.02 =
+* Fixed unique characters being stripped from the urls when saving custom Links.
 
 = 3.01 =
 * Fixed curl notice in the email preview when using Email Customizer with 3rd party email sending plugins.

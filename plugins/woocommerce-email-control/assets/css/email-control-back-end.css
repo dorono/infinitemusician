@@ -108,6 +108,8 @@
 .ec-admin-panel.ec-admin-panel-edit-content .section .section-inner:after { display:block; content: ""; clear:both; float:none; }
 
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element .iris-picker { z-index: 100; position: absolute; display: none; border: 1px solid #CCC; box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); border-radius: 3px; }
+.ec-admin-panel.ec-admin-panel-edit-content .main-controls-element.ec-half-right .iris-picker { right: 0; }
+
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element .reset-to-default {position:absolute;left: -8px;bottom: -20px;font-size: 11px;color: #909090;cursor: pointer;visibility: hidden;opacity: 0;padding: 0 8px 0 8px;line-height: 18px;box-sizing: border-box;text-align: right;letter-spacing: -.1px;transition: all 0.15s ease-in-out 0.05s;/* text-transform: uppercase; *//* display: block !important; *//* opacity: 1 !important; *//* visibility: visible !important; *//* background: rgba(255, 0, 0, 0.28) !important; */}
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element .reset-to-default i {margin: 0 0 0 2px;}
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element:hover .reset-to-default { visibility:visible; opacity:1; }

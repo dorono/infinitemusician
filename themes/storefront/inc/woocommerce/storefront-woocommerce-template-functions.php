@@ -330,9 +330,11 @@ if ( ! function_exists( 'storefront_handheld_footer_bar_account_link' ) ) {
 
 if ( ! function_exists( 'storefront_woocommerce_init_structured_data' ) ) {
 	/**
-	 * Generate product category structured data...
-	 * Hooked into the `woocommerce_before_shop_loop_item` action...
-	 * Apply the `storefront_woocommerce_structured_data` filter hook for structured data customization...
+	 * WARNING: This function will be deprecated in Storefront v2.2.
+	 *
+	 * Generates product category structured data.
+	 *
+	 * Hooked into `woocommerce_before_shop_loop_item` action hook.
 	 */
 	function storefront_woocommerce_init_structured_data() {
 		if ( ! is_product_category() ) {
@@ -348,10 +350,6 @@ if ( ! function_exists( 'storefront_woocommerce_init_structured_data' ) ) {
 		$json['description']       = get_the_excerpt();
 		$json['url']               = get_the_permalink();
 		$json['sku']               = $product->get_sku();
-		$json['brand']             = array(
-			'@type'                  => 'Thing',
-			'name'                   => $product->get_attribute( __( 'brand', 'storefront' ) ),
-		);
 
 		if ( $product->get_rating_count() ) {
 			$json['aggregateRating'] = array(

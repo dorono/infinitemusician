@@ -189,18 +189,17 @@ class EC_Settings {
 								
 								break;
 								
-								// Standard text inputs and subtypes like 'number'
 								case 'text':
 								case 'email':
 								case 'number':
 								case 'color' :
 								case 'password' :
-
+									
 									$type 			= $value['type'];
 									$class 			= '';
 									$option_value 	= self::get_option( $value['id'], $value['default'] );
 
-									if ( $value['type'] == 'color' ) {
+									if ( 'color' == $type ) {
 										$type = 'text';
 										$value['field_class'] .= 'ec-colorpick';
 										$description .= '<div id="colorPickerDiv_' . esc_attr( $value['id'] ) . '" class="colorpickdiv" style="z-index: 100;background:#eee;border:1px solid #ccc;position:absolute;display:none;"></div>';
@@ -674,10 +673,17 @@ class EC_Settings {
 				
 				case 'textarea' :
 
-					if ( isset( $_POST[$value['id']] ) )
-						$option_value = wp_kses_post( trim( stripslashes( $_POST[ $value['id'] ] ) ) );
-					else
+					if ( isset( $_POST[$value['id']] ) ) {
+						
+						$option_value = $_POST[ $value['id'] ];
+						$option_value = stripslashes( $option_value );
+						$option_value = trim( $option_value );
+						$option_value = wp_kses_post( $option_value );
+					}
+					else {
+						
 						$option_value = '';
+					}
 					
 				break;
 
@@ -691,12 +697,19 @@ class EC_Settings {
 				case 'single_select_country' :
 				case 'radio' :
 				case 'image_upload' :
-
-						if ( isset( $_POST[$value['id']] ) )
-							$option_value = wc_clean( stripslashes( $_POST[ $value['id'] ] ) );
-						else
-							$option_value = '';
+				
+					if ( isset( $_POST[$value['id']] ) ) {
 						
+						$option_value = $_POST[ $value['id'] ];
+						$option_value = stripslashes( $option_value );
+						$option_value = trim( $option_value );
+						$option_value = wp_kses_post( $option_value );
+					}
+					else {
+						
+						$option_value = '';
+					}
+					
 				break;
 				
 				// / CX

@@ -5,7 +5,7 @@
  * Author: cxThemes
  * Author URI: http://codecanyon.net/user/cxThemes
  * Plugin URI: http://codecanyon.net/item/email-customizer-for-woocommerce/8654473
- * Version: 3.01
+ * Version: 3.02
  * Text Domain: email-control
  * Domain Path: /languages/
  *
@@ -22,7 +22,7 @@ if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Define Constants
  */
-define( 'WC_EMAIL_CONTROL_VERSION', '3.01' );
+define( 'WC_EMAIL_CONTROL_VERSION', '3.02' );
 define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', '2.3' );
 define( 'WC_EMAIL_CONTROL_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );

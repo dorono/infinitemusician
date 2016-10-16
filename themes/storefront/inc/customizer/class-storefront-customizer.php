@@ -151,23 +151,17 @@ if ( ! class_exists( 'Storefront_Customizer' ) ) :
 
 				$wp_customize->selective_refresh->add_partial( 'custom_logo', array(
 					'selector'        => '.site-branding',
-					'render_callback' => function() {
-						storefront_site_title_or_logo();
-					},
+					'render_callback' => array( $this, 'get_site_logo' ),
 				) );
 
 				$wp_customize->selective_refresh->add_partial( 'blogname', array(
 					'selector'        => '.site-title.beta a',
-					'render_callback' => function() {
-						bloginfo( 'name' );
-					},
+					'render_callback' => array( $this, 'get_site_name' ),
 				) );
 
 				$wp_customize->selective_refresh->add_partial( 'blogdescription', array(
 					'selector'        => '.site-description',
-					'render_callback' => function() {
-						bloginfo( 'description' );
-					},
+					'render_callback' => array( $this, 'get_site_description' ),
 				) );
 			}
 
@@ -762,6 +756,19 @@ if ( ! class_exists( 'Storefront_Customizer' ) ) :
 				background: -webkit-linear-gradient(transparent 0,transparent 0),-webkit-linear-gradient(135deg,' . storefront_adjust_color_brightness( $storefront_theme_mods['background_color'], -7 ) . ' 33.33%,transparent 33.33%),-webkit-linear-gradient(45deg,' . storefront_adjust_color_brightness( $storefront_theme_mods['background_color'], -7 ) . ' 33.33%,transparent 33.33%)
 			}
 
+			p.stars a:before,
+			p.stars a:hover~a:before,
+			p.stars.selected a.active~a:before {
+				color: ' . $storefront_theme_mods['text_color'] . ';
+			}
+
+			p.stars.selected a.active:before,
+			p.stars:hover a:before,
+			p.stars.selected a:not(.active):before,
+			p.stars.selected a.active:before {
+				color: ' . $storefront_theme_mods['accent_color'] . ';
+			}
+
 			@media screen and ( min-width: 768px ) {
 				.site-header-cart .widget_shopping_cart,
 				.site-header .product_list_widget li .quantity {
@@ -871,6 +878,36 @@ if ( ! class_exists( 'Storefront_Customizer' ) ) :
 			}
 			</style>
 			<?php
+		}
+
+		/**
+		 * Get site logo.
+		 *
+		 * @since 2.1.5
+		 * @return string
+		 */
+		public function get_site_logo() {
+			return storefront_site_title_or_logo( false );
+		}
+
+		/**
+		 * Get site name.
+		 *
+		 * @since 2.1.5
+		 * @return string
+		 */
+		public function get_site_name() {
+			return get_bloginfo( 'name', 'display' );
+		}
+
+		/**
+		 * Get site description.
+		 *
+		 * @since 2.1.5
+		 * @return string
+		 */
+		public function get_site_description() {
+			return get_bloginfo( 'description', 'display' );
 		}
 	}
 

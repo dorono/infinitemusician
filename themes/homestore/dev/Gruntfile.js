@@ -59,7 +59,8 @@ module.exports = function(grunt) {
             '<%= config.jsSrc %>/{,*/}*.js',
             '<%= config.jsSrc %>/main.js',
             '!<%= config.jsSrc %>/one-page-checkout.js',
-            '!<%= config.app %>/<%= config.jsSrc %>/global.js'
+            '!<%= config.app %>/<%= config.jsSrc %>/global.js',
+            '!<%= config.jsSrc %>/one-page-checkout.js'
           ]
         },
 
@@ -67,6 +68,7 @@ module.exports = function(grunt) {
           scripts: {
             files: {
               '<%= config.jsDest %>/custom.js': [
+                '<%= config.jsSrc %>/browser-detection.js',
                 '<%= config.jsSrc %>/main.js'
               ]
             }

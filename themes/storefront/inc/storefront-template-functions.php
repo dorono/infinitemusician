@@ -125,7 +125,7 @@ if ( ! function_exists( 'storefront_credit' ) ) {
 		<div class="site-info">
 			<?php echo esc_html( apply_filters( 'storefront_copyright_text', $content = '&copy; ' . get_bloginfo( 'name' ) . ' ' . date( 'Y' ) ) ); ?>
 			<?php if ( apply_filters( 'storefront_credit_link', true ) ) { ?>
-			<br /> <?php printf( esc_attr__( '%1$s designed by %2$s.', 'storefront' ), 'Storefront', '<a href="http://www.woothemes.com" title="Premium WordPress Themes & Plugins by WooThemes" rel="author">WooThemes</a>' ); ?>
+			<br /> <?php printf( esc_attr__( '%1$s designed by %2$s.', 'storefront' ), 'Storefront', '<a href="http://www.woocommerce.com" title="WooCommerce - The Best eCommerce Platform for WordPress" rel="author">WooCommerce</a>' ); ?>
 			<?php } ?>
 		</div><!-- .site-info -->
 		<?php
@@ -171,26 +171,50 @@ if ( ! function_exists( 'storefront_site_title_or_logo' ) ) {
 	/**
 	 * Display the site title or logo
 	 *
-	 * @since  2.1.0
-	 * @return void
+	 * @since 2.1.0
+	 * @param bool $echo Echo the string or return it.
+	 * @return string
 	 */
-	function storefront_site_title_or_logo() {
+	function storefront_site_title_or_logo( $echo = true ) {
 		if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
 			$logo = get_custom_logo();
-
-			echo $logo = is_home() ? '<h1 class="logo">' . $logo . '</h1>' : $logo;
+			$html = is_home() ? '<h1 class="logo">' . $logo . '</h1>' : $logo;
 		} elseif ( function_exists( 'jetpack_has_site_logo' ) && jetpack_has_site_logo() ) {
-			jetpack_the_site_logo();
+			// Copied from jetpack_the_site_logo() function.
+			$logo    = site_logo()->logo;
+			$logo_id = get_theme_mod( 'custom_logo' ); // Check for WP 4.5 Site Logo
+			$logo_id = $logo_id ? $logo_id : $logo['id']; // Use WP Core logo if present, otherwise use Jetpack's.
+			$size    = site_logo()->theme_size();
+			$html    = sprintf( '<a href="%1$s" class="site-logo-link" rel="home" itemprop="url">%2$s</a>',
+				esc_url( home_url( '/' ) ),
+				wp_get_attachment_image(
+					$logo_id,
+					$size,
+					false,
+					array(
+						'class'     => 'site-logo attachment-' . $size,
+						'data-size' => $size,
+						'itemprop'  => 'logo'
+					)
+				)
+			);
+
+			$html = apply_filters( 'jetpack_the_site_logo', $html, $logo, $size );
 		} else {
 			$tag = is_home() ? 'h1' : 'div';
 
-			echo '<' . esc_attr( $tag ) . ' class="beta site-title"><a href="' . esc_url( home_url( '/' ) ) . '" rel="home">' . esc_attr( get_bloginfo( 'name' ) ) . '</a></' . esc_attr( $tag ) .'>';
+			$html = '<' . esc_attr( $tag ) . ' class="beta site-title"><a href="' . esc_url( home_url( '/' ) ) . '" rel="home">' . esc_html( get_bloginfo( 'name' ) ) . '</a></' . esc_attr( $tag ) .'>';
 
-			if ( '' != get_bloginfo( 'description' ) ) { ?>
-				<p class="site-description"><?php echo bloginfo( 'description' ); ?></p>
-				<?php
+			if ( '' !== get_bloginfo( 'description' ) ) {
+				$html .= '<p class="site-description">' . esc_html( get_bloginfo( 'description', 'display' ) ) . '</p>';
 			}
 		}
+
+		if ( ! $echo ) {
+			return $html;
+		}
+
+		echo $html;
 	}
 }
 
@@ -340,7 +364,13 @@ if ( ! function_exists( 'storefront_post_content' ) ) {
 		?>
 		<div class="entry-content">
 		<?php
-		storefront_post_thumbnail( 'full' );
+
+		/**
+		 * Functions hooked in to storefront_post_content_before action.
+		 *
+		 * @hooked storefront_post_thumbnail - 10
+		 */
+		do_action( 'storefront_post_content_before' );
 
 		the_content(
 			sprintf(
@@ -348,6 +378,8 @@ if ( ! function_exists( 'storefront_post_content' ) ) {
 				'<span class="screen-reader-text">' . get_the_title() . '</span>'
 			)
 		);
+
+		do_action( 'storefront_post_content_after' );
 
 		wp_link_pages( array(
 			'before' => '<div class="page-links">' . __( 'Pages:', 'storefront' ),
@@ -776,7 +808,7 @@ if ( ! function_exists( 'storefront_post_thumbnail' ) ) {
 	 * @param string $size the post thumbnail size.
 	 * @since 1.5.0
 	 */
-	function storefront_post_thumbnail( $size ) {
+	function storefront_post_thumbnail( $size = 'full' ) {
 		if ( has_post_thumbnail() ) {
 			the_post_thumbnail( $size );
 		}
@@ -803,15 +835,19 @@ if ( ! function_exists( 'storefront_primary_navigation_wrapper_close' ) ) {
 
 if ( ! function_exists( 'storefront_init_structured_data' ) ) {
 	/**
-	 * Generate the structured data...
-	 * Initialize Storefront::$structured_data via Storefront::set_structured_data()...
-	 * Hooked into:
-	 * `storefront_loop_post`
-	 * `storefront_single_post`
-	 * `storefront_page`
-	 * Apply `storefront_structured_data` filter hook for structured data customization :)
+	 * Generates structured data.
+	 *
+	 * Hooked into the following action hooks:
+	 *
+	 * - `storefront_loop_post`
+	 * - `storefront_single_post`
+	 * - `storefront_page`
+	 *
+	 * Applies `storefront_structured_data` filter hook for structured data customization :)
 	 */
 	function storefront_init_structured_data() {
+
+		// Post's structured data.
 		if ( is_home() || is_category() || is_date() || is_search() || is_single() && ( is_woocommerce_activated() && ! is_woocommerce() ) ) {
 			$image = wp_get_attachment_image_src( get_post_thumbnail_id( get_the_ID() ), 'normal' );
 			$logo  = wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' );
@@ -821,13 +857,6 @@ if ( ! function_exists( 'storefront_init_structured_data' ) ) {
 			$json['mainEntityOfPage'] = array(
 				'@type'                 => 'webpage',
 				'@id'                   => get_the_permalink(),
-			);
-
-			$json['image']            = array(
-				'@type'                 => 'ImageObject',
-				'url'                   => $image[0],
-				'width'                 => $image[1],
-				'height'                => $image[2],
 			);
 
 			$json['publisher']        = array(
@@ -846,11 +875,22 @@ if ( ! function_exists( 'storefront_init_structured_data' ) ) {
 				'name'                  => get_the_author(),
 			);
 
+			if ( $image ) {
+				$json['image']            = array(
+					'@type'                 => 'ImageObject',
+					'url'                   => $image[0],
+					'width'                 => $image[1],
+					'height'                => $image[2],
+				);
+			}
+
 			$json['datePublished']    = get_post_time( 'c' );
 			$json['dateModified']     = get_the_modified_date( 'c' );
 			$json['name']             = get_the_title();
-			$json['headline']         = get_the_title();
+			$json['headline']         = $json['name'];
 			$json['description']      = get_the_excerpt();
+
+		// Page's structured data.
 		} elseif ( is_page() ) {
 			$json['@type']            = 'WebPage';
 			$json['url']              = get_the_permalink();
