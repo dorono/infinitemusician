@@ -185,6 +185,7 @@ function pdfembBindFullScreen($, fsbtn, divContainer) {
             var _pageNum = dC.data('pagenum');
             var _showIsSecure = dC.data('showIsSecure');
 			var _pdfurl = dC.data('pdf-url');
+            var _pageturners = dC.data('pageturners');
             var _download = dC.data('download');
             var _tracking = dC.data('tracking');
             var _newwindow = dC.data('newwindow');
@@ -200,6 +201,7 @@ function pdfembBindFullScreen($, fsbtn, divContainer) {
             fsDivContainer.data('pagenum', _pageNum);
             fsDivContainer.data('showIsSecure', _showIsSecure);
 			fsDivContainer.data('pdf-url', _pdfurl);
+            fsDivContainer.data('pageturners', _pageturners);
             fsDivContainer.data('download', _download);
             fsDivContainer.data('tracking', _tracking);
             fsDivContainer.data('newwindow', _newwindow);
@@ -337,7 +339,14 @@ function pdfembAddAjaxBufferTransport() {
 function pdfemb_rc4ab(key, ab) {
 	var s = [], j = 0, x, res = '';
 	var dv = new DataView(ab);
-	
+
+    // Check for Unicode BOM and skip it
+    var starty = 0;
+    if (dv.getUint8(0) == 0xEF && dv.getUint8(1) == 0xBB && dv.getUint8(2) == 0xBF) {
+        starty = 3;
+    }
+
+    // Decrypt
 	for (var i = 0; i < 256; i++) {
 		s[i] = i;
 	}
@@ -349,7 +358,7 @@ function pdfemb_rc4ab(key, ab) {
 	}
 	i = 0;
 	j = 0;
-	for (var y = 0; y < ab.byteLength; y++) {
+	for (var y = starty; y < ab.byteLength; y++) {
 		i = (i + 1) % 256;
 		j = (j + s[i]) % 256;
 		x = s[i];
@@ -672,4 +681,26 @@ function pdfembPremiumPreRenderCanvas($, ctx, watermark_map, zoom) {
             y += 10;
         }
     }
+}
+
+function pdfembAddPageTurners(divContainer) {
+    var rightturner = jQuery('<div></div>', {'class': 'pdfemb-pageturner pdfemb-pageturner-bottomright'});
+    divContainer.append(rightturner);
+
+    var leftturner = jQuery('<div></div>', {'class': 'pdfemb-pageturner pdfemb-pageturner-bottomleft'});
+    divContainer.append(leftturner);
+
+    divContainer.find('.pdfemb-pageturner').on('mouseenter', function(e) {
+        var pt = jQuery(e.target);
+        if (!pt.hasClass('pdfemb-pageturner-disabled')) {
+            pt.addClass('pdfemb-pageturner-arrow');
+        }
+    }).on('mouseleave', function(e) {
+        var pt = jQuery(e.target);
+        pt.removeClass('pdfemb-pageturner-arrow');
+    }).on('click', function(e) {
+        var pt = jQuery(e.target);
+        pt.parent().trigger('pdfembGotoAction', pt.hasClass('pdfemb-pageturner-bottomright') ? 'NextPage' : 'PrevPage');
+        pdfembPremiumJumpToTop(divContainer);
+    });
 }

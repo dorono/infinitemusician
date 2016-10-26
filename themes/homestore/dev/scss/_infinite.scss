@@ -73,3 +73,23 @@ p.no-comments {
 		}
 	}
 }
+
+/* ORDER RECEIVED */
+.download-url {
+	font-size: 22px;
+  background: green;
+  padding: 10px;
+  color: white;
+  border-radius: 5px;
+
+	a {
+		text-decoration: underline;
+		color: white;
+
+		&:hover {
+			text-decoration: none;
+			color: white;
+			opacity: .75;
+		}
+	}
+}

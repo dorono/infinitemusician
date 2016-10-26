@@ -140,8 +140,8 @@ class core_pdf_embedder {
 			$height = 'max';
 		}
 		
-		$toolbar = isset($atts['toolbar']) && in_array($atts['toolbar'], array('top', 'bottom', 'both')) ? $atts['toolbar'] : $options['pdfemb_toolbar'];
-        if (!in_array($toolbar, array('top', 'bottom', 'both'))) {
+		$toolbar = isset($atts['toolbar']) && in_array($atts['toolbar'], array('top', 'bottom', 'both', 'none')) ? $atts['toolbar'] : $options['pdfemb_toolbar'];
+        if (!in_array($toolbar, array('top', 'bottom', 'both', 'none'))) {
             $toolbar = 'bottom';
         }
 		
@@ -311,6 +311,7 @@ class core_pdf_embedder {
             <option value="top" <?php echo $options['pdfemb_toolbar'] == 'top' ? 'selected' : ''; ?>><?php esc_html_e('Top', 'pdf-embedder'); ?></option>
             <option value="bottom" <?php echo $options['pdfemb_toolbar'] == 'bottom' ? 'selected' : ''; ?>><?php esc_html_e('Bottom', 'pdf-embedder'); ?></option>
             <option value="both" <?php echo $options['pdfemb_toolbar'] == 'both' ? 'selected' : ''; ?>><?php esc_html_e('Both', 'pdf-embedder'); ?></option>
+	        <?php $this->no_toolbar_option($options); ?>
         </select>
         <br class="clear" />
         <br class="clear" />
@@ -338,6 +339,10 @@ class core_pdf_embedder {
         <p><?php printf( __('You can override these defaults for specific embeds by modifying the shortcodes - see <a href="%s" target="_blank">instructions</a>.', 'pdf-embedder'), $this->get_instructions_url()); ?></p>
 
         <?php
+	}
+
+	protected function no_toolbar_option($options) {
+		// Override in commercial
 	}
 
 	protected function pdfemb_mainsection_extra() {
@@ -392,7 +397,7 @@ class core_pdf_embedder {
             );
         }
 
-        if (isset($input['pdfemb_toolbar']) && in_array($input['pdfemb_toolbar'], array('top', 'bottom', 'both'))) {
+        if (isset($input['pdfemb_toolbar']) && in_array($input['pdfemb_toolbar'], array('top', 'bottom', 'both', 'none'))) {
             $newinput['pdfemb_toolbar'] = $input['pdfemb_toolbar'];
         }
         else {

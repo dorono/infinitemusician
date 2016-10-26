@@ -84,3 +84,24 @@ p.no-comments {
   padding: 10px;
   margin-top: 5px;
 }
+
+/* ORDER RECEIVED */
+/* line 78, ../../scss/_infinite.scss */
+.download-url {
+  font-size: 22px;
+  background: green;
+  padding: 10px;
+  color: white;
+  border-radius: 5px;
+}
+/* line 85, ../../scss/_infinite.scss */
+.download-url a {
+  text-decoration: underline;
+  color: white;
+}
+/* line 89, ../../scss/_infinite.scss */
+.download-url a:hover {
+  text-decoration: none;
+  color: white;
+  opacity: .75;
+}

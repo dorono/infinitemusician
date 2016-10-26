@@ -14,20 +14,20 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
 
 	public function pdfemb_wp_enqueue_scripts() {
 		if (!$this->useminified()) {
-			wp_register_script( 'pdfemb_versionspecific_pdf_js', $this->my_plugin_url().'js/pdfemb-premium.js', array('jquery'));
-			wp_register_script( 'pdfemb_grabtopan_js', $this->my_plugin_url().'js/grabtopan-premium.js', array('jquery'));
-			wp_register_script( 'pdfemb_fullscreenpopup_js', $this->my_plugin_url().'js/jquery.fullscreen-popup-premium.js', array('jquery'));
+			wp_register_script( 'pdfemb_versionspecific_pdf_js', $this->my_plugin_url().'js/pdfemb-premium.js', array('jquery'), $this->PLUGIN_VERSION);
+			wp_register_script( 'pdfemb_grabtopan_js', $this->my_plugin_url().'js/grabtopan-premium.js', array('jquery'), $this->PLUGIN_VERSION);
+			wp_register_script( 'pdfemb_fullscreenpopup_js', $this->my_plugin_url().'js/jquery.fullscreen-popup-premium.js', array('jquery'), $this->PLUGIN_VERSION);
 			wp_register_script( 'pdfemb_embed_pdf_js', $this->my_plugin_url().'js/pdfemb-embed-pdf.js', 
-								array('pdfemb_versionspecific_pdf_js', 'pdfemb_grabtopan_js', 'pdfemb_fullscreenpopup_js', 'jquery') );
+								array('pdfemb_versionspecific_pdf_js', 'pdfemb_grabtopan_js', 'pdfemb_fullscreenpopup_js', 'jquery'), $this->PLUGIN_VERSION );
 		}
 		else {
-			wp_register_script( 'pdfemb_embed_pdf_js', $this->my_plugin_url().'js/all-pdfemb-premium.min.js', array('jquery') );
+			wp_register_script( 'pdfemb_embed_pdf_js', $this->my_plugin_url().'js/all-pdfemb-premium.min.js', array('jquery'), $this->PLUGIN_VERSION );
 		}
 
 		wp_localize_script( 'pdfemb_embed_pdf_js', 'pdfemb_trans', $this->get_translation_array() );
 
-		wp_register_script( 'pdfemb_compat_js', $this->my_plugin_url().'js/pdfjs/compatibility'.($this->useminified() ? '.min' : '').'.js');
-		wp_register_script( 'pdfemb_pdf_js', $this->my_plugin_url().'js/pdfjs/pdf'.($this->useminified() ? '.min' : '').'.js', array('pdfemb_compat_js'));
+		wp_register_script( 'pdfemb_compat_js', $this->my_plugin_url().'js/pdfjs/compatibility'.($this->useminified() ? '.min' : '').'.js', array(), $this->PLUGIN_VERSION);
+		wp_register_script( 'pdfemb_pdf_js', $this->my_plugin_url().'js/pdfjs/pdf'.($this->useminified() ? '.min' : '').'.js', array('pdfemb_compat_js'), $this->PLUGIN_VERSION);
 	}
 
 
@@ -74,13 +74,22 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     protected function pdfemb_mainsection_extra() {
         $options = $this->get_option_pdfemb();
         ?>
+	    <br class="clear" />
+	    <br class="clear" />
+
+	    <label for="pdfemb_pageturners" class="textinput"><?php esc_html_e('Page Turners', 'pdf-embedder'); ?></label>
+	    <span>
+        <input type="checkbox" name='<?php echo $this->get_options_name(); ?>[pdfemb_pageturners]' id='pdfemb_pageturners' class='checkbox' <?php echo $options['pdfemb_pageturners'] == 'on' ? 'checked' : ''; ?> />
+        <label for="pdfemb_pageturners" class="checkbox plain"><?php esc_html_e('Page turner arrows when hovering over edges of PDF', 'pdf-embedder'); ?></label>
+        </span>
+
         <br class="clear" />
         <br class="clear" />
 
         <label for="pdfemb_download" class="textinput"><?php esc_html_e('Download Button', 'pdf-embedder'); ?></label>
         <span>
         <input type="checkbox" name='<?php echo $this->get_options_name(); ?>[pdfemb_download]' id='pdfemb_download' class='checkbox' <?php echo $options['pdfemb_download'] == 'on' ? 'checked' : ''; ?> />
-        <label for="pdfemb_download" class="checkbox plain"><?php esc_html_e('Check to provide PDF download button in toolbar', 'pdf-embedder'); ?></label>
+        <label for="pdfemb_download" class="checkbox plain"><?php esc_html_e('Provide PDF download button in toolbar', 'pdf-embedder'); ?></label>
         </span>
 
         <br class="clear" />
@@ -112,6 +121,12 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
 
 	    <?php
     }
+
+	protected function no_toolbar_option($options) {
+		?>
+		<option value="none" <?php echo $options['pdfemb_toolbar'] == 'none' ? 'selected' : ''; ?>><?php esc_html_e('No Toolbar', 'pdf-embedder'); ?></option>
+		<?php
+	}
 
 	protected function pdfemb_mobilesection_text() {
         $options = $this->get_option_pdfemb();
@@ -268,6 +283,7 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     public function pdfemb_options_validate($input) {
         $newinput = parent::pdfemb_options_validate($input);
 
+	    $newinput['pdfemb_pageturners'] = isset($input['pdfemb_pageturners']) && ($input['pdfemb_pageturners'] === true || $input['pdfemb_pageturners'] == 'on') ? 'on' : 'off';
         $newinput['pdfemb_download'] = isset($input['pdfemb_download']) && ($input['pdfemb_download'] === true || $input['pdfemb_download'] == 'on') ? 'on' : 'off';
         $newinput['pdfemb_tracking'] = isset($input['pdfemb_tracking']) && ($input['pdfemb_tracking'] === true || $input['pdfemb_tracking'] == 'on') ? 'on' : 'off';
 	    $newinput['pdfemb_newwindow'] = isset($input['pdfemb_newwindow']) && ($input['pdfemb_newwindow'] === true || $input['pdfemb_newwindow'] == 'on') ? 'on' : 'off';
@@ -349,6 +365,7 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     protected function get_default_options() {
         return array_merge( parent::get_default_options(),
             Array(
+            	'pdfemb_pageturners' => true,
                 'pdfemb_mobilewidth' => '500',
                 'pdfemb_license_key' => '',
                 'pdfemb_tracking' => 'on',
@@ -419,7 +436,13 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
 
         $extraparams = '';
 
-        $download = isset($atts['download']) ? $atts['download'] : (isset($options['pdfemb_download']) && $options['pdfemb_download'] == 'on' ? 'on' : 'off');
+		$pageturners = isset($atts['pageturners']) ? $atts['pageturners'] : (isset($options['pdfemb_pageturners']) && $options['pdfemb_pageturners'] == 'on' ? 'on' : 'off');
+		if (!in_array($pageturners, array('on', 'off'))) {
+			$pageturners = 'off';
+		}
+		$extraparams .= ' data-pageturners="'.$pageturners.'"';
+
+		$download = isset($atts['download']) ? $atts['download'] : (isset($options['pdfemb_download']) && $options['pdfemb_download'] == 'on' ? 'on' : 'off');
         if (!in_array($download, array('on', 'off'))) {
             $download = 'off';
         }
