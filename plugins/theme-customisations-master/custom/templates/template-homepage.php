@@ -17,10 +17,10 @@ get_header(); ?>
 			<?php endif; ?>
 			<div id="homepage-feature">
 				<div>
-					<a href="http://www.bulletproofsaxophoneplaying.com"><img src="<?php get_home_url() ?>/wp-content/uploads/bsp-graphicshouse-multiwidth-300.jpg" /></a>
+					<a href="http://www.bulletproofsaxophoneplaying.com"><img src="<?php echo get_site_url(); ?>/wp-content/uploads/bsp-graphicshouse-multiwidth-300.jpg" /></a>
 				</div>
 				<div>
-					<a href="http://www.jazzlessonswithgiants.com"><img src="<?php get_home_url() ?>/wp-content/uploads/jlwg-300x-250-may-2015.jpg" /></a>
+					<a href="http://www.jazzlessonswithgiants.com"><img src="<?php echo get_site_url(); ?>/wp-content/uploads/jlwg-300x-250-may-2015.jpg" /></a>
 				</div>
 			</div>
 

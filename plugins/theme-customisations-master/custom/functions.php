@@ -18,8 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // getting rid of JS fixed position thingie that was breaking the page at times
 add_action( 'wp_enqueue_scripts', 'jk_remove_sticky_checkout', 99 );
+
 function jk_remove_sticky_checkout() {
- wp_dequeue_script( 'storefront-sticky-payment' );
+	wp_dequeue_script( 'storefront-sticky-payment' );
 }
 
 // create new widget for the top of the homepage
@@ -62,3 +63,14 @@ function custom_storefront_credit() {
 //
 //
 // }
+
+class Homestore_Template {
+	public function single_product_title() { ?>
+		<div id="hero">
+			 <img src="<?php echo get_post_meta( get_the_ID(), 'header_img_url', true ); ?>" class="product-page-hero">
+		 </div>
+		<?php
+	}
+}
+
+add_action( 'woocommerce_before_single_product_summary',  array( Homestore_Template, 'single_product_title' ), 10 );
