@@ -18,25 +18,31 @@ class EC_Settings {
 	public function __construct() {
 		
 		/* Init Shortcodes */
-		add_shortcode( 'ec_firstname',				array( "EC_Settings", 'ec_firstname' ) );
-		add_shortcode( 'ec_lastname',				array( "EC_Settings", 'ec_lastname' ) );
+		add_shortcode( 'ec_firstname',           array( "EC_Settings", 'ec_firstname' ) );
+		add_shortcode( 'ec_lastname',            array( "EC_Settings", 'ec_lastname' ) );
 		
-		add_shortcode( 'ec_email',				    array( "EC_Settings", 'ec_email' ) );
+		add_shortcode( 'ec_email',               array( "EC_Settings", 'ec_email' ) );
 		
-		add_shortcode( 'ec_order',					array( "EC_Settings", 'ec_order' ) );
-		add_shortcode( 'ec_order_link',				array( "EC_Settings", 'ec_order' ) );
-		add_shortcode( 'ec_user_order_link',		array( "EC_Settings", 'ec_order' ) );
-		add_shortcode( 'ec_pay_link',				array( "EC_Settings", 'ec_pay_link' ) );
+		add_shortcode( 'ec_order',               array( "EC_Settings", 'ec_order' ) );
+		add_shortcode( 'ec_order_link',          array( "EC_Settings", 'ec_order' ) );
+		add_shortcode( 'ec_user_order_link',     array( "EC_Settings", 'ec_order' ) );
+		add_shortcode( 'ec_pay_link',            array( "EC_Settings", 'ec_pay_link' ) );
 		
-		add_shortcode( 'ec_customer_note',			array( "EC_Settings", 'ec_customer_note' ) );
+		add_shortcode( 'ec_customer_note',       array( "EC_Settings", 'ec_customer_note' ) );
+		add_shortcode( 'ec_delivery_note',       array( "EC_Settings", 'ec_delivery_note' ) );
 		
-		add_shortcode( 'ec_user_login',				array( "EC_Settings", 'ec_user_login' ) );
-		add_shortcode( 'ec_account_link',			array( "EC_Settings", 'ec_account_link' ) );
-		add_shortcode( 'ec_user_password',			array( "EC_Settings", 'ec_user_password' ) );
-		add_shortcode( 'ec_reset_password_link',	array( "EC_Settings", 'ec_reset_password_link' ) );
-		add_shortcode( 'ec_login_link',				array( "EC_Settings", 'ec_login_link' ) );
-		add_shortcode( 'ec_site_link',				array( "EC_Settings", 'ec_site_link' ) );
-		add_shortcode( 'ec_site_name',				array( "EC_Settings", 'ec_site_name' ) );
+		add_shortcode( 'ec_shipping_method',       array( "EC_Settings", 'ec_shipping_method' ) );
+		add_shortcode( 'ec_payment_method',       array( "EC_Settings", 'ec_payment_method' ) );
+		
+		add_shortcode( 'ec_user_login',          array( "EC_Settings", 'ec_user_login' ) );
+		add_shortcode( 'ec_account_link',        array( "EC_Settings", 'ec_account_link' ) );
+		add_shortcode( 'ec_user_password',       array( "EC_Settings", 'ec_user_password' ) );
+		add_shortcode( 'ec_reset_password_link', array( "EC_Settings", 'ec_reset_password_link' ) );
+		add_shortcode( 'ec_login_link',          array( "EC_Settings", 'ec_login_link' ) );
+		add_shortcode( 'ec_site_link',           array( "EC_Settings", 'ec_site_link' ) );
+		add_shortcode( 'ec_site_name',           array( "EC_Settings", 'ec_site_name' ) );
+		
+		add_shortcode( 'ec_custom_field',        array( "EC_Settings", 'ec_custom_field' ) );
 	}
 	
 	/**
@@ -932,7 +938,7 @@ class EC_Settings {
 	 */
 	public static function check_display( $shortcode_args, $check ) {
 		
-		//Set to arrays
+		// Set to arrays
 		$shortcode_args['show'] = array_map('trim', explode(',', $shortcode_args['show'] ));
 		$shortcode_args['hide'] = array_map('trim', explode(',', $shortcode_args['hide'] ));
 		
@@ -951,12 +957,15 @@ class EC_Settings {
 		global $ec_template_args;
 		
 		$defaults = array(
-			'user_id'       => '' ,
-			'user_login'    => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**username**' : '' ,
-			'user_nicename' => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**nicename**' : '' ,
-			'email'         => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**email**' : '' ,
-			'first_name'    => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**firstname**' : '' ,
-			'last_name'     => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**lastname**' : '' ,
+			'user_id'         => '' ,
+			'user_login'      => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**username**' : '' ,
+			'user_nicename'   => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**nicename**' : '' ,
+			'email'           => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**email**' : '' ,
+			'first_name'      => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**firstname**' : '' ,
+			'last_name'       => ( isset( $_REQUEST["ec_render_email"] ) ) ? '**lastname**' : '' ,
+			'delivery_note'   => ( isset( $_REQUEST["ec_delivery_note"] ) ) ? '**delivery_note**' : '' ,
+			'shipping_method' => ( isset( $_REQUEST["ec_shipping_method"] ) ) ? '**shipping_method**' : '' ,
+			'payment_method'  => ( isset( $_REQUEST["ec_payment_method"] ) ) ? '**payment_method**' : '' ,
 		);
 		
 		$ec_template_args = wp_parse_args( $ec_template_args, $defaults );
@@ -964,6 +973,16 @@ class EC_Settings {
 		if ( isset( $ec_template_args['order'] ) ) {
 			
 			$order = $ec_template_args['order'];
+			
+			// Get Delivery Note.
+			$ec_template_args['delivery_note'] = $order->customer_note; // "The blue house at the end of the street".
+			
+			// Get Shipping Method.
+			if ( 'yes' == get_option( 'woocommerce_calc_shipping' ) )
+				$ec_template_args['shipping_method'] = $order->get_shipping_method(); // "Free Shipping".
+			
+			// Get Payment Method.
+			$ec_template_args['payment_method'] = $order->payment_method_title; // "Paypal".
 			
 			if ( ( $user_id = get_post_meta( $order->id, '_customer_user', true ) ) ) {
 				
@@ -1016,7 +1035,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1032,7 +1051,7 @@ class EC_Settings {
 		
 		$content = esc_html( $ec_template_args['user_login'] );
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_user_login">' . $content . '</span>';
 		}
@@ -1045,7 +1064,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1064,7 +1083,7 @@ class EC_Settings {
 		
 		$content = $ec_template_args['first_name'];
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_firstname">' . trim( $content ) . '</span>';
 		}
@@ -1077,7 +1096,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1096,7 +1115,7 @@ class EC_Settings {
 		
 		$content = $ec_template_args['last_name'];
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_lastname">' . trim( $content ) . '</span>';
 		}
@@ -1109,7 +1128,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1128,9 +1147,9 @@ class EC_Settings {
 		
 		$content = $ec_template_args['email'];
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
-			$content = '<span class="ec_shortcode ec_lastname">' . trim( $content ) . '</span>';
+			$content = '<span class="ec_shortcode ec_email">' . trim( $content ) . '</span>';
 		}
 		
 		return $content;
@@ -1141,7 +1160,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => '#, number, date, link, container',
 			'hide' => '',
@@ -1196,21 +1215,21 @@ class EC_Settings {
 				$content .= '</a>';
 			}
 			
-			//Add space.
+			// Add space.
 			$content .= " ";
 		}
 		
 		if ( self::check_display( $shortcode_args, 'date' ) ) {
 			$content .= '<span class="ec_datetime">(' . sprintf( '<time datetime="%s">%s</time>', date_i18n( 'c', strtotime( $ec_template_args['order']->order_date ) ), date_i18n( wc_date_format(), strtotime( $ec_template_args['order']->order_date ) ) ) . ')</span>';
 			
-			//Add space.
+			// Add space.
 			$content .= " ";
 		}
 		
 		//Trim spaces beginning and end.
 		$content = trim($content);
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_order">' . $content . '</span>';
 		}
@@ -1223,7 +1242,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1261,9 +1280,105 @@ class EC_Settings {
 			return;
 		}
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_customer_note">' . trim( $content ) . '</span>';
+		}
+		
+		return $content;
+	}
+	
+	public static function ec_delivery_note( $shortcode_args ) {
+		
+		// Shortcode args
+		// ---------------------------
+		
+		// Set shortcode args defaults
+		$shortcode_args_defaults = array(
+			'show' => 'container',
+			'hide' => '',
+		);
+		
+		// Merge shortcode args with defaults
+		$shortcode_args = wp_parse_args( $shortcode_args, $shortcode_args_defaults );
+		
+		// Compile content
+		// ----------------------------
+		global $ec_template_args;
+		self::ec_normalize_template_args();
+		
+		// Check if necessary template args exits
+		if ( !isset( $ec_template_args['delivery_note'] ) ) return;
+		
+		$content = $ec_template_args['delivery_note'];
+		
+		// Add Container (optional).
+		if ( self::check_display( $shortcode_args, 'container' ) ) {
+			$content = '<span class="ec_shortcode ec_delivery_note">' . trim( $content ) . '</span>';
+		}
+		
+		return $content;
+	}
+	
+	public static function ec_shipping_method( $shortcode_args ) {
+		
+		// Shortcode args
+		// ---------------------------
+		
+		// Set shortcode args defaults
+		$shortcode_args_defaults = array(
+			'show' => 'container',
+			'hide' => '',
+		);
+		
+		// Merge shortcode args with defaults
+		$shortcode_args = wp_parse_args( $shortcode_args, $shortcode_args_defaults );
+		
+		// Compile content
+		// ----------------------------
+		global $ec_template_args;
+		self::ec_normalize_template_args();
+		
+		// Check if necessary template args exits
+		if ( !isset( $ec_template_args['shipping_method'] ) ) return;
+		
+		$content = $ec_template_args['shipping_method'];
+		
+		// Add Container (optional).
+		if ( self::check_display( $shortcode_args, 'container' ) ) {
+			$content = '<span class="ec_shortcode ec_shipping_method">' . trim( $content ) . '</span>';
+		}
+		
+		return $content;
+	}
+	
+	public static function ec_payment_method( $shortcode_args ) {
+		
+		// Shortcode args
+		// ---------------------------
+		
+		// Set shortcode args defaults
+		$shortcode_args_defaults = array(
+			'show' => 'container',
+			'hide' => '',
+		);
+		
+		// Merge shortcode args with defaults
+		$shortcode_args = wp_parse_args( $shortcode_args, $shortcode_args_defaults );
+		
+		// Compile content
+		// ----------------------------
+		global $ec_template_args;
+		self::ec_normalize_template_args();
+		
+		// Check if necessary template args exits
+		if ( !isset( $ec_template_args['payment_method'] ) ) return;
+		
+		$content = $ec_template_args['payment_method'];
+		
+		// Add Container (optional).
+		if ( self::check_display( $shortcode_args, 'container' ) ) {
+			$content = '<span class="ec_shortcode ec_payment_method">' . trim( $content ) . '</span>';
 		}
 		
 		return $content;
@@ -1274,7 +1389,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1294,7 +1409,7 @@ class EC_Settings {
 		?><a href="<?php echo $link; ?>"><?php echo $link; ?></a><?php
 		$content = ob_get_clean();
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_account_link">' . $content . '</span>';
 		}
@@ -1307,7 +1422,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1335,11 +1450,16 @@ class EC_Settings {
 			wc_get_endpoint_url( 'lost-password', '', get_permalink( wc_get_page_id( 'myaccount' ) ) )
 		) );
 		
+		// Allow custom text as shortcode args.
+		$text = __( 'Click here to reset your password', 'email-control' );
+		if ( isset( $shortcode_args['text'] ) && trim( $shortcode_args['text'] ) )
+			$text = __( $shortcode_args['text'], 'email-control' );
+		
 		ob_start();
-		?><a href="<?php echo $link; ?>"><?php _e( 'Click here to reset your password', 'email-control' ); ?></a><?php
+		?><a href="<?php echo $link; ?>"><?php echo $text; ?></a><?php
 		$content = ob_get_clean();
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_reset_password_link">' . $content . '</span>';
 		}
@@ -1352,7 +1472,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1386,7 +1506,7 @@ class EC_Settings {
 			return;
 		}
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_user_password">' . trim( $content ) . '</span>';
 		}
@@ -1399,7 +1519,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1423,11 +1543,16 @@ class EC_Settings {
 		$link = esc_url_raw( $ec_template_args['order']->get_checkout_payment_url() );
 		if ( ! $link ) return;
 		
+		// Allow custom text as shortcode args.
+		$text = __( 'Pay now', 'email-control' );
+		if ( isset( $shortcode_args['text'] ) && trim( $shortcode_args['text'] ) )
+			$text = __( $shortcode_args['text'], 'email-control' );
+		
 		ob_start();
-		?><a href="<?php echo $link; ?>"><?php _e( 'Pay now', 'email-control' ) ?></a><?php
+		?><a href="<?php echo $link; ?>"><?php echo $text; ?></a><?php
 		$content = ob_get_clean();
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_pay_link">' . $content . '</span>';
 		}
@@ -1440,7 +1565,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1460,7 +1585,7 @@ class EC_Settings {
 		?><a href="<?php echo $link; ?>"><?php echo $link; ?></a><?php
 		$content = ob_get_clean();
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_login_link">' . $content . '</span>';
 		}
@@ -1473,7 +1598,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1491,7 +1616,7 @@ class EC_Settings {
 		?><a href="<?php echo esc_url_raw( get_site_url() ) ?>"><?php echo get_bloginfo( 'name' ); ?></a><?php
 		$content = ob_get_clean();
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_site_link">' . $content . '</span>';
 		}
@@ -1504,7 +1629,7 @@ class EC_Settings {
 		// Shortcode args
 		// ---------------------------
 		
-		//Set shortcode args defaults
+		// Set shortcode args defaults
 		$shortcode_args_defaults = array(
 			'show' => 'container',
 			'hide' => '',
@@ -1520,9 +1645,53 @@ class EC_Settings {
 		
 		$content = get_bloginfo( 'name' );
 		
-		//Add Container (optional).
+		// Add Container (optional).
 		if ( self::check_display( $shortcode_args, 'container' ) ) {
 			$content = '<span class="ec_shortcode ec_site_name">' . $content . '</span>';
+		}
+		
+		return $content;
+	}
+	
+	public static function ec_custom_field( $shortcode_args ) {
+		
+		// Shortcode args
+		// ---------------------------
+		
+		// Set shortcode args defaults
+		$shortcode_args_defaults = array(
+			'show' => 'container',
+			'hide' => '',
+		);
+		
+		// Merge shortcode args with defaults
+		$shortcode_args = wp_parse_args( $shortcode_args, $shortcode_args_defaults );
+		
+		// Compile content
+		// ----------------------------
+		global $ec_template_args;
+		self::ec_normalize_template_args();
+		
+		// s( $shortcode_args['key'] );
+		// s( get_post_meta( $ec_template_args['order']->id, $shortcode_args['key'], TRUE ) );
+		// s( get_post_meta( $ec_template_args['order']->id ) );
+		// exit();
+		
+		// Check if necessary template args exits
+		if ( ! isset( $shortcode_args['key'] ) && ! isset( $ec_template_args['order']->id ) ) return;
+		
+		$content = get_post_meta(
+			$ec_template_args['order']->id,
+			$shortcode_args['key'],
+			TRUE
+		);
+		
+		// Bail if there's no corresponding data to fetch.
+		if ( ! $content ) return;
+		
+		// Add Container (optional).
+		if ( self::check_display( $shortcode_args, 'container' ) ) {
+			$content = '<span class="ec_shortcode ec_custom_field ec_' . trim( $shortcode_args['key'] ) . '">' . trim( $content ) . '</span>';
 		}
 		
 		return $content;
@@ -1546,7 +1715,7 @@ if ( !function_exists('ec_get_settings') ) {
 		
 		global $ec_email_templates;
 		
-		//Set default filtred array of templates, incase get_settings isn't specific about an id
+		// Set default filtred array of templates, incase get_settings isn't specific about an id
 		$ec_email_templates_filtered = $ec_email_templates;
 		
 		

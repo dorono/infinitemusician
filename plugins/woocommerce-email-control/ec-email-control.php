@@ -5,7 +5,7 @@
  * Author: cxThemes
  * Author URI: http://codecanyon.net/user/cxThemes
  * Plugin URI: http://codecanyon.net/item/email-customizer-for-woocommerce/8654473
- * Version: 3.02
+ * Version: 3.03
  * Text Domain: email-control
  * Domain Path: /languages/
  *
@@ -22,7 +22,7 @@ if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Define Constants
  */
-define( 'WC_EMAIL_CONTROL_VERSION', '3.02' );
+define( 'WC_EMAIL_CONTROL_VERSION', '3.03' );
 define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', '2.3' );
 define( 'WC_EMAIL_CONTROL_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
@@ -1012,7 +1012,7 @@ class WC_Email_Control {
 		global $cxec_cache_email_message;
 		
 		// New method of gathering email HTML by pushing the data up into a global.
-		add_action( 'woocommerce_mail_content', array( $this, 'ec_cancel_email_send' ), 90 );
+		add_action( 'woocommerce_mail_content', array( $this, 'cancel_email_send' ), 90 );
 		
 		// Force the email to seem enabled in-case it has been tuned off programmatically.
 		$mail->enabled = 'yes';
@@ -1162,7 +1162,7 @@ class WC_Email_Control {
 	 * Stores the email message up in a global, then return an
 	 * empty string message which prevents the email sending.
 	 */
-	function ec_cancel_email_send( $message ) {
+	function cancel_email_send( $message ) {
 		global $cxec_cache_email_message;
 		$cxec_cache_email_message = $message;
 		return $message;

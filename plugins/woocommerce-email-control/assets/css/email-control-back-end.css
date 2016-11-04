@@ -84,9 +84,15 @@
 .ec-admin-panel.ec-admin-panel-edit-content .edit-top-controls .edit-top-control.close_settings:hover { background: rgb(95, 95, 95); color: white; }
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element { /* border-bottom: 0; */ padding: 15px 15px 15px; margin: 0;}
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element:last-child { border-bottom:0; }
-.ec-admin-panel.ec-admin-panel-edit-content .main-controls-element.ec-allowed-tags { border-bottom: 0; background: rgb(250, 250, 250); margin-bottom: -10px;}
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-heading { display:block; clear:both; background: rgb(252, 252, 252); padding: 10px 10px 11px 14px; color: #555; font-weight: 600; font-size: 13px; box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.07); border-bottom: 1px solid rgba(0, 0, 0, 0.05); text-transform: uppercase; text-align: center; margin: 0 0 12px; line-height: 21px;}
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element.ec-half { width:50%; float: left; clear: none; /* box-shadow: 1px 0 0 rgb(237, 237, 237); */}
+	
+	/* ALLOWED SHORTCODE TAGS */
+	.ec-admin-panel.ec-admin-panel-edit-content .main-controls-element.ec-allowed-tags {border-bottom: 0;background: rgb(250, 250, 250);margin-bottom: -10px;}
+	.ec-new-shortcode-badge {background: #a7a7a7;margin: 0 2px;color: #fafafa;padding: 0 3px 1px;border-radius: 3px;font-size: 9px;font-weight: normal;text-transform: uppercase;}
+	.ec-allowed-shortcode-docs-link {margin: 2px 0 0;font-size: 12px;font-style: italic;/* color: #8e8e8e; */}
+	.ec-allowed-shortcode-docs-link a { color: #6d6d6d; text-decoration: none; border-bottom: 1px dotted rgba(0,0,0,0.2); }
+	.ec-allowed-shortcode-docs-link a:hover {color: #007fa7;border-bottom-color: #007fa7;}
 
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element.ec-condensed { border-bottom: 0; margin: 15px 15px 20px; padding: 0;}
 .ec-admin-panel.ec-admin-panel-edit-content .main-controls-element.ec-condensed .controls-label { font-weight: 600; }

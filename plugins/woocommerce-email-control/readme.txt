@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: cxThemes
 Tags: woocommerce, email, customize, customise, edit, colors, text, preview, template, communication, send, test
-Stable tag: 3.02
+Stable tag: 3.03
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,11 @@ Please see the included PDF for full instructions on how to use this plugin.
  
  
 == Changelog ==
+
+= 3.03 =
+* Added new shortcodes `[ec_delivery_note]` `[ec_shipping_method]` `[ec_payment_method]` `[ec_custom_field]`.
+* Allow for customizing of the text on the `[ec_pay_link text="..."]` and `[ec_reset_password_link text="..."]`.
+* Read more about these, and all our shortcodes, in our new "Shortcodes" documentation https://www.cxthemes.com/documentation/email-customizer/shortcodes-email-customizer/.
 
 = 3.02 =
 * Fixed unique characters being stripped from the urls when saving custom Links.

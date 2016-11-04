@@ -327,12 +327,31 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 							
 							<div class="main-controls-element forminp-tags ec-allowed-tags">
 								<label class="controls-label">
-									<?php _e( 'Allowed Shortcodes:', 'email-control' ) ?>
+									<?php _e( 'Allowed Shortcodes:', 'email-control' ); ?>
 									<span class="help-icon" title="<?php echo esc_attr( __( 'Copy & Paste any of these [shortcodes] to use dynamic text in your text.', 'email-control' ) ) ?>" >&nbsp;</span>
 								</label>
 								<div class="controls-field">
 									<div class="controls-inner-row">
-										[ec_firstname] [ec_lastname] [ec_email] [ec_order] [ec_pay_link] [ec_customer_note] [ec_user_login] [ec_account_link] [ec_user_password] [ec_reset_password_link] [ec_login_link] [ec_site_link] [ec_site_name]
+										
+										[ec_order] 
+										[ec_firstname] 
+										[ec_lastname] 
+										[ec_email] 
+										[ec_pay_link] 
+										[ec_customer_note] 
+										[ec_user_login] 
+										[ec_account_link] 
+										[ec_user_password] 
+										[ec_reset_password_link] 
+										[ec_login_link] 
+										[ec_site_name] 
+										[ec_site_link] 
+										[ec_delivery_note]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
+										[ec_shipping_method]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
+										[ec_payment_method]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
+										[ec_custom_field]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
+										
+										<p class="ec-allowed-shortcode-docs-link"><?php echo sprintf( __( 'For more shortcode documentation <a href="%s" target="_blank">click here</a>', 'email-control' ), 'https://www.cxthemes.com/documentation/email-customizer/shortcodes-email-customizer/' ); ?></p>
 									</div>
 								</div>
 							</div>

@@ -63,14 +63,3 @@ function custom_storefront_credit() {
 //
 //
 // }
-
-class Homestore_Template {
-	public function single_product_title() { ?>
-		<div id="hero">
-			 <img src="<?php echo get_post_meta( get_the_ID(), 'header_img_url', true ); ?>" class="product-page-hero">
-		 </div>
-		<?php
-	}
-}
-
-add_action( 'woocommerce_before_single_product_summary',  array( Homestore_Template, 'single_product_title' ), 10 );
