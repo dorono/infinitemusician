@@ -85,8 +85,13 @@ p.no-comments {
   margin-top: 5px;
 }
 
-/* ORDER RECEIVED */
 /* line 78, ../../scss/_infinite.scss */
+.opc_order_review .product-details {
+  min-width: 65%;
+}
+
+/* ORDER RECEIVED */
+/* line 84, ../../scss/_infinite.scss */
 .download-url {
   font-size: 12px;
   background: green;
@@ -94,12 +99,12 @@ p.no-comments {
   color: white;
   border-radius: 5px;
 }
-/* line 85, ../../scss/_infinite.scss */
+/* line 91, ../../scss/_infinite.scss */
 .download-url a {
   text-decoration: underline;
   color: white;
 }
-/* line 89, ../../scss/_infinite.scss */
+/* line 95, ../../scss/_infinite.scss */
 .download-url a:hover {
   text-decoration: none;
   color: white;
