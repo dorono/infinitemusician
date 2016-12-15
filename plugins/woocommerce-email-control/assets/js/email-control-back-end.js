@@ -1,50 +1,63 @@
 (function($) {
 	$( document ).ready( function() {
 		
-		// Preview Email General Stuff
-		// ----------------------------------------
-		
 		/**
-		 * Preview Email Main Admin Page
+		 * PREVIEW EMAIL - GENERAL STUFF.
+		 */
+
+		/**
+		 * Preview Email Main Admin Page.
 		 */
 		
+		
+		
+
+		/**
+		 * Show/Hide the Customizer Editor, and update the Customizer Sections inside of the editor.
+		 */
+		
+		// Ping a `show_settings_composer` when `Email to show` or `Template to show` is changed.
 		jQuery('#ec_email_type, #ec_email_order').change(function() {
 			reload_preview();
-			
 			hide_settings_composer();
 			show_settings_composer();
-			
 		});
-
 		reload_preview();
-		
-		/**
-		 * Show/Hide the Settings Composer Function.
-		 */
+
 		function show_settings_composer() {
 			
-			ec_settings_form_show = "#ec_settings_form_" + jQuery('#ec_email_template').val();
-			ec_settings_form_sub_show = "#ec_settings_form_sub_" + jQuery('#ec_email_template').val() + "_" + jQuery('#ec_email_type').val();
-			ec_settings_form_sub_show_all = "#ec_settings_form_sub_" + jQuery('#ec_email_template').val() + "_all";
-
+			// Get values.
+			var val_email_type             = jQuery("#ec_email_type").val();
+			var val_email_template         = jQuery("#ec_email_template").val();
+			var val_email_order            = jQuery("#ec_email_order").val();
+			var val_billing_email          = jQuery('#ec_email_order option:selected').attr('data-order-email');
+			var val_email_template_preview = jQuery("#ec_email_template_preview").val();
+			var val_approve_preview        = jQuery("#ec_approve_preview").val();
+			
+			// First hide everything.
 			jQuery(".ec_settings_form").hide();
-			jQuery(".ec_settings_form_sub").hide();
-			jQuery(ec_settings_form_show).show();
-			jQuery(ec_settings_form_sub_show).show();
-			jQuery(ec_settings_form_sub_show_all).show();
+			jQuery(".ec_settings_form").find('.section').hide();
+			
+			// Show the chosen email template's form (e.g. Deluxe, Supreme, etc).
+			$ec_settings_form_show = jQuery( "#ec_settings_form_" + val_email_template );
+			jQuery( $ec_settings_form_show ).show();
+			
+			// Show the chosen email type's panels (e.g. New Order, Cancelled Order, etc).
+			$ec_settings_form_show.find('.section').filter('[data-ec-template-kind="' + val_email_type + '"]').show();
+			$ec_settings_form_show.find('.section').filter('[data-ec-template-kind="all"]').show();
 
 			// Hide the main editing block on change of template
 			jQuery(".ec-admin-panel-edit-content").removeClass('ec_active');
 
-
-			// Show the edit buttin if there are fields showing to edit
-			if ( jQuery(ec_settings_form_sub_show).length || jQuery(ec_settings_form_sub_show_all).length ) {
+			// Show the edit button if there are fields showing to edit
+			if ( $ec_settings_form_show.find('.section').filter(':visible') ) {
 				jQuery("#ec_edit_content_controls").removeClass('disabled');
 			}
 			else{
 				jQuery("#ec_edit_content_controls").addClass('disabled');
 			}
 		}
+		
 		function hide_settings_composer() {
 			
 			jQuery("#ec_edit_content_controls").addClass('disabled');
@@ -59,19 +72,150 @@
 				hide_settings_composer();
 		}
 		
-		
+		// Ping a `show_settings_composer` so that the correct feilds are shown on startup.
 		show_settings_composer();
+
+
+		/**
+		 * Show/Hide the Customizer - Edit Panel.
+		 */
+		
+		// Show.
+		function show_edit_panel() {
+			
+			jQuery(".ec-admin-panel-edit-content").addClass('ec_active');
+			
+			window.location.hash = 'customize';
+		}
+		
+		// Hide.
+		function hide_edit_panel() {
+			
+			if ( edited ) {
+				var confirm_result = confirm("Are you sure you want to close without saving");
+				
+				if ( ! confirm_result ) {
+					return;
+				}
+			}
+			
+			jQuery('.ec-admin-panel-edit-content').removeClass('ec_active');
+
+			window.location.hash = '';
+		}
+		
+		// Toggle.
+		function toggle_edit_panel() {
+			
+			if( ! jQuery('.ec-admin-panel-edit-content').hasClass('ec_active') ) {
+				
+				show_edit_panel();
+			}
+			else {
+				
+				hide_edit_panel();
+			}
+		}
+
+		// Peek (Breifly Hide)
+		jQuery(".hide_settings").hover(
+			function (event) {
+				//jQuery(".ec-admin-panel-edit-content").animate({opacity:0}, 100);
+				jQuery(".ec-admin-panel-edit-content").addClass('ec_force_hide');
+			},
+			function (event) {
+				//jQuery(".ec-admin-panel-edit-content").animate({opacity:1}, 100);
+				jQuery(".ec-admin-panel-edit-content").removeClass('ec_force_hide');
+			}
+		);
+		
+		jQuery("#close_edit_settings").click( function(event) {
+			
+			toggle_edit_panel();
+
+			return false;
+		});
+		
+
+		/**
+		 * Show/Hide the Customizer Accordions.
+		 */
+		
+		// Accordions open/close
+		jQuery(document).on( 'click', '.section h3', function() {
+
+			// Get elements.
+			$section            = jQuery(this).parent('.section');
+			$section_inner      = jQuery(this).parent('.section').find('.section-inner');
+			$section_holder     = jQuery(this).parent('.section').parent('.ec_settings_form_sub');
+			$edit_content_panel = jQuery('.ec-admin-panel-edit-content');
+			$visible_panels     = $edit_content_panel.find('.section:visible');
+			
+			
+			/**
+			 * Set the height of the sections panel to make sure it uses the remaining vertical height of the window.
+			 */
+			
+			$i = 0;
+			$visible_panels.each(function(){
+				// Get the current elements position so we know how many elements above.
+				$i++;
+				if ( $(this).is( $section ) ) return false;
+			});
+			
+			// Get the heights of the element above the current one.
+			$elements_above_height = ( ( $i + 1 ) * $section.find('h3').outerHeight() ) + $edit_content_panel.find('.edit-top-controls').outerHeight();
+			$remaining_height_for_panel = jQuery(window).height() - $elements_above_height;
+			
+			// If the resulting height is too small then limit it.
+			$remaining_height_for_panel =  ( $remaining_height_for_panel > 120 ) ? $remaining_height_for_panel : 120 ;
+			
+			// Set the max height.
+			$section_inner.css( 'max-height', $remaining_height_for_panel );
+			
+			
+			/**
+			 * Close the other elements.
+			 */
+			
+			jQuery('.section-inner').not($section_inner).slideUp();
+			jQuery('.section').not($section).removeClass('ec-active');
+			// document.location.hash = 'customize';
+			
+			
+			/**
+			 * Open the chosen element.
+			 */
+			
+			if ( $section.hasClass('ec-active') ) {
+				
+				$section.removeClass('ec-active');
+				$section_inner.slideUp();
+				// document.location.hash = 'customize';
+			}
+			else{
+				
+				$section.addClass('ec-active');
+				$section_inner.slideDown();
+				// document.location.hash = 'customize/' + $section_holder.attr('id');
+			}
+		});
+
+		// Close all the panels to start
+		jQuery('.section-inner').slideUp();
+
+
 		
 		// Ajax saving of fields
 		jQuery("#send_test").on("click", function () {
 			
-			//Split up the val array
-			var val_email_type			= jQuery("#ec_email_type").val();
-			var val_email_type_name		= jQuery( "#ec_email_type :selected" ).text().replace(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } ).replace(/(\r\n|\n|\r)/gm,"");
-			var val_email_template 		= jQuery("#ec_email_template").val();
-			var val_email_order			= jQuery("#ec_email_order").val();
-			var val_billing_email		= jQuery('#ec_email_order:selected').attr('data-order-email');
-			var val_testing_email		= jQuery("#ec_send_email").val();
+			// Get values.
+			var val_email_type      = jQuery("#ec_email_type").val();
+			var val_email_type_name = jQuery( "#ec_email_type :selected" ).text().replace(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } ).replace(/(\r\n|\n|\r)/gm,"");
+			var val_email_template  = jQuery("#ec_email_template").val();
+			var val_email_order     = jQuery("#ec_email_order").val();
+			var val_billing_email   = jQuery('#ec_email_order:selected').attr('data-order-email');
+			var val_testing_email   = jQuery("#ec_send_email").val();
 			
 
 			form_data = "";
@@ -213,76 +357,6 @@
 			return false;
 		});
 		
-		// Breifly Hide the Edit Window
-		jQuery(".hide_settings").hover(
-			function (event) {
-				//jQuery(".ec-admin-panel-edit-content").animate({opacity:0}, 100);
-				jQuery(".ec-admin-panel-edit-content").addClass('ec_force_hide');
-			},
-			function (event) {
-				//jQuery(".ec-admin-panel-edit-content").animate({opacity:1}, 100);
-				jQuery(".ec-admin-panel-edit-content").removeClass('ec_force_hide');
-			}
-		);
-		
-		jQuery("#close_edit_settings").click( function(event) {
-			
-			toggle_edit_panel();
-
-			return false;
-		});
-		
-		
-		/**
-		 * Show/Hide the Edit Panel.
-		 */
-		
-		function show_edit_panel() {
-			
-			/**
-			 * Show.
-			 */
-			
-			jQuery(".ec-admin-panel-edit-content").addClass('ec_active');
-			
-			window.location.hash = 'customize';
-		}
-		
-		function hide_edit_panel() {
-			
-			/**
-			 * Close.
-			 */
-			
-			if ( edited ) {
-				var confirm_result = confirm("Are you sure you want to close without saving");
-				
-				if (!confirm_result)
-					return;
-					
-				//reload_preview();
-				
-				//clear_edited(this);
-			}
-			
-			jQuery('.ec-admin-panel-edit-content').removeClass('ec_active');
-
-			window.location.hash = '';
-		}
-		
-		function toggle_edit_panel() {
-			
-			if( ! jQuery('.ec-admin-panel-edit-content').hasClass('ec_active') ) {
-				
-				show_edit_panel();
-			}
-			else {
-				
-				hide_edit_panel();
-			}
-		}
-		
-		
 		
 		// Show Send button only when somone types in the field
 		jQuery('#ec_send_email').keyup(function() {
@@ -389,7 +463,6 @@
 			hide_settings_composer();
 			
 			return false;
-			
 		});
 		
 		
@@ -425,7 +498,6 @@
 			show_settings_composer();
 			
 			return false;
-			
 		});
 		
 		// Handle Default re-populating
@@ -536,7 +608,6 @@
 			toggle_edit_panel();
 			
 			return false;
-			
 		});
 		
 		// Open all links in the preview in a new tab.
@@ -612,6 +683,7 @@
 		
 		// Loading Testing
 		if (false) {
+			
 			time_interval = 3000;
 			setTimeout(function() { /* ec_loading(); */ }, 0 * time_interval);
 			setTimeout(function() { /* ec_loading( { text: "Loadski!..." } ); */ }, 1 * time_interval);
@@ -627,50 +699,6 @@
 			setTimeout(function() { /* ec_notify("Third thing done again!", {id: "third-thing"} ); */ }, 6 * time_interval);
 			setTimeout(function() { /* ec_notify("Sixth thing done!", {id: "sixth-thing"} ); */ }, 7 * time_interval);
 		}
-		
-		/**
-		 * Customizer Accordions.
-		 */
-
-			// Accordions open/close
-			jQuery(document).on( 'click', '.section h3', function() {
-				
-				// Get elements.
-				$section = jQuery(this).parent('.section');
-				$section_inner = jQuery(this).parent('.section').find('.section-inner');
-				$section_holdr = jQuery(this).parent('.section').parent('.ec_settings_form_sub');
-				$edit_content_panel = jQuery('.ec-admin-panel-edit-content');
-				
-				// Set the max hight of the panel.
-				if ( ! $edit_content_panel.data( 'closed-height' ) ) {
-					$edit_content_panel.data( 'closed-height', $edit_content_panel.height() );
-				}
-				$remaining_height = jQuery(window).height() - $edit_content_panel.data( 'closed-height' );
-				$section_inner.css( 'max-height', $remaining_height );
-
-				jQuery('.section-inner').not($section_inner).slideUp();
-				jQuery('.section').not($section).removeClass('ec-active');
-				//document.location.hash = 'customize';
-
-				if ( $section.hasClass('ec-active') ) {
-
-					$section.removeClass('ec-active');
-					$section_inner.slideUp();
-
-					//document.location.hash = 'customize';
-				}
-				else{
-
-					$section.addClass('ec-active');
-					$section_inner.slideDown();
-
-					//document.location.hash = 'customize/' + $section_holder.attr('id');
-				}
-
-			});
-
-			// Close all the panels to start
-			jQuery('.section-inner').slideUp();
 			
 		
 		// Deep link to the cusomizer panel on startup.
@@ -688,13 +716,14 @@
 
 
 function reload_preview() {
-
-	var val_email_type = jQuery("#ec_email_type").val();
-	var val_email_template = jQuery("#ec_email_template").val();
-	var val_email_order = jQuery("#ec_email_order").val();
-	var val_billing_email = jQuery('#ec_email_order option:selected').attr('data-order-email');
+	
+	// Get values.
+	var val_email_type             = jQuery("#ec_email_type").val();
+	var val_email_template         = jQuery("#ec_email_template").val();
+	var val_email_order            = jQuery("#ec_email_order").val();
+	var val_billing_email          = jQuery('#ec_email_order option:selected').attr('data-order-email');
 	var val_email_template_preview = jQuery("#ec_email_template_preview").val();
-	var val_approve_preview = jQuery("#ec_approve_preview").val();
+	var val_approve_preview        = jQuery("#ec_approve_preview").val();
 
 	// Reload the Preview src
 	var new_src = "";

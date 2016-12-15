@@ -1,0 +1,13 @@
+
+Translating our plugin to your language
+---------------------------------------
+- Go here to get general information about WordPress Plugin Translation. https://codex.wordpress.org/I18n_for_WordPress_Developers
+- We recommend using Loco Translate plugin to do your translations. https://wordpress.org/plugins/loco-translate/
+- Please see the Loco Translate 'Installation' page for usage instructions.
+- We have chosen not to include a .pot (template) with our plugin as it can lead to our .pot being out of date and missing strings that you require, so you can create your own .pot (template). Or you can skip that and go straight to creating your language file. Please save your language files to this location that Loco Translate suggests: /wp-content/languages/plugins/email-control-en_US.po
+- Then translate all the strings that you want, and click Save.
+- Done!
+
+Translating custom text areas
+-----------------------------
+Custom fields will not appear automatically in WPML or any other translation plugin as they are created dynamically at runtime – you need to add the string manually (copy-and-paste them) and do the accompanying translation there. Then when the custom text is called, it will use your newly translated text.

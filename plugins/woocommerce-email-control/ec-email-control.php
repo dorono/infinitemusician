@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: WooCommerce Email Customizer
+ * Plugin URI: https://codecanyon.net/item/email-customizer-for-woocommerce/8654473?ref=cxThemes&utm_source=email%20customizer&utm_campaign=commercial%20plugin%20upsell&utm_medium=plugins%20page%20view%20details
  * Description: WooCommerce Email Customizer plugin allows you to fully customize the styling, colors, logo and text in the emails sent from your WooCommerce store.
  * Author: cxThemes
- * Author URI: http://codecanyon.net/user/cxThemes
- * Plugin URI: http://codecanyon.net/item/email-customizer-for-woocommerce/8654473
- * Version: 3.03
+ * Author URI: https://codecanyon.net/item/email-customizer-for-woocommerce/8654473?ref=cxThemes&utm_source=email%20customizer&utm_campaign=commercial%20plugin%20upsell&utm_medium=plugins%20page%20view%20details
+ * Version: 3.04
  * Text Domain: email-control
  * Domain Path: /languages/
  *
@@ -22,7 +22,7 @@ if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Define Constants
  */
-define( 'WC_EMAIL_CONTROL_VERSION', '3.03' );
+define( 'WC_EMAIL_CONTROL_VERSION', '3.04' );
 define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', '2.3' );
 define( 'WC_EMAIL_CONTROL_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
@@ -424,7 +424,7 @@ class WC_Email_Control {
 		$email_type = $_REQUEST['ec_email_type'];
 		$order_id   = $_REQUEST['ec_email_order'];
 		// $email_addresses = $_REQUEST['ec_email_addresses'];
-		// $email_template_id = $_REQUEST['ec_email_template'];
+		// $email_template = $_REQUEST['ec_email_template'];
 		
 		// Handle button actions
 		if ( !empty( $_REQUEST['ec_email_type'] ) ) {

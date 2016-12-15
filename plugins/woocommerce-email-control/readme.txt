@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: cxThemes
 Tags: woocommerce, email, customize, customise, edit, colors, text, preview, template, communication, send, test
-Stable tag: 3.03
+Stable tag: 3.04
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,11 @@ Please see the included PDF for full instructions on how to use this plugin.
  
  
 == Changelog ==
+
+= 3.04 =
+* We have chosen not to include a .pot (template) with our plugin as it can lead to our .pot being out of date and missing strings that you require, so you can create your own .pot (template). Or you can skip that and go straight to creating your language file. Please save your language files to this location that Loco Translate suggests: /wp-content/languages/plugins/email-control-en_US.po. Please see the /languages/guide.txt for a step-by-step guide.
+* Small changes to some of the text, tip text & layout in the Email Customizer.
+* Fix issue in very small browser windows where the customizer sections would not be high enough to display the fields inside them.
 
 = 3.03 =
 * Added new shortcodes `[ec_delivery_note]` `[ec_shipping_method]` `[ec_payment_method]` `[ec_custom_field]`.

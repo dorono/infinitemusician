@@ -74,33 +74,6 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 						</div>
 					</div>
 					
-					<div class="main-controls-element">
-						<label class="controls-label">
-							<?php _e( "Email to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Choose which email to preview or send.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
-						</label>
-						<div class="controls-field">
-							<div class="controls-inner-row">
-								<select class="w-select control-dropdown" id="ec_email_type" name="ec_email_type">
-									<option value="">
-										Select one...
-									</option>
-									<?php
-									//Customer_Invoice
-									if ( !empty( $mails ) ) {
-										foreach ( $mails as $mail ) {
-											?>
-											<option value="<?php echo $mail->id ?>" <?php echo ($show_type == $mail->id) ? "selected" : "" ; ?> >
-												<?php echo ucwords($mail->title); ?>
-											</option>
-											<?php
-										}
-									}
-									?>
-								</select>
-							</div>
-						</div>
-					</div>
-					
 					<?php
 					global $ec_email_templates;
 					
@@ -108,7 +81,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 						?>
 						<div class="main-controls-element">
 							<label class="controls-label">
-								<?php _e( "Template to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Edit the email.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+								<?php _e( "Template to show","email-control") ; ?> <span class="help-icon" title="<?php _e( "Choose which email template to preview. Then click 'Use' to use it for all your future WooCommerce emails.", 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 							</label>
 							<div class="controls-field">
 								<div class="controls-inner-row">
@@ -144,9 +117,36 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 					endif;
 					?>
 					
+					<div class="main-controls-element">
+						<label class="controls-label">
+							<?php _e( "Email to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Choose which email type to preview.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						</label>
+						<div class="controls-field">
+							<div class="controls-inner-row">
+								<select class="w-select control-dropdown" id="ec_email_type" name="ec_email_type">
+									<option value="">
+										Select one...
+									</option>
+									<?php
+									//Customer_Invoice
+									if ( !empty( $mails ) ) {
+										foreach ( $mails as $mail ) {
+											?>
+											<option value="<?php echo $mail->id ?>" <?php echo ($show_type == $mail->id) ? "selected" : "" ; ?> >
+												<?php echo ucwords($mail->title); ?>
+											</option>
+											<?php
+										}
+									}
+									?>
+								</select>
+							</div>
+						</div>
+					</div>
+					
 					<div class="main-controls-element" id="ec_edit_content_controls">
 						<label class="controls-label">
-							<?php _e( "Customize Template","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Customize the email that you are showing.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+							<?php _e( "Customize","email-control") ; ?> <span class="help-icon" title="<?php _e( "Customize the email you're showing in the preview. Then click 'Save & Publish' to save your customizations.", 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -278,57 +278,80 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 				$ec_email_types_for_settings = $mails;
 				$ec_email_types_for_settings[] = (object)array('id'=>'all');
 				
-				foreach ($ec_email_templates as $ec_email_template_key => $ec_email_template_args ) {
+				foreach ( $ec_email_templates as $ec_email_template_key => $ec_email_template_args ) {
 					
-					$ec_email_template_id			= $ec_email_template_key;
-					$ec_email_template_name			= $ec_email_template_args["name"];
-					
-					if ( !empty($ec_email_types_for_settings) && ec_get_settings($ec_email_template_id) ) {
+					if ( ! empty( $ec_email_types_for_settings) && ec_get_settings( $ec_email_template_key ) ) {
 						
-						$form_id	= "ec_settings_form_" . $ec_email_template_id;
+						$form_id = "ec_settings_form_{$ec_email_template_key}";
 						
-						$form_class	= "ec_settings_form ";
-						$form_class	.= "ec_settings_form_" . $ec_email_template_id . " ";
+						$form_class = '';
+						$form_class	.= "ec_settings_form ";
+						$form_class	.= "ec_settings_form_{$ec_email_template_key} ";
 						?>
-						<form id="<?php echo $form_id ?>" class="<?php echo $form_class ?>" >
+						<form
+							id="<?php echo esc_attr( $form_id ); ?>"
+							class="<?php echo esc_attr( $form_class ); ?>"
+							>
 							
 							<input type="button" id="save_edit_settings" class="button-primary save_edit_settings" value='Saved' disabled />
 							
 							<?php
 							foreach ( $ec_email_types_for_settings as $mail ) {
-								$ec_email_template_kind = $mail->id;
 								
-								if ( ec_get_settings( $ec_email_template_id, array( 'group' => $ec_email_template_kind ) ) ) {
+								$ec_email_type = $mail->id;
+								
+								// Get the related settings.
+								$ec_settings = ec_get_settings( $ec_email_template_key, array(
+									'email-type' => $ec_email_type,
+								) );
+								
+								if ( $ec_settings ) {
 									
-									$ec_email_template_kind	= $ec_email_template_kind;
-									$form_sub_id			= "ec_settings_form_sub_" . $ec_email_template_id . "_" . $ec_email_template_kind;
+									// Get Sections array.
+									$sections = ec_get_sections( $ec_email_template_key );
 									
-									$form_sub_class			= "ec_settings_form_sub ";
-									$form_sub_class			.= "ec_settings_form_sub_" . $ec_email_template_id . " ";
-									$form_sub_class			.= "ec_settings_form_sub_" . $ec_email_template_id . "_" . $ec_email_template_kind . " ";
-									?>
-									
-									<div id="<?php echo $form_sub_id ?>" class="<?php echo $form_sub_class ?>" >
+									foreach ( $sections as $section_value_array ) {
 										
-										<?php EC_Settings::output_fields( ec_get_settings($ec_email_template_id, array( 'group' => $ec_email_template_kind ) ) ); ?>
-										
-									</div>
+										$ec_settings = ec_get_settings( $ec_email_template_key, array(
+											'email-type' => $ec_email_type,
+											'section'    => $section_value_array['id'],
+										) );
 									
-									<?php
+										if ( $ec_settings ) {
+											?>
+											<div
+												class="section"
+												data-ec-template-id="<?php echo esc_attr( $ec_email_template_key ); ?>"
+												data-ec-template-kind="<?php echo esc_attr( $ec_email_type ); ?>"
+												>
+												<h3>
+													<?php echo $section_value_array['name'] ?>
+													<?php if ( FALSE ) { ?>
+														(<?php echo $ec_email_template_key ?>, <?php echo $ec_email_type ?>)
+													<?php } ?>
+												</h3>
+												
+												<div class="section-inner">
+													
+													<?php EC_Settings::output_fields( $ec_settings ); ?>
+													
+												</div>
+											</div>
+											<?php
+										}
+									}
 								}
 							}
 							?>
 							
-							<!--
-							<input type="hidden" name="ec_email_type" value="<?php echo $ec_email_template_kind ?>" >
-							-->
-							<input type="hidden" name="ec_email_id" value="<?php echo $ec_email_template_id ?>" >
+							<!-- <input type="hidden" name="ec_email_type" value="<?php echo $ec_email_type ?>" > -->
+							<input type="hidden" name="ec_email_id" value="<?php echo $ec_email_template_key ?>" >
 							<input type="hidden" name="ec_action" value="yes" >
 							
 							<div class="main-controls-element forminp-tags ec-allowed-tags">
 								<label class="controls-label">
 									<?php _e( 'Allowed Shortcodes:', 'email-control' ); ?>
-									<span class="help-icon" title="<?php echo esc_attr( __( 'Copy & Paste any of these [shortcodes] to use dynamic text in your text.', 'email-control' ) ) ?>" >&nbsp;</span>
+									<span class="help-icon" title="<?php echo esc_attr( __( 'Copy & paste any of these [shortcodes] to use dynamic text in your text.', 'email-control' ) ) ?>" >&nbsp;</span>
 								</label>
 								<div class="controls-field">
 									<div class="controls-inner-row">
@@ -346,10 +369,10 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user, $email_control_te
 										[ec_login_link] 
 										[ec_site_name] 
 										[ec_site_link] 
-										[ec_delivery_note]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
-										[ec_shipping_method]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
-										[ec_payment_method]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
-										[ec_custom_field]<span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span> 
+										[ec_delivery_note] 
+										[ec_shipping_method] 
+										[ec_payment_method] 
+										[ec_custom_field] <!-- <span class="ec-new-shortcode-badge"><?php _e( 'New', 'email-control' ) ?></span>  -->
 										
 										<p class="ec-allowed-shortcode-docs-link"><?php echo sprintf( __( 'For more shortcode documentation <a href="%s" target="_blank">click here</a>', 'email-control' ), 'https://www.cxthemes.com/documentation/email-customizer/shortcodes-email-customizer/' ); ?></p>
 									</div>
