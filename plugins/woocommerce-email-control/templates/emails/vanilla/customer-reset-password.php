@@ -13,10 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 <div class="top_heading">
-	<?php echo get_option( "ec_vanilla_customer_reset_password_heading" ); ?>
+	<?php echo get_option( 'ec_vanilla_customer_reset_password_heading' ); ?>
 </div>
 
-<?php echo get_option( "ec_vanilla_customer_reset_password_main_text" ); ?>
+<?php echo get_option( 'ec_vanilla_customer_reset_password_main_text' ); ?>
 
 
 <?php do_action( 'woocommerce_email_footer', $email ); ?>

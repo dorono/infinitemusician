@@ -20,8 +20,8 @@ if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 						</tr>
 						
 						<?php
-						$footer_text	= get_option("ec_deluxe_all_footer_text");
-						$footer_image	= get_option('ec_deluxe_all_footer_left_image');
+						$footer_text	= get_option( 'ec_deluxe_all_footer_text' );
+						$footer_image	= get_option( 'ec_deluxe_all_footer_left_image' );
 						$nav_bar		= ec_nav_bar();
 						
 						if ( $footer_image && ( $footer_text || $nav_bar ) ) :

@@ -16,10 +16,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 <?php if ( $partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
 
 	<div class="top_heading">
-		<?php echo get_option( "ec_vanilla_customer_refunded_order_heading_partial" ); ?>
+		<?php echo get_option( 'ec_vanilla_customer_refunded_order_heading_partial' ); ?>
 	</div>
 	
-	<?php echo get_option( "ec_vanilla_customer_refunded_order_main_text_partial" ); ?>
+	<?php echo get_option( 'ec_vanilla_customer_refunded_order_main_text_partial' ); ?>
 	
 	<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
 		<p class="state-guide">
@@ -29,13 +29,13 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 	
 <?php } ?>
 
-<?php if ( !$partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
+<?php if ( ! $partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
 	
 	<div class="top_heading">
-		<?php echo get_option( "ec_vanilla_customer_refunded_order_heading_full" ); ?>
+		<?php echo get_option( 'ec_vanilla_customer_refunded_order_heading_full' ); ?>
 	</div>
 	
-	<?php echo get_option( "ec_vanilla_customer_refunded_order_main_text_full" ); ?>
+	<?php echo get_option( 'ec_vanilla_customer_refunded_order_main_text_full' ); ?>
 	
 	<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
 		<p class="state-guide">

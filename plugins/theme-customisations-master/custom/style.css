@@ -5,15 +5,15 @@
 
 /* bsp & jlwg */
 /* line 5, ../../scss/_infinite.scss */
-.postid-11.single-product .desc,
-.postid-11.single-product .price,
-.postid-11.single-product .wc-tabs-wrapper,
-.postid-11.single-product div.product .entry-summary,
-.postid-11.single-product div.product .images,
-.postid-11.single-product div.product .single_variation .price,
-.postid-11.single-product div.product_meta,
-.postid-11.single-product header,
-.postid-11.single-product nav,
+.single-product .desc,
+.single-product .price,
+.single-product .wc-tabs-wrapper,
+.single-product div.product .entry-summary,
+.single-product div.product .images,
+.single-product div.product .single_variation .price,
+.single-product div.product_meta,
+.single-product header,
+.single-product nav,
 .woocommerce-shipping-fields {
   display: none;
 }
@@ -39,7 +39,7 @@ p.no-comments {
 
 @media (min-width: 768px) {
   /* line 33, ../../scss/_infinite.scss */
-  .postid-11.storefront-full-width-content.single-product div.product .images {
+  .storefront-full-width-content.single-product div.product .images {
     margin-bottom: 0;
   }
 }
@@ -90,8 +90,13 @@ p.no-comments {
   min-width: 65%;
 }
 
-/* ORDER RECEIVED */
 /* line 84, ../../scss/_infinite.scss */
+.woocommerce-variation-add-to-cart.variations_button {
+  cursor: pointer;
+}
+
+/* ORDER RECEIVED */
+/* line 90, ../../scss/_infinite.scss */
 .download-url {
   font-size: 12px;
   background: green;
@@ -99,12 +104,12 @@ p.no-comments {
   color: white;
   border-radius: 5px;
 }
-/* line 91, ../../scss/_infinite.scss */
+/* line 97, ../../scss/_infinite.scss */
 .download-url a {
   text-decoration: underline;
   color: white;
 }
-/* line 95, ../../scss/_infinite.scss */
+/* line 101, ../../scss/_infinite.scss */
 .download-url a:hover {
   text-decoration: none;
   color: white;

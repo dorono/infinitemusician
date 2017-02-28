@@ -19,14 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$email_heading = get_option( "ec_woocommerce_customer_completed_order_heading" );
+$email_heading = get_option( 'ec_woocommerce_customer_completed_order_heading' );
 
 /**
  * @hooked WC_Emails::email_header() Output the email header
  */
 do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
-<?php echo get_option( "ec_woocommerce_customer_completed_order_main_text" ); ?>
+<?php echo get_option( 'ec_woocommerce_customer_completed_order_main_text' ); ?>
 
 <?php
 

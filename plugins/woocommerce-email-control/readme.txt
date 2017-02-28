@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: cxThemes
 Tags: woocommerce, email, customize, customise, edit, colors, text, preview, template, communication, send, test
-Stable tag: 3.04
+Stable tag: 3.07
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,17 @@ Please see the included PDF for full instructions on how to use this plugin.
  
  
 == Changelog ==
+
+= 3.07 =
+* Fixed issue when using WPML String Translation where each new email sent would add new unique strings to the database causing unwanted bloat.
+
+= 3.06 =
+* Added new Template Information (click 'Header & Template Info' in the Email Customizer) shows which templates are used in the email you're previewing, where the templates come from and whether you are overriding the template (via your theme or child-theme). This means that you can more confidently customize our email templates without losing the changes you've made when you update our plugin. For more information see our Customize Emails by Overriding Templates via your Theme documentation here https://www.cxthemes.com/documentation/email-customizer/customize-emails-by-overriding-templates-via-your-theme/.
+
+= 3.05 =
+* Added new shortcode `[ec_coupon_code]`.
+* Fix issue where shortcodes like `[ec_order]` would not display when using the show or hide settings.
+* Replace deprecated function `get_currentuserinfo()` with `wp_get_current_user()`.
 
 = 3.04 =
 * We have chosen not to include a .pot (template) with our plugin as it can lead to our .pot being out of date and missing strings that you require, so you can create your own .pot (template). Or you can skip that and go straight to creating your language file. Please save your language files to this location that Loco Translate suggests: /wp-content/languages/plugins/email-control-en_US.po. Please see the /languages/guide.txt for a step-by-step guide.
@@ -90,7 +101,7 @@ Please see the included PDF for full instructions on how to use this plugin.
 * Display a notice if attempting to use our plugin alongside other email template plugins that will conflict with ours.
 
 = 2.35 =
-* We've added the new WooCommerce Editable Template - this empowers the familiar WooCoomerce email template with full text customizations, and the expected color customizations, inside our Email Customizer.
+* We've added the new WooCommerce Editable Theme - this empowers the familiar WooCoomerce email template with full text customizations, and the expected color customizations, inside our Email Customizer.
 * Added a friendly warning and the simplified email preview when there's not at least one order to preview.
 * Updated all the templates with new functions, filters, etc so they are up to date with the latest version of WooCommerce.
 * Remove styling of the low_stock, no_stock, backorder emails - they are internal so we're following WooCoomerce lead and not interfering with them.
@@ -171,7 +182,7 @@ Please see the included PDF for full instructions on how to use this plugin.
 * Fix no rendering of the default WC email in the preview.
 
 = 2.17 =
-* Rewrite shortcode logic and the way that template args are shared with them.
+* Rewrite shortcode logic and the way that email args are shared with them.
 * Changed default email texts to use the multipurpose ec_order shortcode that works on the front and back end.
 
 = 2.16 =

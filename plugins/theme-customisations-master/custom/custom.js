@@ -9,7 +9,7 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
 
 jQuery(document).ready(function($) {
     var $woocommerceCheckout = $(document).find('.woocommerce-checkout');
-    var $productInfo = $('.postid-11.single-product div.product').find('.images, .entry-summary');
+    var $productInfo = $('.single-product div.product').find('.images, .entry-summary');
 
     if ($woocommerceCheckout.find('.product-remove a').length < 1) {
       $productInfo.show();

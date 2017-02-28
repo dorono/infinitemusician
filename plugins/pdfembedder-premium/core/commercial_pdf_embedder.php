@@ -215,7 +215,17 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
                 echo '</p>';
             }
 
-            echo '<br class="clear" />';
+	        echo '<br class="clear" />';
+
+            ?>
+            <span>
+            <input type="checkbox" name='<?php echo $this->get_options_name(); ?>[pdfemb_allowbeta]' id='pdfemb_allowbeta' class='checkbox' <?php echo $options['pdfemb_allowbeta'] == 'on' ? 'checked' : ''; ?> />
+            <label for="pdfemb_allowbeta" class="checkbox plain"><?php esc_html_e('Participate in future beta releases of the plugin', 'pdf-embedder'); ?></label>
+            </span>
+
+            <br class="clear" />
+
+            <?php
 
 	        if (isset($license_status['download_link'])) {
 		        echo '<p>Download latest plugin ZIP <a href="'.$license_status['download_link'].'" target="_blank">here</a></p>';
@@ -229,23 +239,24 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     }
 
     protected function edd_plugin_updater($license_key=null) {
+	    $options = $this->get_option_pdfemb();
         if (is_null($license_key)) {
-            $options = $this->get_option_pdfemb();
             $license_key = $options['pdfemb_license_key'];
         }
 
-        if( !class_exists( 'EDD_SL_Plugin_Updater10' ) ) {
+        if( !class_exists( 'EDD_SL_Plugin_Updater11' ) ) {
             // load our custom updater
             include( dirname( __FILE__ ) . '/EDD_SL_Plugin_Updater.php' );
         }
 
         // setup the updater
-        $edd_updater = new EDD_SL_Plugin_Updater10( $this->WPPDF_STORE_URL, $this->my_plugin_basename(),
+        $edd_updater = new EDD_SL_Plugin_Updater11( $this->WPPDF_STORE_URL, $this->my_plugin_basename(),
             array(
                 'version' 	=> $this->PLUGIN_VERSION,
                 'license' 	=> $license_key,
                 'item_name' => $this->WPPDF_ITEM_NAME,
-                'author' 	=> 'Dan Lester'
+                'author' 	=> 'Dan Lester',
+                'beta'      => $options['pdfemb_allowbeta']
             ),
             $this->get_eddsl_optname(),
             $this->get_settings_url()."#license",
@@ -273,8 +284,53 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
             add_action('wp_ajax_pdfemb_count_download', array($this, 'ajax_pdfemb_count_download'));
         }
 
+        // Advertise the new beta upgrades option
+        $no_thanks = get_site_option($this->get_options_name().'_beta_no_thanks', false);
+        if (!$no_thanks && !$options['pdfemb_allowbeta'] && is_super_admin()) {
+            // is_super_admin() should return true for a regular admin if not in network mode
+            if (isset($_REQUEST['pdfemb_beta_action']) && in_array($_REQUEST['pdfemb_beta_action'], array('no_thanks', 'yes_please'))) {
+                $this->pdfemb_said_beta_action($_REQUEST['pdfemb_beta_action']);
+            }
+
+            if ($this->is_multisite_and_network_activated()) {
+                add_action('network_admin_notices', Array($this, 'pdfemb_beta_offer_message'));
+            }
+            else {
+                add_action('admin_notices', Array($this, 'pdfemb_beta_offer_message'));
+            }
+        }
+
         parent::pdfemb_admin_init();
     }
+
+    public function pdfemb_beta_offer_message() {
+		$purchase_url = add_query_arg( 'pdfemb_beta_action', 'yes_please', $this->get_settings_url()."#license" );
+		$nothanks_url = add_query_arg( 'pdfemb_beta_action', 'no_thanks' );
+		echo '<div class="updated"><p>';
+		echo  __('Cutting edge? You can now choose to receive early beta releases of PDF Embedder updates! Just opt-in to beta releases on the License tab.', 'pdf-embedder');
+		echo ' &nbsp; <a href="'.esc_url($purchase_url).'" class="button-secondary">' . __( 'Yes Please!', 'pdf-embedder' ) . '</a>';
+		echo '&nbsp;<a href="' . esc_url($nothanks_url) . '" class="button-secondary">' . __( 'No Thanks', 'pdf-embedder' ) . '</a>';
+		echo '</p></div>';
+	}
+
+    public function pdfemb_said_beta_action( $response ) {
+	    // No longer need to display the message
+		update_site_option($this->get_options_name().'_beta_no_thanks', true);
+		if ($response == 'yes_please') {
+		    $options = $this->get_option_pdfemb();
+		    if (isset($options['pdfemb_allowbeta']) && !$options['pdfemb_allowbeta']) {
+		        $options['pdfemb_allowbeta'] = true;
+                if ($this->is_multisite_and_network_activated()) {
+                    update_site_option( $this->get_options_name(), $options );
+                }
+                else {
+                    update_option( $this->get_options_name(), $options );
+                }
+		    }
+		}
+		wp_redirect( remove_query_arg( 'pdfemb_beta_action' ) );
+		exit;
+	}
 
     protected function get_instructions_url() {
         return 'http://wp-pdf.com/premium-instructions/?utm_source=PDF%20Settings%20Main&utm_medium=premium&utm_campaign=Premium';
@@ -338,6 +394,7 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
             }
         }
 
+        $newinput['pdfemb_allowbeta'] = isset($input['pdfemb_allowbeta']) && $input['pdfemb_allowbeta'];
 
         return $newinput;
     }
@@ -371,7 +428,8 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
                 'pdfemb_tracking' => 'on',
 	            'pdfemb_newwindow' => 'on',
 	            'pdfemb_scrolltotop' => 'off',
-	            'pdfemb_resetviewport' => false
+	            'pdfemb_resetviewport' => false,
+	            'pdfemb_allowbeta' => false
             ) );
     }
 

@@ -20,7 +20,7 @@ foreach ( $items as $item_id => $item ) :
 					<tr>
 						<?php
 						// Show image.
-						$show_image = ( 'yes' == get_option( "ec_deluxe_all_order_item_table_thumbnail" ) );
+						$show_image = ( 'yes' == get_option( 'ec_deluxe_all_order_item_table_thumbnail' ) );
 						$image_size = array( 70, 70 );
 						if ( $show_image && is_object( $_product ) && $_product->get_image_id() ) {
 							?>

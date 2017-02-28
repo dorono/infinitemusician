@@ -20,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( $order->has_status( 'pending' ) )
-	$email_heading = get_option( "ec_woocommerce_customer_invoice_heading_pending" );
+	$email_heading = get_option( 'ec_woocommerce_customer_invoice_heading_pending' );
 else
-	$email_heading = get_option( "ec_woocommerce_customer_invoice_heading_complete" );
+	$email_heading = get_option( 'ec_woocommerce_customer_invoice_heading_complete' );
 
 /**
  * @hooked WC_Emails::email_header() Output the email header
@@ -30,9 +30,9 @@ else
 do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
 <?php if ( $order->has_status( 'pending' ) ) : ?>
-	<?php echo get_option( "ec_woocommerce_customer_invoice_main_text_pending" ); ?>
+	<?php echo get_option( 'ec_woocommerce_customer_invoice_main_text_pending' ); ?>
 <?php else : ?>
-	<?php echo get_option( "ec_woocommerce_customer_invoice_main_text_complete" ); ?>
+	<?php echo get_option( 'ec_woocommerce_customer_invoice_main_text_complete' ); ?>
 <?php endif; ?>
 
 <?php

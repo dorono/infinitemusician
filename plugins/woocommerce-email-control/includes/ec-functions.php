@@ -8,44 +8,44 @@
  */
 
 /**
- * Register Email Templates.
+ * Register Email Themes.
  *
- * A function for creating or modifying a email templates based on the
+ * A function for creating or modifying a email themes based on the
  * parameters given. The function will accept an array (second optional
  * parameter), along with a string for the post type name.
  *
  * @since	2.0
  * @date	20-08-2014
  *
- * @global 	array      			$ec_email_templates	List of email templates.
+ * @global 	array      			$ec_email_themes	List of email themes.
  *
- * @param 	string				$template_id	Email template id, must not exceed 20 characters.
+ * @param 	string				$theme_id	Email theme id, must not exceed 20 characters.
  * @param	array|string		$args {
- *     Array or string of arguments for registering email template.
+ *     Array or string of arguments for registering email theme.
  * }
  * @return	object|WP_Error		The registered post type object, or an error object.
  */
-if ( !function_exists('ec_register_email_template') ) {
-	function ec_register_email_template( $template_id, $args ) {
+if ( !function_exists('ec_register_email_theme') ) {
+	function ec_register_email_theme( $theme_id, $args ) {
 		
-		global $ec_email_templates;
+		global $ec_email_themes;
 		
-		if ( !is_array( $ec_email_templates ) )
-			$ec_email_templates = array();
+		if ( ! is_array( $ec_email_themes ) )
+			$ec_email_themes = array();
 		
 		$defaults = array(
-			'name'                	=> $template_id,
+			'name'                	=> $theme_id,
 			'description'           => '',
 			'settings'           	=> false,
 		);
 		$args = wp_parse_args( $args, $defaults );
 		
-		if ( strlen( $template_id ) > 40 ) {
-			_doing_it_wrong( __FUNCTION__, __( 'Template IDs cannot exceed 20 characters in length', 'email-control' ) );
-			return new WP_Error( 'template_id_too_long', __( 'Template IDs cannot exceed 20 characters in length', 'email-control' ) );
+		if ( strlen( $theme_id ) > 40 ) {
+			_doing_it_wrong( __FUNCTION__, __( 'Theme IDs cannot exceed 20 characters in length', 'email-control' ) );
+			return new WP_Error( 'theme_id_too_long', __( 'Theme IDs cannot exceed 20 characters in length', 'email-control' ) );
 		}
 
-		$ec_email_templates[ $template_id ] = $args;
+		$ec_email_themes[ $theme_id ] = $args;
 		
 		return $args;
 	}
@@ -89,88 +89,31 @@ function ec_apply_inline_styles( $content = '', $css = '' ) {
  *
  * @author cxThemes
  */
-if ( !function_exists( 'mb_convert_encoding' ) ) {
+if ( ! function_exists( 'mb_convert_encoding' ) ) {
 	function mb_convert_encoding ( $string, $type = 'HTML-ENTITIES', $encoding = 'utf-8' ) {
 		
-		//$string = htmlentities( $string, ENT_COMPAT, $encoding, false);
-		//return html_entity_decode( $string );
+		// $string = htmlentities( $string, ENT_COMPAT, $encoding, false);
+		// return html_entity_decode( $string );
 		return $string;
 	}
 	
-	//$string = 'Test:!"$%&/()=ÖÄÜöäü<<';
-	//echo mb_convert_encoding($string, 'HTML-ENTITIES', 'utf-8');
-	//echo htmlspecialchars_decode( utf8_decode( htmlentities( $string, ENT_COMPAT, 'utf-8', false) ) );
+	// $string = 'Test:!"$%&/()=ÖÄÜöäü<<';
+	// echo mb_convert_encoding( $string, 'HTML-ENTITIES', 'utf-8' );
+	// echo htmlspecialchars_decode( utf8_decode( htmlentities( $string, ENT_COMPAT, 'utf-8', false) ) );
 }
 
 /**
- * Get Option - NOT USED.
+ * Helper function to check if a theme will work with the current WooCommerce version.
  *
- * @param  string  $key   the full key of the field ec_supreme_...
- * @param  boolean $autop whether to autop and style the return value.
- * @return string         option, or it's default.
- */
-
-function ec_get_option( $key, $autop = FALSE ) {
-	
-	$return = '';
-	
-	// We're in customier preview so just return the posted value.
-	if ( isset( $_REQUEST[$key] ) ) {
-	
-		$return = stripslashes( $_REQUEST[$key] );
-	}
-	else {
-		
-		// Get selected template.
-		$ec_template_selected = false;
-		if ( get_option( 'ec_template' ) ) {
-			$ec_template_selected = get_option( 'ec_template' );
-		}
-		if ( isset( $_REQUEST['ec_email_template'] ) ) {
-			$ec_template_selected = $_REQUEST['ec_email_template'];
-		}
-		
-		// Get the ec_key named setttings of the selected template.
-		$settings = ec_get_settings( $ec_template_selected );
-		
-		// Get the default if there is one.
-		$default = FALSE;
-		if ( isset( $settings[$key]['default'] ) ) $default = $settings[$key]['default'];
-		
-		$return = get_option( $key, $default );
-	}
-	
-	$return = __( $return, 'email-control' );
-	$return = do_shortcode( $return );
-	
-	// stylise certain content types, eg textarea - NOT IN USE. RATHER RELY ON FIELD TYPE TEXTAREA.
-	if ( $autop ) {
-		$return = wptexturize( $return );
-		$return = wpautop( $return );
-	}
-	
-	// stylise certain content types, eg textarea
-	if ( 'textarea' == EC_Settings::get_option_array( $key, 'type' ) ) {
-		$return = wptexturize( $return );
-		$return = wpautop( $return );
-	}
-	
-	// Return the option.
-	return __( $return, 'email-control' );
-}
-
-/**
- * Helper function to check if a template will work with the current WooCommerce version.
- *
- * @param    string    $template_id   Template id eg `supreme` to check.
+ * @param    string    $theme_id   Theme id eg `supreme` to check.
  * @return   boolean
  */
-function ec_check_template_version( $template_id ) {
-	global $ec_email_templates;
+function ec_check_theme_version( $theme_id ) {
+	global $ec_email_themes;
 	
-	if ( ! isset( $ec_email_templates[$template_id] ) ) return TRUE;
+	if ( ! isset( $ec_email_themes[$theme_id] ) ) return TRUE;
 	
-	$woocommerce_required_version = ( isset( $ec_email_templates[$template_id]['woocoomerce_required_version'] ) ) ? $ec_email_templates[$template_id]['woocoomerce_required_version'] : WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION ;
+	$woocommerce_required_version = ( isset( $ec_email_themes[$theme_id]['woocoomerce_required_version'] ) ) ? $ec_email_themes[$theme_id]['woocoomerce_required_version'] : WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION ;
 	return version_compare( get_option( 'woocommerce_version' ), $woocommerce_required_version, '>' );
 }
 

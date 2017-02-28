@@ -7,7 +7,7 @@ Author URI: http://prospress.com/
 Text Domain: wcopc
 Domain Path: languages
 Plugin URI: http://www.woothemes.com/products/woocommerce-one-page-checkout/
-Version: 1.3.0
+Version: 1.3.1
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -604,7 +604,7 @@ class PP_One_Page_Checkout {
 					)
 				);
 			}
-
+			
 			$args = apply_filters( 'wcopc_products_query_args', $args );
 
 			$product_posts = get_posts( $args );
@@ -1762,7 +1762,7 @@ class PP_One_Page_Checkout {
 
 	/**
 	 * Make sure shipping address fields are displayed if any of the available products require shipping
-	 *
+	 * 
 	 * @since 1.2.2
 	 */
 	public static function maybe_show_shipping( $products ) {

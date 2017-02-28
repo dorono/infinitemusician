@@ -5,7 +5,7 @@
  * Description: WooCommerce Email Customizer plugin allows you to fully customize the styling, colors, logo and text in the emails sent from your WooCommerce store.
  * Author: cxThemes
  * Author URI: https://codecanyon.net/item/email-customizer-for-woocommerce/8654473?ref=cxThemes&utm_source=email%20customizer&utm_campaign=commercial%20plugin%20upsell&utm_medium=plugins%20page%20view%20details
- * Version: 3.04
+ * Version: 3.07
  * Text Domain: email-control
  * Domain Path: /languages/
  *
@@ -22,8 +22,8 @@ if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Define Constants
  */
-define( 'WC_EMAIL_CONTROL_VERSION', '3.04' );
-define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', '2.3' );
+define( 'WC_EMAIL_CONTROL_VERSION', '3.07' );
+define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', 2.3 );
 define( 'WC_EMAIL_CONTROL_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); // woocommerce-email-control/ec-email-control.php
@@ -55,11 +55,12 @@ if ( WC_Email_Control::is_conflicting_plugins_active() ) {
  */
 include_once( 'includes/ec-woo-back-compat-functions.php' );
 include_once( 'includes/ec-functions.php' );
-include_once( 'includes/class-ec-settings.php' );
-include_once( 'ec-template-woocommerce.php' ); // Template
-include_once( 'ec-template-vanilla.php' ); // Template
-include_once( 'ec-template-deluxe.php' ); // Template
-include_once( 'ec-template-supreme.php' ); // Template
+include_once( 'includes/ec-shortcodes.php' );
+include_once( 'includes/ec-settings.php' );
+include_once( 'ec-theme-woocommerce.php' ); // Theme
+include_once( 'ec-theme-vanilla.php' ); // Theme
+include_once( 'ec-theme-deluxe.php' ); // Theme
+include_once( 'ec-theme-supreme.php' ); // Theme
 
 /**
  * Instantiate plugin.
@@ -100,14 +101,14 @@ class WC_Email_Control {
 		// Translations
 		add_action( 'init', array( $this, 'load_translation' ) );
 		
-		// Register email templates.
-		add_action( 'init', array( $this, 'register_email_templates' ), 100 );
+		// Register email themes.
+		add_action( 'init', array( $this, 'register_email_themes' ), 100 );
 		
 		// Enqueue Scripts/Styles - in head of admin page
 		add_action( 'admin_enqueue_scripts', array( $this, 'ec_head_scripts' ) );
 		
-		// Enqueue Scripts/Styles - in head of email template page
-		add_action( 'ec_render_template_head_scripts', array( $this, 'ec_head_scripts' ), 102 );
+		// Enqueue Scripts/Styles - in head of email preview page
+		add_action( 'ec_render_preview_head_scripts', array( $this, 'ec_head_scripts' ), 102 );
 		
 		// Add menu item
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
@@ -131,8 +132,8 @@ class WC_Email_Control {
 		// Check Templates
 		add_filter( 'wc_get_template', array( $this, 'ec_get_template' ), 10, 5 );
 		
-		//Email Customizer - Admin and Template pages only
-		if ( isset($_REQUEST["page"]) && $_REQUEST["page"] == $this->id ) {
+		//Email Customizer - Admin and Preview pages only
+		if ( isset( $_REQUEST["page"] ) && $_REQUEST["page"] == $this->id ) {
 			
 			// Remove all notifications
 			remove_all_actions( 'admin_notices' );
@@ -142,24 +143,24 @@ class WC_Email_Control {
 						
 			if ( ! isset( $_REQUEST["ec_render_email"] ) ) {
 				
-				//Email Customizer - Admin Page only
+				// Email Customizer - Admin page only
 				add_action( 'in_admin_header', array( $this, 'ec_render_admin_page' ) );
 			}
 			else {
 				
-				//Email Customizer - Template page only
+				// Email Customizer - Preview page only
 				add_filter( 'wp_print_scripts', array( $this, 'deregister_all_scripts' ), 101 );
 				add_action( 'wp_print_scripts', array( $this, 'ec_head_scripts' ), 102 );
-				add_action( 'admin_init', array( $this, 'ec_render_template_page' ) );
+				add_action( 'admin_init', array( $this, 'ec_render_preview_page' ) );
 			}
 		}
 		
 		// Add Button in WooCommerce->Settings->Email
 		add_action( 'woocommerce_settings_tabs_email', array( $this, 'woocommerce_settings_button' ) );
 		
-		// Setup global template args.
-		add_action( 'woocommerce_before_template_part', array( $this, 'ec_before_template_setup_args_global' ) , 10, 4 );
-		add_action( 'woocommerce_after_template_part', array( $this, 'ec_after_template_setup_args_global' ) , 10, 4 );
+		// Setup global email args.
+		add_action( 'woocommerce_before_template_part', array( $this, 'ec_before_template_prep_email_args_global' ) , 10, 4 );
+		add_action( 'woocommerce_after_template_part', array( $this, 'ec_after_template_prep_email_args_global' ) , 10, 4 );
 		
 		// Setup options filtering.
 		add_action( 'woocommerce_before_template_part', array( $this, 'ec_before_template_filter_options' ) , 10, 4 );
@@ -209,21 +210,21 @@ class WC_Email_Control {
 	}
 	
 	/**
-	 * Allows hooking by the templates wishing to be initialized
+	 * Allows hooking by the themes wishing to be initialized
 	 *
 	 * @date	20-04-2016
 	 * @since	2.36
 	 */
-	public static function register_email_templates() {
+	public static function register_email_themes() {
 		
-		// Register email templates.
-		do_action( 'register_email_template' );
+		// Register email themes.
+		do_action( 'register_email_theme' );
 	}
 	
 	/**
 	 * Dergister all scripts & styles
 	 *
-	 * Deregister all scripts so the email template preview is
+	 * Deregister all scripts so the email preview is
 	 * css clean and free of other plugins js bugs
 	 *
 	 * @date	20-08-2014
@@ -234,22 +235,22 @@ class WC_Email_Control {
 		global $wp_scripts,  $wp_styles;
 		
 		// Dequeue All Scripts
-		if (false != $wp_scripts->queue) {
-			foreach($wp_scripts->queue as $script) {
+		if ( false != $wp_scripts->queue ) {
+			foreach( $wp_scripts->queue as $script ) {
 				$wp_scripts->dequeue( $script );
 				
-				// if (isset($wp_scripts->registered[$script])) {
+				// if ( isset( $wp_scripts->registered[$script] ) ) {
 				// 	$wp_scripts->registered[$script]->deps = array();
 				// }
 			}
 		}
 		
 		// Dequeue All Styles
-		if (false != $wp_styles->queue) {
-			foreach($wp_styles->queue as $script) {
+		if ( false != $wp_styles->queue ) {
+			foreach( $wp_styles->queue as $script ) {
 				$wp_styles->dequeue( $script );
 				
-				// if (isset($wp_styles->registered[$script])) {
+				// if ( isset( $wp_styles->registered[$script] ) ) {
 				// 	$wp_styles->registered[$script]->deps = array();
 				// }
 			}
@@ -277,13 +278,13 @@ class WC_Email_Control {
 		
 		// Email Customizer - Admin page only
 		if 	(
-				( isset($_REQUEST["page"]) && $_REQUEST["page"] == $this->id)
+				( isset( $_REQUEST["page"] ) && $_REQUEST["page"] == $this->id )
 				||
-				( isset($_REQUEST["page"]) && $_REQUEST["page"] == "wc-settings")
+				( isset( $_REQUEST["page"] ) && $_REQUEST["page"] == "wc-settings" )
 				||
-				( isset($_REQUEST["ec_render_email"]) )
+				( isset( $_REQUEST["ec_render_email"] ) )
 				||
-				( isset($current_screen->id) && $current_screen->id == "shop_order")
+				( isset( $current_screen->id ) && $current_screen->id == "shop_order" )
 				||
 				( 'plugins.php' == $pagenow )
 			) {
@@ -320,8 +321,8 @@ class WC_Email_Control {
 		
 		wp_enqueue_style( 'open-sans' );
 		
-		// Email Customizer - Template page only
-		if ( ( isset($_REQUEST["page"]) && $_REQUEST["page"] == $this->id ) && isset( $_REQUEST["ec_render_email"] ) ) {
+		// Email Customizer - Preview page only
+		if ( ( isset( $_REQUEST["page"] ) && $_REQUEST["page"] == $this->id ) && isset( $_REQUEST["ec_render_email"] ) ) {
 			
 			// Load jQuery
 			wp_enqueue_script( 'jquery' );
@@ -363,17 +364,18 @@ class WC_Email_Control {
 		}
 		*/
 		
-		global $current_user;
-		get_currentuserinfo();
+		$current_user = wp_get_current_user();
 		
-		$field_name  = (isset($_REQUEST["field_name"])) ? $_REQUEST["field_name"] : "" ;
-		$field_value  = (isset($_REQUEST["field_value"])) ? $_REQUEST["field_value"] : "" ;
+		$field_name  = ( isset( $_REQUEST["field_name"] ) ) ? $_REQUEST["field_name"] : "" ;
+		$field_value  = ( isset( $_REQUEST["field_value"] ) ) ? $_REQUEST["field_value"] : "" ;
 
-		if ( strpos($field_name, "userspecifc") ) {
+		if ( strpos( $field_name, 'userspecifc' ) ) {
+			
 			//Save the option specific to the current user
 			update_user_meta( $current_user->ID, $field_name, $field_value );
 		}
 		else {
+			
 			//Save the option to the global options
 			update_option( $field_name, $field_value );
 		}
@@ -394,13 +396,13 @@ class WC_Email_Control {
 	*/
 	function save_option() {
 		/*
-		if ( !wp_verify_nonce( $_REQUEST['nonce'], "save_option_nonce")) {
+		if ( ! wp_verify_nonce( $_REQUEST['nonce'], "save_option_nonce")) {
 		  exit("No naughty business please");
 		}
 		*/
 		
-		$field_name  = (isset($_REQUEST["field_name"])) ? $_REQUEST["field_name"] : "" ;
-		$field_value  = (isset($_REQUEST["field_value"])) ? $_REQUEST["field_value"] : "" ;
+		$field_name  = ( isset( $_REQUEST["field_name"] ) ) ? $_REQUEST["field_name"] : "" ;
+		$field_value  = ( isset( $_REQUEST["field_value"] ) ) ? $_REQUEST["field_value"] : "" ;
 		
 		update_option( $field_name, $field_value );
 		
@@ -424,10 +426,10 @@ class WC_Email_Control {
 		$email_type = $_REQUEST['ec_email_type'];
 		$order_id   = $_REQUEST['ec_email_order'];
 		// $email_addresses = $_REQUEST['ec_email_addresses'];
-		// $email_template = $_REQUEST['ec_email_template'];
+		// $email_theme = $_REQUEST['ec_email_theme'];
 		
 		// Handle button actions
-		if ( !empty( $_REQUEST['ec_email_type'] ) ) {
+		if ( ! empty( $_REQUEST['ec_email_type'] ) ) {
 
 			// Load mailer
 			$mailer = $woocommerce->mailer();
@@ -439,7 +441,7 @@ class WC_Email_Control {
 			
 			$email_to_send = wc_clean( $_REQUEST['ec_email_type'] );
 
-			if ( !empty( $mails ) ) {
+			if ( ! empty( $mails ) ) {
 				foreach ( $mails as $mail ) {
 					if ( $mail->id == $email_to_send ) {
 						
@@ -488,7 +490,7 @@ class WC_Email_Control {
 		$email_addresses = str_replace( " ", "", $email_addresses );
 		$email_addresses = explode( ",", $email_addresses );
 		
-		$mail->object		= new WC_Order($order);
+		$mail->object		= new WC_Order( $order );
 		
 		
 		$mail->find[] = '{order_date}';
@@ -506,7 +508,7 @@ class WC_Email_Control {
 		$email_attachments	= $mail->get_attachments();
 		
 		
-		foreach ($email_addresses as $email_address) {
+		foreach ( $email_addresses as $email_address ) {
 			echo $mail->send( $email_address, $email_subject, $email_content, $email_headers, $email_attachments );
 		}
 		
@@ -514,15 +516,15 @@ class WC_Email_Control {
 	}
 	
 	/*
-	*  Save all edit template options.
+	*  Save all edit options.
 	*
 	*  @date	20-08-2014
 	*  @since	1.0
 	*/
 	public function save_edit_email() {
 				
-		$email_type		= ($_REQUEST['ec_email_type']) ? $_REQUEST['ec_email_type'] : false ;
-		$email_id		= ($_REQUEST['ec_email_id']) ? $_REQUEST['ec_email_id'] : false ;
+		$email_type		= ( $_REQUEST['ec_email_type'] ) ? $_REQUEST['ec_email_type'] : false ;
+		$email_id		= ( $_REQUEST['ec_email_id'] ) ? $_REQUEST['ec_email_id'] : false ;
 		
 		$settings = ec_get_settings( $email_id );
 		
@@ -548,14 +550,14 @@ class WC_Email_Control {
 	}
 	
 	/**
-	 * Render template page.
+	 * Render preview page.
 	 *
 	 * @date	20-08-2014
 	 * @since	1.0
 	 */
-	public function ec_render_template_page() {
+	public function ec_render_preview_page() {
 		
-		require_once( 'pages/ec-template-page.php');
+		require_once( 'pages/ec-preview-page.php');
 	}
 	
 	/**
@@ -582,7 +584,7 @@ class WC_Email_Control {
 	 * @date	20-08-2014
 	 * @since	1.0
 	 */
-	function woocommerce_settings_button($data) {
+	function woocommerce_settings_button( $data ) {
 		
 		global $woocommerce, $wp_scripts, $current_screen;
 		
@@ -592,7 +594,7 @@ class WC_Email_Control {
 		$ec_url .= "?";
 		$ec_url .= "page=woocommerce_email_control";
 		
-		if ( isset($_REQUEST["section"]) ) {
+		if ( isset( $_REQUEST["section"] ) ) {
 			
 			if ( class_exists('WC') ) {
 				$mailer = WC()->mailer();
@@ -603,11 +605,11 @@ class WC_Email_Control {
 				$mails = $mailer->get_emails();
 			}
 			
-			if ( !empty($mails) ) {
+			if ( ! empty( $mails ) ) {
 				foreach ( $mails as $mail ) {
-					$template = str_replace("wc_email_", "", $_REQUEST["section"] );
-					if ( $mail->id == $template ) {
-						$ec_url .= "&ec_email_type=" . $template;
+					$email_type = str_replace( "wc_email_", "", $_REQUEST["section"] );
+					if ( $mail->id == $email_type ) {
+						$ec_url .= "&ec_email_type=" . $email_type;
 					}
 				}
 			}
@@ -616,7 +618,7 @@ class WC_Email_Control {
 		?>
 		<div class="pe-wc-settings-holder">
 			
-			<?php if ( isset($_REQUEST["section"]) && $_REQUEST["section"] != "" ) { ?>
+			<?php if ( isset( $_REQUEST["section"] ) && $_REQUEST["section"] != "" ) { ?>
 				
 				<!-- Inner Tabs -->
 				<h4>Email Customizer</h4>
@@ -674,83 +676,96 @@ class WC_Email_Control {
 		
 		if ( in_array( 'emails', explode( '/', $template_name ) ) && ! in_array( 'plain', explode( '/', $template_name ) ) ) {
 			
-			global $ec_email_templates, $woocommerce;
+			global $ec_email_themes, $woocommerce, $collect_email_template;
 			
-			// Use the selected template from database
-			$ec_template_selected = get_option( 'ec_template' );
+			// If not set yet then set it.
+			if ( ! isset( $collect_email_template ) ) $collect_email_template = array();
 			
-			// Overide selected template with that passed by preview
-			if ( isset( $_REQUEST["ec_email_template_preview"] ) ) $ec_template_selected = $_REQUEST["ec_email_template_preview"];
+			// Use the selected theme from database
+			$ec_theme_selected = get_option( 'ec_template' );
 			
-			if ( is_array( $ec_email_templates ) && isset( $ec_template_selected ) && $ec_template_selected !== false ) {
-				if ( array_key_exists( $ec_template_selected, $ec_email_templates ) ) {
+			// Overide selected theme with that passed by preview
+			if ( isset( $_REQUEST["ec_email_theme_preview"] ) ) $ec_theme_selected = $_REQUEST["ec_email_theme_preview"];
+			
+			// Used to record how the template was found - so we can display it on the debugging info.
+			$status = 'third-party';
+			
+			if ( is_array( $ec_email_themes ) && isset( $ec_theme_selected ) && $ec_theme_selected !== false ) {
+				if ( array_key_exists( $ec_theme_selected, $ec_email_themes ) ) {
 					
-					// It's one of our templates so do custom filters
+					// It's one of our themes so do custom filters
 					add_filter( 'woocommerce_email_custom_details_header', '__return_empty_string' ); // Remove the header of the customer details.
 					
 					$this_template_pathinfo  = pathinfo( $template_name );
-					$ec_template_selected; // supreme
+					$ec_theme_selected; // supreme
 					$this_folder_name        = $this_template_pathinfo['dirname']; // emails
 					$this_original_file_name = $this_template_pathinfo['filename'] . '.php'; // email-footer.php
-					$this_modified_file_name = $this_template_pathinfo['filename'] . '-' . $ec_template_selected . '.php'; // email-footer-supreme.php
+					$this_modified_file_name = $this_template_pathinfo['filename'] . '-' . $ec_theme_selected . '.php'; // email-footer-supreme.php
 					
 					$this_template_versions = '';
 					// if ( ! version_compare( WC()->version, '2.4', '>=' ) ) $this_template_versions = '-below-wc2.4';
 					if ( ! version_compare( WC()->version, '2.5', '>=' ) ) $this_template_versions = '-below-wc2.5';
 					
-					$this_template = '';
-					
-					/**
-					 * Check the WooCommerce template locations.
-					 */
-					// Check WooCommerce for `emails/email-footer-supreme.php`.
-					// Check WooCommerce for `emails/supreme/email-footer.php`.
-					if ( ! $this_template ) {
-						$this_template = locate_template( array(
-							trailingslashit( $woocommerce->template_path() ) . $this_folder_name . '/' . $this_modified_file_name,
-							trailingslashit( $woocommerce->template_path() ) . $this_folder_name . '/' . $ec_template_selected . '/' . $this_original_file_name,
-						));
-					}
-					
-					
-					/**
-					 * Check templates-as-plugin locations.
-					 */
-					// Check template-plugin for `templates/emails/email-footer-supreme.php`.
-					if ( ! $this_template ) {
-						$this_template = WC_EMAIL_CONTROL_DIR . '/templates' . $this_template_versions . '/' . 'emails' . '/' . $this_modified_file_name;
-						if ( !file_exists($this_template) ) $this_template = false;
-					}
-					// Check template-plugin for `templates/emails/supreme/email-footer.php`.
-					if ( ! $this_template ) {
-						$this_template = WC_EMAIL_CONTROL_DIR . '/templates' . $this_template_versions . '/' . 'emails' . '/' . $ec_template_selected . '/' . $this_original_file_name;
-						if ( !file_exists($this_template) ) $this_template = false;
-					}
-					
+					$this_template = $located;
 					
 					/**
 					 * Check our plugin locations.
 					 */
-					// Check our plugin for `templates/emails/email-footer-supreme.php`.
-					if ( ! $this_template && isset( $ec_email_templates[$ec_template_selected]['template_folder'] ) ) {
-						$this_template = trailingslashit( $ec_email_templates[$ec_template_selected]['template_folder'] ) . 'emails' . '/' . $this_modified_file_name;
-						if ( !file_exists($this_template) ) $this_template = false;
+					// Check our plugin for `templates/emails/email-footer-supreme.php` (old file structure/name).
+					if ( isset( $ec_email_themes[$ec_theme_selected]['template_folder'] ) ) {
+						$new_template = trailingslashit( $ec_email_themes[$ec_theme_selected]['template_folder'] ) . 'emails' . '/' . $this_modified_file_name;
+						if ( file_exists( $new_template ) ) {
+							$this_template = $new_template;
+							$status = 'default';
+						}
 					}
 					// Check our plugin for `templates/emails/supreme/email-footer.php`.
-					if ( ! $this_template && isset( $ec_email_templates[$ec_template_selected]['template_folder'] ) ) {
-						$this_template = trailingslashit( $ec_email_templates[$ec_template_selected]['template_folder'] ) . 'emails' . '/' . $ec_template_selected . '/' . $this_original_file_name;
-						if ( !file_exists($this_template) ) $this_template = false;
+					if ( isset( $ec_email_themes[$ec_theme_selected]['template_folder'] ) ) {
+						$new_template = trailingslashit( $ec_email_themes[$ec_theme_selected]['template_folder'] ) . 'emails' . '/' . $ec_theme_selected . '/' . $this_original_file_name;
+						if ( file_exists( $new_template ) ) {
+							$this_template = $new_template;
+							$status = 'default';
+						}
 					}
 					
+					/**
+					 * Check theme-as-plugin locations.
+					 */
+					// Check theme-plugin for `templates/emails/email-footer-supreme.php` (old file structure/name).
+					$new_template = WC_EMAIL_CONTROL_DIR . '/templates' . $this_template_versions . '/' . 'emails' . '/' . $this_modified_file_name;
+					if ( file_exists( $new_template ) ) {
+						$this_template = $new_template;
+						$status = 'default';
+					}
+					// Check theme-plugin for `templates/emails/supreme/email-footer.php`.
+					$new_template = WC_EMAIL_CONTROL_DIR . '/templates' . $this_template_versions . '/' . 'emails' . '/' . $ec_theme_selected . '/' . $this_original_file_name;
+					if ( file_exists( $new_template ) ) {
+						$this_template = $new_template;
+						$status = 'default';
+					}
 					
-					// Else return to what was originally passed - $located.
-					if ( ! $this_template ) {
-						$this_template = $located;
+					/**
+					 * Check the WooCommerce template locations.
+					 */
+					// Check WooCommerce for `emails/email-footer-supreme.php` (old file structure/name).
+					// Check WooCommerce for `emails/supreme/email-footer.php`.
+					$new_template = locate_template( array(
+						trailingslashit( $woocommerce->template_path() ) . $this_folder_name . '/' . $this_modified_file_name,
+						trailingslashit( $woocommerce->template_path() ) . $this_folder_name . '/' . $ec_theme_selected . '/' . $this_original_file_name,
+					));
+					if ( file_exists( $new_template ) ) {
+						$this_template = $new_template;
+						$status = 'override';
 					}
 					
 					// Set the located as $this_template.
 					$located = $this_template;
 				}
+			}
+			
+			// Store the templates used, and whether it was: default | third-party | override
+			if ( ! array_key_exists( $located, $collect_email_template ) ) { // Make sure it doens't already exist.
+				$collect_email_template[ $located ] = $status;
 			}
 		}
 		
@@ -786,17 +801,17 @@ class WC_Email_Control {
 		
 		if ( FALSE !== strrpos( $template_name, 'email' ) ) {
 			
-			// Get active templates.
-			$ec_template_selected = false;
+			// Get active themes.
+			$ec_theme_selected = false;
 			if ( get_option( "ec_template" ) ) {
-				$ec_template_selected = get_option( "ec_template" );
+				$ec_theme_selected = get_option( "ec_template" );
 			}
-			if ( isset( $_REQUEST['ec_email_template'] ) ) {
-				$ec_template_selected = $_REQUEST['ec_email_template'];
+			if ( isset( $_REQUEST['ec_email_theme'] ) ) {
+				$ec_theme_selected = $_REQUEST['ec_email_theme'];
 			}
 			
 			// Modify if theres preview fields.
-			$settings = ec_get_settings( $ec_template_selected );
+			$settings = ec_get_settings( $ec_theme_selected );
 			
 			if ( $settings ) {
 				foreach ( $settings as $setting_key => $setting_value ) {
@@ -824,16 +839,16 @@ class WC_Email_Control {
 	 * @date	20-08-2014
 	 * @since	2.12
 	 */
-	function ec_before_template_setup_args_global( $template_name, $template_path, $located, $args ) {
+	function ec_before_template_prep_email_args_global( $template_name, $template_path, $located, $args ) {
 		
 		// Only do this for email templates.
 		if ( FALSE !== strrpos( $template_name, 'email' ) ) {
 			
-			global $ec_template_args;
+			global $ec_email_args;
 			
-			if ( NULL == $ec_template_args ) {
+			if ( NULL == $ec_email_args ) {
 				
-				$ec_template_args = array_merge( $args, array( 'ec_template_name' => $template_name ) );
+				$ec_email_args = array_merge( $args, array( 'ec_template_name' => $template_name ) );
 				
 				// Debugging
 				//echo 'start:&nbsp;' . $template_name;
@@ -847,16 +862,16 @@ class WC_Email_Control {
 	 * @date	09-02-2015
 	 * @since	2.17
 	 */
-	function ec_after_template_setup_args_global( $template_name, $template_path, $located, $args ) {
+	function ec_after_template_prep_email_args_global( $template_name, $template_path, $located, $args ) {
 		
 		// Only do this for email templates.
 		if ( FALSE !== strrpos( $template_name, 'email' ) ) {
 			
-			global $ec_template_args;
+			global $ec_email_args;
 			
-			if ( isset( $ec_template_args['ec_template_name'] ) && $template_name == $ec_template_args['ec_template_name'] ) {
+			if ( isset( $ec_email_args['ec_template_name'] ) && $template_name == $ec_email_args['ec_template_name'] ) {
 				
-				$ec_template_args = NULL;
+				$ec_email_args = NULL;
 				
 				// Debugging
 				//echo 'end:&nbsp;' . $template_name;
@@ -1248,7 +1263,7 @@ class WC_Email_Control {
 	 */
 	public static function woocommerce_inactive_notice() {
 		if ( current_user_can( 'activate_plugins' ) ) :
-			if ( !class_exists( 'WooCommerce' ) ) :
+			if ( ! class_exists( 'WooCommerce' ) ) :
 				?>
 				<div id="message" class="error">
 					<p>

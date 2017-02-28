@@ -16,10 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<td valign="top" class="top_content_container">
 			
 			<div class="top_heading">
-				<?php echo get_option( "ec_deluxe_customer_reset_password_heading" ); ?>
+				<?php echo get_option( 'ec_deluxe_customer_reset_password_heading' ); ?>
 			</div>
 			<div class="top_paragraph">
-				<?php echo get_option( "ec_deluxe_customer_reset_password_main_text" ); ?>
+				<?php echo get_option( 'ec_deluxe_customer_reset_password_main_text' ); ?>
 			</div>
 			
 		</td>

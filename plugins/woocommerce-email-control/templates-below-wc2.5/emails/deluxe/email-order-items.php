@@ -16,7 +16,7 @@ foreach ( $items as $item ) :
 				<tr>
 					<?php
 					// Show image.
-					$show_image = ( 'yes' == get_option( "ec_deluxe_all_order_item_table_thumbnail" ) );
+					$show_image = ( 'yes' == get_option( 'ec_deluxe_all_order_item_table_thumbnail' ) );
 					$image_size = array( 70, 70 );
 					if ( $show_image && is_object( $_product ) && $_product->get_image_id() ) {
 						?>
@@ -72,7 +72,7 @@ foreach ( $items as $item ) :
 			
 		</td>
 		<td class="order_items_table_td_style order_items_table_td order_items_table_td_product">
-			<?php echo $item['qty'] ;?>
+			<?php echo $item['qty']; ?>
 		</td>
 		<td class="order_items_table_td_style order_items_table_td order_items_table_td_right order_items_table_td_product" style="text-align:right">
 			<?php echo $order->get_formatted_line_subtotal( $item ); ?>

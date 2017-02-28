@@ -26,7 +26,7 @@ class core_pdf_embedder {
 			
 			wp_enqueue_script( 'pdfemb_pdf_js' );
 			
-			wp_enqueue_style( 'pdfemb_embed_pdf_css', $this->my_plugin_url().'css/pdfemb-embed-pdf.css' );
+			wp_enqueue_style( 'pdfemb_embed_pdf_css', $this->my_plugin_url().'css/pdfemb-embed-pdf.css', array(), $this->PLUGIN_VERSION );
 		}
 	}
 	
@@ -189,15 +189,26 @@ class core_pdf_embedder {
 	protected function get_options_pagename() {
 		return 'pdfemb_options';
 	}
+
+	protected function is_multisite_and_network_activated() {
+	    if (!is_multisite()) {
+	        return false;
+        }
+
+		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+		}
+        return is_plugin_active_for_network($this->my_plugin_basename());
+    }
 	
 	protected function get_settings_url() {
-		return is_multisite()
+		return $this->is_multisite_and_network_activated()
 		? network_admin_url( 'settings.php?page='.$this->get_options_menuname() )
 		: admin_url( 'options-general.php?page='.$this->get_options_menuname() );
 	}
 	
 	public function pdfemb_admin_menu() {
-		if (is_multisite()) {
+		if ($this->is_multisite_and_network_activated()) {
 			add_submenu_page( 'settings.php', __('PDF Embedder settings', 'pdf-embedder'), __('PDF Embedder', 'pdf-embedder'),
 			'manage_network_options', $this->get_options_menuname(),
 			array($this, 'pdfemb_options_do_page'));
@@ -212,11 +223,11 @@ class core_pdf_embedder {
 	public function pdfemb_options_do_page() {
 
         wp_enqueue_script( 'pdfemb_admin_js', $this->my_plugin_url().'js/admin/pdfemb-admin.js', array('jquery') );
-        wp_enqueue_style( 'pdfemb_admin_css', $this->my_plugin_url().'css/pdfemb-admin.css' );
+        wp_enqueue_style( 'pdfemb_admin_css', $this->my_plugin_url().'css/pdfemb-admin.css', array(), $this->PLUGIN_VERSION  );
 
-        $submit_page = is_multisite() ? 'edit.php?action='.$this->get_options_menuname() : 'options.php';
+        $submit_page = $this->is_multisite_and_network_activated() ? 'edit.php?action='.$this->get_options_menuname() : 'options.php';
 	
-		if (is_multisite()) {
+		if ($this->is_multisite_and_network_activated()) {
 			$this->pdfemb_options_do_network_errors();
 		}
 		?>
@@ -440,9 +451,14 @@ class core_pdf_embedder {
 					$error_setting[] = $e['setting'];
 				}
 			}
-	
-			update_site_option($this->get_options_name(), $outoptions);
-				
+
+			if ($this->is_multisite_and_network_activated()) {
+				update_site_option( $this->get_options_name(), $outoptions );
+			}
+			else {
+				update_option( $this->get_options_name(), $outoptions );
+            }
+
 			// redirect to settings page in network
 			wp_redirect(
 			add_query_arg(
@@ -507,8 +523,13 @@ class core_pdf_embedder {
 		if ($this->pdfemb_options != null) {
 			return $this->pdfemb_options;
 		}
-	
-		$option = get_site_option($this->get_options_name(), Array());
+
+		if ($this->is_multisite_and_network_activated()) {
+			$option = get_site_option( $this->get_options_name(), Array() );
+		}
+		else {
+			$option = get_option( $this->get_options_name(), Array() );
+        }
 	
 		$default_options = $this->get_default_options();
 		foreach ($default_options as $k => $v) {
@@ -522,7 +543,12 @@ class core_pdf_embedder {
 	}
 
 	protected function save_option_pdfemb($option) {
-		update_site_option($this->get_options_name(), $option);
+		if ($this->is_multisite_and_network_activated()) {
+			update_site_option( $this->get_options_name(), $option );
+		}
+		else {
+			update_option( $this->get_options_name(), $option );
+        }
 		$this->pdfemb_options = $option;
 	}
 
@@ -542,7 +568,7 @@ class core_pdf_embedder {
 
 		add_filter( 'attachment_fields_to_edit', array($this, 'pdfemb_attachment_fields_to_edit'), 10, 2 );
 
-		wp_enqueue_style( 'pdfemb_admin_other_css', $this->my_plugin_url().'css/pdfemb-admin-other.css' );
+		wp_enqueue_style( 'pdfemb_admin_other_css', $this->my_plugin_url().'css/pdfemb-admin-other.css', array(), $this->PLUGIN_VERSION  );
 	}
 
 	// Override in Basic and Commercial
@@ -585,13 +611,13 @@ class core_pdf_embedder {
 		if (is_admin()) {
 			add_action( 'admin_init', array($this, 'pdfemb_admin_init'), 5, 0 );
 			
-			add_action(is_multisite() ? 'network_admin_menu' : 'admin_menu', array($this, 'pdfemb_admin_menu'));
+			add_action($this->is_multisite_and_network_activated() ? 'network_admin_menu' : 'admin_menu', array($this, 'pdfemb_admin_menu'));
 			
-			if (is_multisite()) {
+			if ($this->is_multisite_and_network_activated()) {
 				add_action('network_admin_edit_'.$this->get_options_menuname(), array($this, 'pdfemb_save_network_options'));
 			}
 
-            add_filter(is_multisite() ? 'network_admin_plugin_action_links' : 'plugin_action_links', array($this, 'pdfemb_plugin_action_links'), 10, 2 );
+            add_filter($this->is_multisite_and_network_activated() ? 'network_admin_plugin_action_links' : 'plugin_action_links', array($this, 'pdfemb_plugin_action_links'), 10, 2 );
 		}
 	}
 

@@ -74,10 +74,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 													?>
 													<tr class="order_items_table_total_row order_items_table_total_row_<?php echo esc_attr( sanitize_title( $total['label'] ) ) ?>">
 														<th scope="row" class="order_items_table_totals_style order_items_table_td">
-															<?php _e( $total['label'], 'email-control' ); ?>
+															<?php echo $total['label']; ?>
 														</th>
 														<td class="order_items_table_totals_style order_items_table_td">
-															<?php _e( $total['value'], 'email-control' ); ?>
+															<?php echo $total['value']; ?>
 														</td>
 													</tr>
 													<?php

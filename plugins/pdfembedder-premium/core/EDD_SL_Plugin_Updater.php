@@ -13,9 +13,9 @@
  * Allows plugins to use their own update API.
  *
  * @author Pippin Williamson and Dan Lester
- * @version 10
+ * @version 11
  */
-class EDD_SL_Plugin_Updater10 {
+class EDD_SL_Plugin_Updater11 {
 	private $api_url  = '';
 	private $api_data = array();
 	private $name     = '';
@@ -27,6 +27,7 @@ class EDD_SL_Plugin_Updater10 {
 	private $license_warning_delay = 3600;
 
 	private $display_warnings = true;
+	private $cache_key = '';
 
 	/**
 	 * Class constructor.
@@ -46,7 +47,10 @@ class EDD_SL_Plugin_Updater10 {
 		$this->name     = plugin_basename( $_plugin_file );
 		$this->slug     = basename( $_plugin_file, '.php');
 		$this->version  = $_api_data['version'];
+		$this->beta     = $_api_data['beta'];
 		$this->display_warnings = $display_warnings;
+
+		$this->cache_key = md5( serialize( $this->slug . $this->api_data['license'] ) );
 
 		if (is_null($license_status_optname)) {
 			$license_status_optname = 'eddsl_'.$this->slug;
@@ -200,14 +204,14 @@ class EDD_SL_Plugin_Updater10 {
 
 		if ( ! is_object( $update_cache ) || empty( $update_cache->response ) || empty( $update_cache->response[ $this->name ] ) ) {
 
-			$cache_key    = md5( 'edd_plugin_' .sanitize_key( $this->name ) . '_version_info' );
-			$version_info = get_transient( $cache_key );
+			$cache_key    = md5( 'edd_plugin_' .sanitize_key( $this->name ) . '_version_info' . ($this->api_data['beta'] ? '-beta' :'-reg') );
+			$version_info = $this->get_cached_version_info( $cache_key );
 
 			if( false === $version_info ) {
 
-				$version_info = $this->api_request( 'plugin_latest_version', array( 'slug' => $this->slug ) );
+				$version_info = $this->api_request( 'get_version', array( 'slug' => $this->slug ) ); // 'plugin_latest_version'
 
-				set_transient( $cache_key, $version_info, 3600 );
+				$this->set_version_info_cache( $version_info, $cache_key );
 			}
 
 
@@ -385,10 +389,33 @@ class EDD_SL_Plugin_Updater10 {
 			)
 		);
 
-		$api_response = $this->api_request( 'get_version', $to_send ); // plugin_information
+		$cache_key = 'edd_api_request_' . md5( serialize( $this->slug . $this->api_data['license'] . ($this->api_data['beta'] ? '-beta' :'-reg') ) );
 
-		if ( false !== $api_response ) {
-			$_data = $api_response;
+		$edd_api_request_transient = $this->get_cached_version_info( $cache_key );
+
+		//If we have no transient-saved value, run the API, set a fresh transient with the API value, and return that value too right now.
+		if ( empty( $edd_api_request_transient ) ){
+
+			$api_response = $this->api_request( 'get_version', $to_send );  // 'plugin_information'
+
+			// Expires in 3 hours
+			$this->set_version_info_cache( $api_response, $cache_key );
+
+			if ( false !== $api_response ) {
+				$_data = $api_response;
+			}
+
+		} else {
+			// Convert sections into an assoc array
+			if (isset($edd_api_request_transient->sections)) {
+				$new_sections = array();
+				foreach ($edd_api_request_transient->sections as $k => $v) {
+					$new_sections[$k] = $v;
+				}
+				$edd_api_request_transient->sections = $new_sections;
+			}
+
+			$_data = $edd_api_request_transient;
 		}
 
 		return $_data;
@@ -445,7 +472,8 @@ class EDD_SL_Plugin_Updater10 {
 			'item_id'    => isset( $data['item_id'] ) ? $data['item_id'] : false,
 			'slug'       => $data['slug'],
 			'author'     => $data['author'],
-			'url'        => home_url()
+			'url'        => home_url(),
+			'beta'       => $data['beta']
 		);
 
 		$request = wp_remote_post( $this->api_url, array( 'timeout' => $this->get_timeout(), 'sslverify' => false, 'body' => $api_params ) );
@@ -473,7 +501,6 @@ class EDD_SL_Plugin_Updater10 {
 
 	public function show_changelog() {
 
-
 		if( empty( $_REQUEST['edd_sl_action'] ) || 'view_plugin_changelog' != $_REQUEST['edd_sl_action'] ) {
 			return;
 		}
@@ -490,12 +517,47 @@ class EDD_SL_Plugin_Updater10 {
 			wp_die( __( 'You do not have permission to install plugin updates', 'edd' ), __( 'Error', 'edd' ), array( 'response' => 403 ) );
 		}
 
-		$response = $this->api_request( 'plugin_latest_version', array( 'slug' => $_REQUEST['slug'] ) );
+		$cache_key    = md5( 'edd_plugin_' . sanitize_key( $_REQUEST['plugin'] ) . '_version_info' . ($this->api_data['beta'] ? '-beta' :'-reg') );
+		$version_info = $this->get_cached_version_info( $cache_key );
 
-		if( $response && isset( $response->sections['changelog'] ) ) {
-			echo '<div style="background:#fff;padding:10px;">' . $response->sections['changelog'] . '</div>';
+		if( false === $version_info ) {
+
+			$api_params = array(
+				'edd_action' => 'get_version',
+				'item_name'  => isset( $this->api_data['item_name'] ) ? $this->api_data['item_name'] : false,
+				'item_id'    => isset( $this->api_data['item_id'] ) ? $this->api_data['item_id'] : false,
+				'slug'       => $_REQUEST['slug'],
+				'author'     => isset($this->api_data['author']) ? $this->api_data['author'] : '',
+				'url'        => home_url(),
+				'beta'       => $this->api_data['beta']
+			);
+
+			$request = wp_remote_post( $this->api_url, array( 'timeout' => 15, 'sslverify' => false, 'body' => $api_params ) );
+
+			if ( ! is_wp_error( $request ) ) {
+				$version_info = json_decode( wp_remote_retrieve_body( $request ) );
+			}
+
+
+			if ( ! empty( $version_info ) && isset( $version_info->sections ) ) {
+				$version_info->sections = maybe_unserialize( $version_info->sections );
+			} else {
+				$version_info = false;
+			}
+
+			if( ! empty( $version_info ) ) {
+				foreach( $version_info->sections as $key => $section ) {
+					$version_info->$key = (array) $section;
+				}
+			}
+
+			$this->set_version_info_cache( $version_info, $cache_key );
+
 		}
 
+		if( ! empty( $version_info ) && isset( $version_info->sections['changelog'] ) ) {
+			echo '<div style="background:#fff;padding:10px;">' . $version_info->sections['changelog'] . '</div>';
+		}
 
 		exit;
 	}
@@ -506,7 +568,8 @@ class EDD_SL_Plugin_Updater10 {
 		$api_params = array(
 			'edd_action'=> 'activate_license',
 			'license' 	=> $this->api_data['license'],
-			'item_name' => $this->api_data['item_name']
+			'item_name' => $this->api_data['item_name'],
+			'beta' => $this->api_data['beta']
 		);
 
 		// Call the custom API.
@@ -606,4 +669,34 @@ class EDD_SL_Plugin_Updater10 {
 		}
 	}
 
+	private function get_cached_version_info( $cache_key = '' ) {
+
+		if( empty( $cache_key ) ) {
+			$cache_key = $this->cache_key;
+		}
+
+		$cache = get_option( $cache_key );
+
+		if( empty( $cache['timeout'] ) || current_time( 'timestamp' ) > $cache['timeout'] ) {
+			return false; // Cache is expired
+		}
+
+		return json_decode($cache['value']);
+
+	}
+
+	private function set_version_info_cache( $value = '', $cache_key = '' ) {
+
+		if( empty( $cache_key ) ) {
+			$cache_key = $this->cache_key;
+		}
+
+		$data = array(
+			'timeout' => strtotime( '+3 hours', current_time( 'timestamp' ) ),
+			'value'   => json_encode($value)
+		);
+
+		update_option( $cache_key, $data );
+
+	}
 }

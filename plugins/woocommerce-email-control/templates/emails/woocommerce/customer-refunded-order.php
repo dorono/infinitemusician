@@ -20,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( $partial_refund )
-	$email_heading  = get_option( "ec_woocommerce_customer_refunded_order_heading_partial" );
+	$email_heading  = get_option( 'ec_woocommerce_customer_refunded_order_heading_partial' );
 else
-	$email_heading  = get_option( "ec_woocommerce_customer_refunded_order_heading_full" );
+	$email_heading  = get_option( 'ec_woocommerce_customer_refunded_order_heading_full' );
 
 /**
  * @hooked WC_Emails::email_header() Output the email header
@@ -31,10 +31,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
 <?php
 	if ( $partial_refund ) {
-		echo get_option( "ec_woocommerce_customer_refunded_order_main_text_partial" );
+		echo get_option( 'ec_woocommerce_customer_refunded_order_main_text_partial' );
 	}
 	else {
-		echo get_option( "ec_woocommerce_customer_refunded_order_main_text_full" );
+		echo get_option( 'ec_woocommerce_customer_refunded_order_main_text_full' );
 	}
 ?>
 

@@ -5,21 +5,21 @@
  */
 
 // Background Styling
-$back_bg_color = get_option( "ec_vanilla_all_background_color" ); //"#f7f7f5";
+$back_bg_color = get_option( 'ec_vanilla_all_background_color' ); //"#f7f7f5";
 
 // Email Sizing
-$email_width = get_option( "ec_vanilla_all_email_width" ); //700px
+$email_width = get_option( 'ec_vanilla_all_email_width' ); //700px
 
 // Main Body Styling
-$body_color				= get_option( "ec_vanilla_all_text_color" );
-$body_accent_color		= get_option( "ec_vanilla_all_text_accent_color" ); //#988255
-$body_text_color		= get_option( "ec_vanilla_all_text_color" ); // "#3d3d3d";
+$body_color				= get_option( 'ec_vanilla_all_text_color' );
+$body_accent_color		= get_option( 'ec_vanilla_all_text_accent_color' ); //#988255
+$body_text_color		= get_option( 'ec_vanilla_all_text_color' ); // "#3d3d3d";
 $body_text_size 		= 14; //px
 $body_letter_spacing	= 0.1; //em
 
-$heading_color 			= get_option( "ec_vanilla_all_heading_color" );
+$heading_color 			= get_option( 'ec_vanilla_all_heading_color' );
 
-$heading_1_size			= get_option( "ec_vanilla_all_heading_1_size" ); //px
+$heading_1_size			= get_option( 'ec_vanilla_all_heading_1_size' ); //px
 
 $body_a_color 			= $body_accent_color;
 $body_a_decoration 		= "underline";
@@ -168,7 +168,7 @@ a { color: <?php echo $body_text_color ?>; font-style: <?php echo $body_a_style 
 .footer_a_tag { color: <?php echo $footer_a_color ?>; text-decoration: <?php echo $footer_a_decoration ?>; }
 
 /* CUSTOM CSS */
-<?php echo wp_strip_all_tags( get_option( "ec_vanilla_all_custom_css" ) ); ?>
+<?php echo wp_strip_all_tags( get_option( 'ec_vanilla_all_custom_css' ) ); ?>
 
 /* RESPONSIVE */
 @media screen and ( max-width: <?php echo $email_width + 60 ?>px ) {

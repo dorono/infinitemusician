@@ -15,10 +15,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 <?php if ( $order->has_status( 'pending' ) || isset( $_REQUEST['ec_render_email'] ) ) { ?>
 	
 	<div class="top_heading">
-		<?php echo get_option( "ec_vanilla_customer_invoice_heading_pending" ); ?>
+		<?php echo get_option( 'ec_vanilla_customer_invoice_heading_pending' ); ?>
 	</div>
 	
-	<?php echo get_option( "ec_vanilla_customer_invoice_main_text_pending" ); ?>
+	<?php echo get_option( 'ec_vanilla_customer_invoice_main_text_pending' ); ?>
 	
 	<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
 		<p class="state-guide">
@@ -31,10 +31,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 <?php if ( ! $order->has_status( 'pending' ) || isset( $_REQUEST['ec_render_email'] ) ) { ?>
 	
 	<div class="top_heading">
-		<?php echo get_option( "ec_vanilla_customer_invoice_heading_complete" ); ?>
+		<?php echo get_option( 'ec_vanilla_customer_invoice_heading_complete' ); ?>
 	</div>
 	
-	<?php echo get_option( "ec_vanilla_customer_invoice_main_text_complete" ); ?>
+	<?php echo get_option( 'ec_vanilla_customer_invoice_main_text_complete' ); ?>
 	
 	<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
 		<p class="state-guide">

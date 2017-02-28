@@ -17,10 +17,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 		<td valign="top" class="top_content_container">
 			
 			<div class="top_heading">
-				<?php echo get_option( "ec_deluxe_customer_note_heading" ); ?>
+				<?php echo get_option( 'ec_deluxe_customer_note_heading' ); ?>
 			</div>
 			<div class="top_paragraph">
-				<?php echo get_option( "ec_deluxe_customer_note_main_text" ); ?>
+				<?php echo get_option( 'ec_deluxe_customer_note_main_text' ); ?>
 			</div>
 			
 		</td>

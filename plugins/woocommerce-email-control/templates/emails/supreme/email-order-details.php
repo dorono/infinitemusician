@@ -64,10 +64,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 								?>
 								<tr class="order_items_table_total_row order_items_table_total_row_<?php echo esc_attr( sanitize_title( $total['label'] ) ) ?>">
 									<th scope="row" colspan="2" class="order_items_table_totals_style order_items_table_td order_items_table_td_left">
-										<?php _e( $total['label'], 'email-control' ); ?>
+										<?php echo $total['label']; ?>
 									</th>
 									<td class="order_items_table_totals_style order_items_table_td order_items_table_td_right" style="text-align:right;" >
-										<?php _e( $total['value'], 'email-control' ); ?>
+										<?php echo $total['value']; ?>
 									</td>
 								</tr>
 								<?php

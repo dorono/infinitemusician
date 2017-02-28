@@ -16,7 +16,7 @@
 		 * Show/Hide the Customizer Editor, and update the Customizer Sections inside of the editor.
 		 */
 		
-		// Ping a `show_settings_composer` when `Email to show` or `Template to show` is changed.
+		// Ping a `show_settings_composer` when `Email Type to show` or `Email Theme to show` is changed.
 		jQuery('#ec_email_type, #ec_email_order').change(function() {
 			reload_preview();
 			hide_settings_composer();
@@ -28,25 +28,25 @@
 			
 			// Get values.
 			var val_email_type             = jQuery("#ec_email_type").val();
-			var val_email_template         = jQuery("#ec_email_template").val();
+			var val_email_theme         = jQuery("#ec_email_theme").val();
 			var val_email_order            = jQuery("#ec_email_order").val();
 			var val_billing_email          = jQuery('#ec_email_order option:selected').attr('data-order-email');
-			var val_email_template_preview = jQuery("#ec_email_template_preview").val();
+			var val_email_theme_preview = jQuery("#ec_email_theme_preview").val();
 			var val_approve_preview        = jQuery("#ec_approve_preview").val();
 			
 			// First hide everything.
 			jQuery(".ec_settings_form").hide();
 			jQuery(".ec_settings_form").find('.section').hide();
 			
-			// Show the chosen email template's form (e.g. Deluxe, Supreme, etc).
-			$ec_settings_form_show = jQuery( "#ec_settings_form_" + val_email_template );
+			// Show the chosen email theme's form (e.g. Deluxe, Supreme, etc).
+			$ec_settings_form_show = jQuery( "#ec_settings_form_" + val_email_theme );
 			jQuery( $ec_settings_form_show ).show();
 			
 			// Show the chosen email type's panels (e.g. New Order, Cancelled Order, etc).
-			$ec_settings_form_show.find('.section').filter('[data-ec-template-kind="' + val_email_type + '"]').show();
-			$ec_settings_form_show.find('.section').filter('[data-ec-template-kind="all"]').show();
+			$ec_settings_form_show.find('.section').filter('[data-ec-email-type="' + val_email_type + '"]').show();
+			$ec_settings_form_show.find('.section').filter('[data-ec-email-type="all"]').show();
 
-			// Hide the main editing block on change of template
+			// Hide the main editing block on change of theme
 			jQuery(".ec-admin-panel-edit-content").removeClass('ec_active');
 
 			// Show the edit button if there are fields showing to edit
@@ -212,7 +212,7 @@
 			// Get values.
 			var val_email_type      = jQuery("#ec_email_type").val();
 			var val_email_type_name = jQuery( "#ec_email_type :selected" ).text().replace(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } ).replace(/(\r\n|\n|\r)/gm,"");
-			var val_email_template  = jQuery("#ec_email_template").val();
+			var val_email_theme  = jQuery("#ec_email_theme").val();
 			var val_email_order     = jQuery("#ec_email_order").val();
 			var val_billing_email   = jQuery('#ec_email_order:selected').attr('data-order-email');
 			var val_testing_email   = jQuery("#ec_send_email").val();
@@ -227,7 +227,7 @@
 			form_data	+= 'ec_email_type=' + val_email_type;
 
 			form_data	+= '&';
-			form_data	+= 'ec_email_template=' + val_email_template;
+			form_data	+= 'ec_email_theme=' + val_email_theme;
 
 			form_data	+= '&';
 			form_data	+= 'ec_email_order=' + val_email_order;
@@ -280,13 +280,13 @@
 		
 		var update_preview = debounce(function() {
 
-			iframe_src = jQuery('#preview-email-template-iframe').attr("src");
+			iframe_src = jQuery('#preview-email-iframe').attr("src");
 			submit_form = jQuery(this).closest("form");
 
 			//console.log( submit_form.attr('class') );
 
 			submit_form.attr("action", iframe_src);
-			submit_form.attr("target", "my-iframe");
+			submit_form.attr("target", "preview-email-iframe");
 			submit_form.attr("method", "post");
 
 			submit_form.submit();
@@ -371,7 +371,7 @@
 				jQuery('#send_test').fadeIn()
 				.parent(".main-controls-element").addClass("element-open");
 				
-				jQuery("#preview-email-template-iframe")[0].contentWindow.ec_set_to_email( jQuery("#ec_send_email").val() );
+				jQuery("#preview-email-iframe")[0].contentWindow.ec_set_to_email( jQuery("#ec_send_email").val() );
 			}
 			
 		});
@@ -385,7 +385,7 @@
 		// Ajax saving of fields
 		jQuery(".header_info_userspecifc").on("change", function () {
 			
-			//jQuery("#preview-email-template-iframe")[0].contentWindow.ec_toggle_header_info();
+			//jQuery("#preview-email-iframe")[0].contentWindow.ec_toggle_header_info();
 			
 			ec_toggle_header_info();
 			
@@ -450,13 +450,13 @@
 			
 		});
 		
-		// Preview Email Template Selector
+		// Preview Email Theme Selector
 		// ----------------------------------------
 		
-		jQuery('#ec_email_template').on("change", function () {
+		jQuery('#ec_email_theme').on("change", function () {
 			
-			jQuery('#template-commit').css({display:"block"});
-			jQuery('#ec_email_template_preview').val( jQuery(this).val() );
+			jQuery('#theme-commit').css({display:"block"});
+			jQuery('#ec_email_theme_preview').val( jQuery(this).val() );
 			
 			reload_preview();
 			
@@ -466,32 +466,32 @@
 		});
 		
 		
-		jQuery('#ec_save_email_template').on("click", function () {
+		jQuery('#ec_save_email_theme').on("click", function () {
 			
-			var confirm_result = confirm("Are you sure you want to use this template for all future emails sent from your site");
+			var confirm_result = confirm("Are you sure you want to use this theme for all future emails sent from your site");
 			if (confirm_result) {
-				jQuery('#template-commit').css({display:"none"});
+				jQuery('#theme-commit').css({display:"none"});
 
-				save_option ( "ec_template", jQuery('#ec_email_template_preview').val() /*, function() { reload_preview(); }*/ );
+				save_option ( "ec_template", jQuery('#ec_email_theme_preview').val() /*, function() { reload_preview(); }*/ );
 
-				jQuery('#ec_email_template_active').val( jQuery('#ec_email_template').val() );
-				jQuery('#ec_email_template_preview').val("");
+				jQuery('#ec_email_theme_active').val( jQuery('#ec_email_theme').val() );
+				jQuery('#ec_email_theme_preview').val("");
 				
 				show_settings_composer();
 			}
 			else{
-				jQuery('#ec_cancel_email_template').click();
+				jQuery('#ec_cancel_email_theme').click();
 			}
 
 			return false;
 		});
 		
-		jQuery('#ec_cancel_email_template').on("click", function () {
+		jQuery('#ec_cancel_email_theme').on("click", function () {
 			
-			jQuery('#template-commit').css({display:"none"});
+			jQuery('#theme-commit').css({display:"none"});
 			
-			jQuery('#ec_email_template').val( jQuery('#ec_email_template_active').val() );
-			jQuery('#ec_email_template_preview').val("");
+			jQuery('#ec_email_theme').val( jQuery('#ec_email_theme_active').val() );
+			jQuery('#ec_email_theme_preview').val("");
 			
 			reload_preview();
 			
@@ -601,7 +601,7 @@
 
 		});
 		
-		// Preview Email Edit Content
+		// Preview Email - Edit Content
 		// ----------------------------------------
 		jQuery('#ec_edit_content').on("click", function () {
 			
@@ -611,10 +611,10 @@
 		});
 		
 		// Open all links in the preview in a new tab.
-		jQuery('#ec-template .main-content a:not("#ec_approve_preview_button")')
+		jQuery('#ec-theme .main-content a:not("#ec_approve_preview_button")')
 			.attr( 'target', 'wc_email_customizer_window' );
 		
-		// Dismiss compatability warning in email template.
+		// Dismiss compatability warning in email preview.
 		jQuery("#ec_approve_preview_button").on('click', function(event) {
 			
 			var email_id = jQuery(this).data('approve-preview');
@@ -623,7 +623,7 @@
 			return false;
 		});
 		
-		// Preview Email Preview Template
+		// Preview Email - Preview Template
 		// ----------------------------------------
 		
 		// Open-Close the header info
@@ -719,10 +719,10 @@ function reload_preview() {
 	
 	// Get values.
 	var val_email_type             = jQuery("#ec_email_type").val();
-	var val_email_template         = jQuery("#ec_email_template").val();
+	var val_email_theme         = jQuery("#ec_email_theme").val();
 	var val_email_order            = jQuery("#ec_email_order").val();
 	var val_billing_email          = jQuery('#ec_email_order option:selected').attr('data-order-email');
-	var val_email_template_preview = jQuery("#ec_email_template_preview").val();
+	var val_email_theme_preview = jQuery("#ec_email_theme_preview").val();
 	var val_approve_preview        = jQuery("#ec_approve_preview").val();
 
 	// Reload the Preview src
@@ -733,7 +733,7 @@ function reload_preview() {
 	new_src += "&";
 	new_src += "ec_render_email=true";
 	new_src += "&";
-	new_src += "ec_email_template=" + val_email_template;
+	new_src += "ec_email_theme=" + val_email_theme;
 	new_src += "&";
 	new_src += "ec_email_type=" + val_email_type;
 	new_src += "&";
@@ -742,12 +742,12 @@ function reload_preview() {
 	new_src += "&";
 	new_src += "ec_approve_preview=" + val_approve_preview;
 
-	if ( val_email_template_preview ) {
+	if ( val_email_theme_preview ) {
 		new_src += "&";
-		new_src += "ec_email_template_preview=" + val_email_template_preview;
+		new_src += "ec_email_theme_preview=" + val_email_theme_preview;
 	}
 
-	jQuery('#preview-email-template-iframe').attr("src", new_src );
+	jQuery('#preview-email-iframe').attr("src", new_src );
 
 
 
@@ -789,15 +789,15 @@ function ec_loading_end() {
 
 function ec_toggle_header_info() {
 	
-	if ( jQuery("#preview-email-template-iframe").contents().find(".header-info").is(":visible") ) {
-		jQuery("#preview-email-template-iframe").contents().find(".header-info").slideUp({ duration: 300 });
-		jQuery("#preview-email-template-iframe").contents().find(".hide-icon.hide-up").fadeOut(50);
-		jQuery("#preview-email-template-iframe").contents().find(".hide-icon.hide-down").fadeIn(50);
+	if ( jQuery("#preview-email-iframe").contents().find(".header-info-holder").is(":visible") ) {
+		jQuery("#preview-email-iframe").contents().find(".header-info-holder").slideUp({ duration: 300 });
+		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-up").fadeOut(50);
+		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-down").fadeIn(50);
 	}
 	else {
-		jQuery("#preview-email-template-iframe").contents().find(".header-info").slideDown({ duration: 300 });
-		jQuery("#preview-email-template-iframe").contents().find(".hide-icon.hide-up").fadeIn(50);
-		jQuery("#preview-email-template-iframe").contents().find(".hide-icon.hide-down").fadeOut(50);
+		jQuery("#preview-email-iframe").contents().find(".header-info-holder").slideDown({ duration: 300 });
+		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-up").fadeIn(50);
+		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-down").fadeOut(50);
 	}
 }
 

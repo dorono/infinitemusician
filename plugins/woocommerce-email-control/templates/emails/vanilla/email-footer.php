@@ -33,8 +33,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 						
 						<!-- Footer -->
 						<?php
-						$footer_text = get_option("ec_vanilla_all_footer_text");
-						$footer_image = get_option('ec_vanilla_all_footer_image');
+						$footer_text = get_option( 'ec_vanilla_all_footer_text' );
+						$footer_image = get_option( 'ec_vanilla_all_footer_image' );
 						
 						if ( $footer_text || $footer_image ) {
 							?>

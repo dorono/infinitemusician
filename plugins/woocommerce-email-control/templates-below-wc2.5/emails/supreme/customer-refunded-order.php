@@ -15,10 +15,10 @@ do_action( 'woocommerce_email_header', $email_heading );
 			<?php if ( $partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
 
 				<div class="top_heading">
-					<?php echo get_option( "ec_supreme_customer_refunded_order_heading_partial" ); ?>
+					<?php echo get_option( 'ec_supreme_customer_refunded_order_heading_partial' ); ?>
 				</div>
 				<div class="top_paragraph">
-					<?php echo get_option( "ec_supreme_customer_refunded_order_main_text_partial" ); ?>
+					<?php echo get_option( 'ec_supreme_customer_refunded_order_main_text_partial' ); ?>
 				</div>
 				
 				<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
@@ -32,10 +32,10 @@ do_action( 'woocommerce_email_header', $email_heading );
 			<?php if ( !$partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
 				
 				<div class="top_heading">
-					<?php echo get_option( "ec_supreme_customer_refunded_order_heading_full" ); ?>
+					<?php echo get_option( 'ec_supreme_customer_refunded_order_heading_full' ); ?>
 				</div>
 				<p class="top_paragraph">
-					<?php echo get_option( "ec_supreme_customer_refunded_order_main_text_full" ); ?>
+					<?php echo get_option( 'ec_supreme_customer_refunded_order_main_text_full' ); ?>
 				</p>
 				
 				<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
@@ -112,10 +112,10 @@ do_action( 'woocommerce_email_header', $email_heading );
 							?>
 							<tr class="order_items_table_total_row order_items_table_total_row_<?php echo esc_attr( sanitize_title( $total['label'] ) ) ?>">
 								<th scope="row" colspan="2" class="order_items_table_totals_style order_items_table_td order_items_table_td_left">
-									<?php _e( $total['label'], 'email-control' ); ?>
+									<?php echo $total['label']; ?>
 								</th>
 								<td class="order_items_table_totals_style order_items_table_td order_items_table_td_right" style="text-align:right;" >
-									<?php _e( $total['value'], 'email-control' ); ?>
+									<?php echo $total['value']; ?>
 								</td>
 							</tr>
 							<?php

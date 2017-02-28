@@ -13,14 +13,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 <div class="top_heading">
-	<?php echo get_option( "ec_vanilla_customer_new_account_heading" ); ?>
+	<?php echo get_option( 'ec_vanilla_customer_new_account_heading' ); ?>
 </div>
 
-<?php echo get_option( "ec_vanilla_customer_new_account_main_text" ); ?>
+<?php echo get_option( 'ec_vanilla_customer_new_account_main_text' ); ?>
 
-<?php if ( (get_option( 'woocommerce_registration_generate_password' ) == 'yes' && $password_generated) || isset( $_REQUEST['ec_render_email'] ) ) : ?>
+<?php if ( ( get_option( 'woocommerce_registration_generate_password' ) == 'yes' && $password_generated ) || isset( $_REQUEST['ec_render_email'] ) ) : ?>
 	
-	<?php echo get_option( "ec_vanilla_customer_new_account_main_text_generate_pass" ); ?>
+	<?php echo get_option( 'ec_vanilla_customer_new_account_main_text_generate_pass' ); ?>
 	
 	<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
 		<p class="state-guide">

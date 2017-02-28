@@ -5,42 +5,42 @@
  */
 
 // Background Styling
-$back_bg_color	= get_option( "ec_deluxe_all_background_color" ); //"#f7f7f5";
+$back_bg_color	= get_option( 'ec_deluxe_all_background_color' ); //"#f7f7f5";
 
 // Email Sizing
-$email_width  				= get_option( "ec_deluxe_all_email_width" ); //700px
-$email_border_radius		= get_option( "ec_deluxe_all_border_radius" ); //5px
+$email_width  				= get_option( 'ec_deluxe_all_email_width' ); //700px
+$email_border_radius		= get_option( 'ec_deluxe_all_border_radius' ); //5px
 $email_padding_top_bottom	= 30; //px
 
 // Header Styling
-$header_bg_color				= get_option( "ec_deluxe_all_header_color" );  //"#fdfdfd";
-$header_text_color				= wc_light_or_dark( $header_bg_color, wc_hex_darker($header_bg_color, 55), wc_hex_lighter($header_bg_color, 85) );
-$header_border_bottom_color		= wc_hex_darker($header_bg_color, 5);
-$header_logo_alignment			= get_option( "ec_deluxe_all_logo_position" );
+$header_bg_color				= get_option( 'ec_deluxe_all_header_color' );  //"#fdfdfd";
+$header_text_color				= wc_light_or_dark( $header_bg_color, wc_hex_darker( $header_bg_color, 55 ), wc_hex_lighter( $header_bg_color, 85 ) );
+$header_border_bottom_color		= wc_hex_darker( $header_bg_color, 5 );
+$header_logo_alignment			= get_option( 'ec_deluxe_all_logo_position' );
 
 // Main Body Styling
-$body_bg_color			= get_option( "ec_deluxe_all_page_color" ); //"#ffffff";
-$body_color				= get_option( "ec_deluxe_all_text_color" );
-$body_accent_color		= get_option( "ec_deluxe_all_text_accent_color" ); //#988255
-$body_text_color		= get_option( "ec_deluxe_all_text_color" ); // "#3d3d3d";
+$body_bg_color			= get_option( 'ec_deluxe_all_page_color' ); //"#ffffff";
+$body_color				= get_option( 'ec_deluxe_all_text_color' );
+$body_accent_color		= get_option( 'ec_deluxe_all_text_accent_color' ); //#988255
+$body_text_color		= get_option( 'ec_deluxe_all_text_color' ); // "#3d3d3d";
 $body_text_size 		= 14; //px
 $body_letter_spacing	= 0.1; //em
-$body_line_height		= get_option( "ec_deluxe_all_line_height" ); //1.3em
-$body_border_color		= wc_hex_darker($back_bg_color, 6);
+$body_line_height		= get_option( 'ec_deluxe_all_line_height' ); //1.3em
+$body_border_color		= wc_hex_darker( $back_bg_color, 6 );
 
-$top_nav_bg_color		= wc_hex_darker($body_bg_color, 2);
-$top_nav_border_color	= wc_hex_darker($body_bg_color, 4);
+$top_nav_bg_color		= wc_hex_darker( $body_bg_color, 2 );
+$top_nav_border_color	= wc_hex_darker( $body_bg_color, 4 );
 
-$heading_1_size			= get_option( "ec_deluxe_all_heading_1_size" ); //px
+$heading_1_size			= get_option( 'ec_deluxe_all_heading_1_size' ); //px
 
 $body_h2_color 			= $body_text_color; //"3d3d3d"
-$body_h2_size 			= get_option( "ec_deluxe_all_heading_2_size" ); //px
+$body_h2_size 			= get_option( 'ec_deluxe_all_heading_2_size' ); //px
 $body_h2_decoration 	= "none";
 $body_h2_style			= "none";
 $body_h2_weight			= "bold";
 $body_h2_transform		= "uppercase";
-$body_h2_border_width	= get_option( "ec_deluxe_all_heading_2_line_width" ); //2px
-$body_h2_border_color	= get_option( "ec_deluxe_all_heading_2_line_color" ); //"#000000";
+$body_h2_border_width	= get_option( 'ec_deluxe_all_heading_2_line_width' ); //2px
+$body_h2_border_color	= get_option( 'ec_deluxe_all_heading_2_line_color' ); //"#000000";
 
 $body_a_color 			= $body_accent_color;
 $body_a_decoration 		= "underline";
@@ -57,21 +57,21 @@ $body_highlight_decoration	= "none";
 $body_highlight_style		= "none";
 
 // Order Items Table
-$order_items_table_outer_border_style		= get_option( "ec_deluxe_all_order_item_table_style" ); //none, dotted, etc;
-$order_items_table_outer_border_width		= get_option( "ec_deluxe_all_order_item_table_outer_border_width" ); //0 px
-$order_items_table_outer_border_color		= get_option( "ec_deluxe_all_table_outer_border_color" ); //red";
+$order_items_table_outer_border_style		= get_option( 'ec_deluxe_all_order_item_table_style' ); //none, dotted, etc;
+$order_items_table_outer_border_width		= get_option( 'ec_deluxe_all_order_item_table_outer_border_width' ); //0 px
+$order_items_table_outer_border_color		= get_option( 'ec_deluxe_all_table_outer_border_color' ); //red";
 
-$order_items_table_bg_color					= ( $order_items_table_outer_border_style != 'none' ) ? get_option( "ec_deluxe_all_order_item_table_bg_color" ) : 'none' ; //red";
-$order_items_table_outer_border_radius		= ( $order_items_table_outer_border_style != 'none' ) ? get_option( "ec_deluxe_all_order_item_table_radius" ) : '0' ; //3px
+$order_items_table_bg_color					= ( $order_items_table_outer_border_style != 'none' ) ? get_option( 'ec_deluxe_all_order_item_table_bg_color' ) : 'none' ; //red";
+$order_items_table_outer_border_radius		= ( $order_items_table_outer_border_style != 'none' ) ? get_option( 'ec_deluxe_all_order_item_table_radius' ) : '0' ; //3px
 
 $order_items_table_inner_border_width		= 1; //px
-$order_items_table_inner_border_style		= get_option( "ec_deluxe_all_border_style" ); //"dotted";
-$order_items_table_inner_border_color		= get_option( "ec_deluxe_all_border_color" ); //"#d4d4d4";
+$order_items_table_inner_border_style		= get_option( 'ec_deluxe_all_border_style' ); //"dotted";
+$order_items_table_inner_border_color		= get_option( 'ec_deluxe_all_border_color' ); //"#d4d4d4";
 
 // Footer Styling
-$footer_bg_color			= $top_nav_bg_color; // get_option( "ec_deluxe_all_footer_color" ); // "#F9F9F5";
-$footer_text_color			= wc_light_or_dark( $footer_bg_color, wc_hex_darker($footer_bg_color, 60), wc_hex_lighter($footer_bg_color, 60) );
-$footer_border_bottom_color	= wc_hex_darker($footer_bg_color, 5);
+$footer_bg_color			= $top_nav_bg_color; // get_option( 'ec_deluxe_all_footer_color' ); // "#F9F9F5";
+$footer_text_color			= wc_light_or_dark( $footer_bg_color, wc_hex_darker( $footer_bg_color, 60 ), wc_hex_lighter( $footer_bg_color, 60 ) );
+$footer_border_bottom_color	= wc_hex_darker( $footer_bg_color, 5 );
 $footer_a_color				= "#3C3C3C";
 $footer_a_decoration		= "none";
 $footer_a_style				= "none";
@@ -170,7 +170,7 @@ h2 { font-family: Arial, sans-serif; font-size: <?php echo $heading_1_size ?>px;
 .order_items_table_totals_style { font-family: Arial, sans-serif; text-align: left; text-transform: uppercase; font-size: 14px; line-height: 1em; }
 
 /* PRODUCT TABLE ITEMS - BORDER RADIUS */
-<?php if ( isset($order_items_table_outer_border_radius) && $order_items_table_outer_border_radius > 0 ) { ?>
+<?php if ( isset( $order_items_table_outer_border_radius ) && $order_items_table_outer_border_radius > 0 ) { ?>
 	.order_items_table { border-radius: <?php echo $order_items_table_outer_border_radius ?>px; }
 <?php } ?>
 
@@ -210,7 +210,7 @@ else{
 .footer_a_tag { color: <?php echo $footer_a_color ?>; text-decoration: <?php echo $footer_a_decoration ?>; }
 
 /* CUSTOM CSS */
-<?php echo wp_strip_all_tags( get_option( "ec_deluxe_all_custom_css" ) ); ?>
+<?php echo wp_strip_all_tags( get_option( 'ec_deluxe_all_custom_css' ) ); ?>
 
 /* RESPONSIVE */
 @media screen and ( max-width: <?php echo $email_width + 60 ?>px ) {

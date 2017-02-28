@@ -444,6 +444,8 @@ var pdfembAnnotationsLayerBuilder = (function AnnotationsLayerBuilderClosure() {
                                 link.target = '_blank';
                             }
 
+                            link.title = '';
+
                             jQuery(link).on('touchstart', function(e){
                                 e.stopPropagation();
                             });
