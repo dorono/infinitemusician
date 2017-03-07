@@ -5,7 +5,7 @@ Description:      A storefront child theme for webshops selling homeware goods.
 Author:           WooThemes
 Author URI:       https://woocommerce.com
 Template:         storefront
-Version:          2.0.10
+Version:          2.0.13
 License:          GNU General Public License v2 or later
 License URI:      http://www.gnu.org/licenses/gpl-2.0.html
 Tags:             light, dark, two-columns, right-sidebar, left-sidebar, responsive-layout, accessibility-ready
@@ -455,9 +455,9 @@ table.cart {
   background-color: #e8e8e8; }
 
 .site-header .site-branding,
-.site-header .site-logo-anchor,
-.site-header .site-logo-link,
-.site-header .custom-logo-link {
+.site-header .col-full > .site-logo-anchor,
+.site-header .col-full > .site-logo-link,
+.site-header .col-full > .custom-logo-link {
   padding: 3em 0;
   margin-bottom: 0; }
 
@@ -585,8 +585,7 @@ ul.products {
   body.archive #main ul.products {
     margin-bottom: 32px; }
   ul.products li.product.product-category {
-    position: relative;
-    overflow: hidden; }
+    position: relative; }
     ul.products li.product.product-category img {
       margin: 0;
       max-width: 100%;
@@ -637,7 +636,7 @@ ul.products {
   display: inline-block;
   font-weight: 500;
   background: #fbd685;
-  padding: 0 0.9em;
+  padding: 0 17px 0 65px;
   font-size: 1.1em;
   height: 48px;
   line-height: 48px;
@@ -648,7 +647,6 @@ ul.products {
   clear: both; }
   .storefront-product-section .section-title:after,
   .single-product div.product .related.products > h2:first-child:after {
-    transform: scaleX(0.9);
     transform-origin: center right;
     display: block;
     position: absolute;
@@ -657,9 +655,9 @@ ul.products {
     height: 0;
     border-style: solid;
     border-width: 48px 0 0 48px;
-    border-color: #fbd685 transparent transparent transparent;
+    border-color: transparent #fcfcfc #fcfcfc #fcfcfc;
     top: 0;
-    left: -48px; }
+    left: 0; }
 
 .storefront-product-section,
 .home.page-template-template-homepage #main > .hentry {
@@ -674,6 +672,11 @@ ul.products {
 -------------------------------------------------------------- */
 .storefront-blog .section-title {
   float: right; }
+
+/* Storefront Powerpack
+-------------------------------------------------------------- */
+.sp-header-active .site-header .site-branding {
+  max-width: none; }
 
 /* Product hero
 -------------------------------------------------------------- */
@@ -1704,9 +1707,9 @@ a.more-link {
     margin-top: 1em;
     margin-bottom: 0; }
   #masthead .site-branding,
-  #masthead .site-logo-anchor,
-  #masthead .site-logo-link,
-  #masthead .custom-logo-link {
+  #masthead .col-full > .site-logo-anchor,
+  #masthead .col-full > .site-logo-link,
+  #masthead .col-full > .custom-logo-link {
     padding: 1.75em 0; }
   #masthead .site-header-cart .cart-contents {
     -webkit-transition: box-shadow 100ms ease-in-out;
@@ -1887,6 +1890,19 @@ a.more-link {
         font-size: 1em;
         float: left;
         min-width: 2.8em; }
+  .sp-header-active.woocommerce-active .site-header .site-header-cart {
+    position: static;
+    transform: none;
+    margin-top: 0;
+    padding-top: 0;
+    width: auto;
+    top: 0;
+    left: 0; }
+    .sp-header-active.woocommerce-active .site-header .site-header-cart .cart-contents .count {
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 0; }
   .woocommerce-active.storefront-2x .site-header .site-header-cart .cart-contents:after {
     float: right;
     margin-right: -1.8em; }

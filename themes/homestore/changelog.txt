@@ -1,5 +1,15 @@
 *** Homestore Changelog ***
 
+2016.11.14 - version 2.0.13
+ * Fix - First category on the homepage template is no longer hidden on mobile.
+
+2016.11.10 - version 2.0.12
+ * Tweak - Homepage section titles can now be edited via Storefront Powerpack.
+
+2016.08.15 - version 2.0.11
+ * Tweak - Storefront 2.1 compatibility.
+ * Tweak - Storefront Powerpack compatibility.
+
 2016.07.15 - version 2.0.10
 * Fix - Homepage content sections visibility.
 * Fix - Storefront Footer Bar compatibility.
