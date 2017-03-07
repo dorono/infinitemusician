@@ -80,7 +80,7 @@ See https://github.com/adobe-type-tools/cmap-resources
 
       <div id="mainContainer">
         <div class="back-to-bsp">
-          <a href="/bulletproof-saxophone-playing-complete-content/">&larr; Back to Bulletproof Saxophone Playing</a>
+          <a href="/bulletproof-saxophone-playing-complete-content/" onclick="goBack()">&larr; Go Back</a>
         </div>
 
         <div class="findbar hidden doorHanger hiddenSmallView" id="findbar">
@@ -361,5 +361,11 @@ See https://github.com/adobe-type-tools/cmap-resources
 
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
+
+    <script>
+    function goBack() {
+      window.history.back();
+    }
+    </script>
   </body>
 </html>
