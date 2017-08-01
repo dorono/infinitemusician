@@ -70,7 +70,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 					
 					<div class="main-controls-element main-controls-element-heading-block">
 						<div class="heading-first">
-							<h2><?php _e( "Email Customizer","email-control"); ?></h2>
+							<h2><?php _e( "Email Customizer", 'email-control' ); ?></h2>
 						</div>
 					</div>
 					
@@ -80,8 +80,9 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 					if ( isset( $ec_email_themes ) && is_array( $ec_email_themes ) ) :
 						?>
 						<div class="main-controls-element">
-							<label class="controls-label" for="ec_email_theme">
-								<?php _e( "Email Theme to show","email-control") ; ?> <span class="help-icon" title="<?php _e( "Choose which email theme to preview. Then click 'Use' to use it for all your future WooCommerce emails.", 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+							<label class="controls-label" for="ec_email_theme" title="<?php _e( "Choose which email theme to preview. Then click 'Use' to use it for all your future WooCommerce emails.", 'email-control' ); ?>">
+								<?php _e( "Email Theme to show", 'email-control' ); ?> 
+								<span class="help-icon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 							</label>
 							<div class="controls-field">
 								<div class="controls-inner-row">
@@ -118,14 +119,15 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 					?>
 					
 					<div class="main-controls-element">
-						<label class="controls-label" for="ec_email_type">
-							<?php _e( "Email Type to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Choose which email type to preview.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						<label class="controls-label" for="ec_email_type" title="<?php _e( 'Choose which email type to preview.', 'email-control' ); ?>">
+							<?php _e( "Email Type to show", 'email-control' ); ?> 
+							<span class="help-icon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
 								<select class="w-select control-dropdown" id="ec_email_type" name="ec_email_type">
 									<option value="">
-										Select one...
+										<?php _e( "Select one...", 'email-control' ); ?>
 									</option>
 									<?php
 									//Customer_Invoice
@@ -145,8 +147,9 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 					</div>
 					
 					<div class="main-controls-element" id="ec_edit_content_controls">
-						<label class="controls-label" for="ec_edit_content">
-							<?php _e( "Customize","email-control") ; ?> <span class="help-icon" title="<?php _e( "Customize the email you're showing in the preview. Then click 'Save & Publish' to save your customizations.", 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						<label class="controls-label" for="ec_edit_content" title="<?php _e( "Customize the email you're showing in the preview. Then click 'Save & Publish' to save your customizations.", 'email-control' ); ?>">
+							<?php _e( "Customize", 'email-control' ); ?> 
+							<span class="help-icon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -164,8 +167,9 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 					</div>
 					
 					<div class="main-controls-element">
-						<label class="controls-label" for="ec_email_order">
-							<?php _e( "Order to show","email-control") ; ?> <span class="help-icon" title="<?php _e( 'Choose which order to use to populate the email preview.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						<label class="controls-label" for="ec_email_order" title="<?php _e( 'Choose which order to use to populate the email preview.', 'email-control' ); ?>">
+							<?php _e( "Order to show", 'email-control' ); ?> 
+							<span class="help-icon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -213,8 +217,9 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 					</div>
 					
 					<div class="main-controls-element">
-						<label class="controls-label" for="header_info_userspecifc">
-							<?php _e( "Show Header & Template Info", 'email-control' ) ; ?> <span class="help-icon" title="<?php _e( 'Display the email header information.', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						<label class="controls-label" title="<?php _e( 'More advanced debugging options.', 'email-control' ); ?>">
+							<?php _e( "Debugging", 'email-control' ) ; ?> 
+							<span class="help-icon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -222,7 +227,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 								<label for="header_info_userspecifc">
 									<?php
 									$field_default = "off";
-									$field_value = get_user_meta( $current_user->ID, "header_info_userspecifc", true);
+									$field_value = get_user_meta( $current_user->ID, "ec_header_info_userspecifc", true);
 									$field_value = ( $field_value )? $field_value : $field_default;
 									
 									if ( $field_value == "on" ) $header = true;
@@ -230,7 +235,21 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 									?>
 									
 									<input type="checkbox" id="header_info_userspecifc" class="header_info_userspecifc" <?php if ( $field_value == "on" ) echo "checked"; ?> name="header_info_userspecifc" value="on" /> 
-									<?php _e( 'Header & Template Info', 'email-control' ) ?>
+									<?php _e( 'Show Header & Template Info', 'email-control' ) ?>
+								</label>
+								
+								<label for="show_errors_userspecifc">
+									<?php
+									$field_default = "off";
+									$field_value = get_user_meta( $current_user->ID, "ec_show_errors_userspecifc", true);
+									$field_value = ( $field_value )? $field_value : $field_default;
+									
+									if ( $field_value == "on" ) $header = true;
+									else $header = false;
+									?>
+									
+									<input type="checkbox" id="show_errors_userspecifc" class="show_errors_userspecifc" <?php if ( $field_value == "on" ) echo "checked"; ?> name="show_errors_userspecifc" value="on" /> 
+									<?php _e( 'Show Error Notices', 'email-control' ) ?>
 								</label>
 							
 							</div>
@@ -242,8 +261,9 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 						//Load order for Email Customizer Send
 						$order = new WC_Order( $show_order );
 						?>
-						<label class="controls-label" for="ec_send_email">
-							<?php _e( "Send a Test", 'email-control' ) ; ?> <span class="help-icon" title="<?php _e( 'Send a test email to any address. Use a comma separated list to send to multiple addresses', 'email-control' ); ?>" >&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						<label class="controls-label" for="ec_send_email" title="<?php _e( 'Send a test email to any address. Use a comma separated list to send to multiple addresses', 'email-control' ); ?>">
+							<?php _e( "Send a Test", 'email-control' ) ; ?> 
+							<span class="help-icon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
@@ -352,9 +372,9 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 							<input type="hidden" name="ec_action" value="yes" >
 							
 							<div class="main-controls-element forminp-tags ec-allowed-tags">
-								<label class="controls-label">
+								<label class="controls-label" title="<?php echo esc_attr( __( 'Copy & paste any of these [shortcodes] to use dynamic text in your text.', 'email-control' ) ) ?>">
 									<?php _e( 'Allowed Shortcodes:', 'email-control' ); ?>
-									<span class="help-icon" title="<?php echo esc_attr( __( 'Copy & paste any of these [shortcodes] to use dynamic text in your text.', 'email-control' ) ) ?>" >&nbsp;</span>
+									<span class="help-icon">&nbsp;</span>
 								</label>
 								<div class="controls-field">
 									<div class="controls-inner-row">

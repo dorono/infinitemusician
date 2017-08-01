@@ -19,6 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 // getting rid of JS fixed position thingie that was breaking the page at times
 add_action( 'wp_enqueue_scripts', 'jk_remove_sticky_checkout', 99 );
 
+add_action( 'wp_enqueue_scripts', 'remove_product_zoom', 99 );
+
+function remove_product_zoom () {
+	remove_theme_support( 'wc-product-gallery-zoom' );
+}
+
 function jk_remove_sticky_checkout() {
 	wp_dequeue_script( 'storefront-sticky-payment' );
 }

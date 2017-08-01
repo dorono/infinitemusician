@@ -1,9 +1,9 @@
 === Authorize.Net CIM Gateway for WooCommerce ===
 Author: skyverge, woocommerce
 Requires at least: 4.1
-Tested up to: 4.7.3
+Tested up to: 4.8.0
 Requires WooCommerce at least: 2.5.5
-Tested WooCommerce up to: 3.0.0
+Tested WooCommerce up to: 3.1.0
 
 Adds the Authorize.Net CIM Payment Gateway to your WooCommerce site, offering support for Subscriptions and more!
 

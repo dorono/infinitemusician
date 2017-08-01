@@ -5,7 +5,7 @@
  * Description: Sell memberships that provide access to restricted content, products, discounts, and more!
  * Author: SkyVerge
  * Author URI: https://www.woocommerce.com/
- * Version: 1.8.5
+ * Version: 1.8.7
  * Text Domain: woocommerce-memberships
  * Domain Path: /i18n/languages/
  *
@@ -40,7 +40,7 @@ if ( ! class_exists( 'SV_WC_Framework_Bootstrap' ) ) {
 	require_once( plugin_dir_path( __FILE__ ) . 'lib/skyverge/woocommerce/class-sv-wc-framework-bootstrap.php' );
 }
 
-SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.6.3', __( 'WooCommerce Memberships', 'woocommerce-memberships' ), __FILE__, 'init_woocommerce_memberships', array(
+SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.6.5', __( 'WooCommerce Memberships', 'woocommerce-memberships' ), __FILE__, 'init_woocommerce_memberships', array(
 	'minimum_wc_version'   => '2.5.5',
 	'minimum_wp_version'   => '4.4',
 	'backwards_compatible' => '4.4.0',
@@ -61,7 +61,7 @@ class WC_Memberships extends SV_WC_Plugin {
 
 
 	/** plugin version number */
-	const VERSION = '1.8.5';
+	const VERSION = '1.8.7';
 
 	/** @var WC_Memberships single instance of this plugin */
 	protected static $instance;

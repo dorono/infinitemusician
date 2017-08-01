@@ -27,12 +27,12 @@
 		function show_settings_composer() {
 			
 			// Get values.
-			var val_email_type             = jQuery("#ec_email_type").val();
+			var val_email_type          = jQuery("#ec_email_type").val();
 			var val_email_theme         = jQuery("#ec_email_theme").val();
-			var val_email_order            = jQuery("#ec_email_order").val();
-			var val_billing_email          = jQuery('#ec_email_order option:selected').attr('data-order-email');
+			var val_email_order         = jQuery("#ec_email_order").val();
+			var val_billing_email       = jQuery('#ec_email_order option:selected').attr('data-order-email');
 			var val_email_theme_preview = jQuery("#ec_email_theme_preview").val();
-			var val_approve_preview        = jQuery("#ec_approve_preview").val();
+			var val_approve_preview     = jQuery("#ec_approve_preview").val();
 			
 			// First hide everything.
 			jQuery(".ec_settings_form").hide();
@@ -212,7 +212,7 @@
 			// Get values.
 			var val_email_type      = jQuery("#ec_email_type").val();
 			var val_email_type_name = jQuery( "#ec_email_type :selected" ).text().replace(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } ).replace(/(\r\n|\n|\r)/gm,"");
-			var val_email_theme  = jQuery("#ec_email_theme").val();
+			var val_email_theme     = jQuery("#ec_email_theme").val();
 			var val_email_order     = jQuery("#ec_email_order").val();
 			var val_billing_email   = jQuery('#ec_email_order:selected').attr('data-order-email');
 			var val_testing_email   = jQuery("#ec_send_email").val();
@@ -283,8 +283,6 @@
 			iframe_src = jQuery('#preview-email-iframe').attr("src");
 			submit_form = jQuery(this).closest("form");
 
-			//console.log( submit_form.attr('class') );
-
 			submit_form.attr("action", iframe_src);
 			submit_form.attr("target", "preview-email-iframe");
 			submit_form.attr("method", "post");
@@ -345,9 +343,9 @@
 						
 						clear_edited(element);
 						//reload_preview();
-
 					},
 					error:		function(xhr, status, error) {
+						
 						console.log(xhr, status, error);
 					}
 				});
@@ -379,75 +377,82 @@
 		if ( jQuery('#ec_send_email').val() != "" ) {
 			
 			jQuery('#send_test').fadeIn();
-			
 		}
 		
-		// Ajax saving of fields
-		jQuery(".header_info_userspecifc").on("change", function () {
-			
-			//jQuery("#preview-email-iframe")[0].contentWindow.ec_toggle_header_info();
-			
-			ec_toggle_header_info();
-			
-			var field_name	= jQuery(this).attr("name");
-			var field_value	= jQuery(this).val();
-			
-			if ( jQuery(this).attr('type') == "checkbox" ) {
-				if ( jQuery( "input[name='" + jQuery(this).attr('name') + "']" ).length == 1 ) {
-					
-					if ( jQuery(this).is(":checked") ) field_value = "on";
-					else field_value = "off";
-										
-				}
-			}
-
-			jQuery.ajax({
-				type:		"post",
-				dataType:	"json",
-				url:		woocommerce_email_control.ajaxurl,
-				data: {
-					action:			"save_meta",
-					field_name:		field_name,
-					field_value:	field_value
-					//nonce:		nonce
-				},
-				success: function( data ) {
-					
-				},
-				error: function(xhr, status, error) {
-					
-				}
-			});
+		
+		// Show Header Info (save checkbox setting when changed).
+		save_on_change({
+			'input_name' : '#header_info_userspecifc', // Name of the field.
+			'field_name' : 'ec_header_info_userspecifc', // Name of the option.
+			// 'complete' : ec_toggle_header_info, // Complete function.
+			'beforeSend' : ec_toggle_header_info, // beforeSend function.
+			'field_type' : 'user', // user | option.
 		});
 		
-		// Ajax saving of options
-		function save_option ( option_name, option_value, complete ) {
+		// Show Header Info (Save checkbox setting when changed).
+		save_on_change({
+			'input_name' : '#show_errors_userspecifc', // Name of the field.
+			'field_name' : 'ec_show_errors_userspecifc', // Name of the option.
+			'complete'   : function(){ reload_preview(); }, // Complete function.
+			// 'beforeSend' : ec_toggle_header_info, // beforeSend function.
+			'field_type' : 'user', // user | option.
+		});
+		
+		// Helper function to save checkbox setting when changed.
+		function save_on_change( options ) {
+			
+			// Ajax saving of fields.
+			jQuery( options.input_name ).on( 'change', function() {
+				
+				options.field_value = jQuery(this).val();
+				
+				if ( jQuery(this).attr('type') == "checkbox" ) {
+					if ( jQuery( "input[name='" + jQuery(this).attr('name') + "']" ).length == 1 ) {
+						
+						if ( jQuery(this).is(":checked") ) {
+							options.field_value = "on";
+						}
+						else {
+							options.field_value = "off";
+						}
+					}
+				}
+				
+				save_option( options );
+			});
+		}
+		
+		// Helper function to ajax save options.
+		function save_option( options ) {
+			
+			// Execute `beforeSend` event.
+			if ( typeof options.beforeSend !== 'undefined' ) options.beforeSend();
 			
 			jQuery.ajax({
-				type:		"post",
-				url:		woocommerce_email_control.ajaxurl,
-				data: {
-					action:			"save_option",
-					field_name:		option_name,
-					field_value:	option_value
-					//nonce:		nonce
+				type : "post",
+				url  : woocommerce_email_control.ajaxurl,
+				data : {
+					action      : 'ec_save_option',
+					field_name  : options.field_name,
+					field_value : options.field_value,
+					field_type  : options.field_type,
+					// nonce      : nonce,
 				},
 				success: function( data ) {
 					
-					if (typeof complete !== 'undefined') complete();
-					
+					if ( typeof options.complete !== 'undefined' ) options.complete();
 				},
 				error: function(xhr, status, error) {
+					
 					console.log(xhr, status, error);
 				}
 			});
-
 		}
+		
 		
 		jQuery("#ec_edit_email").on('click', function(event) {
 			
 			return false;
-			
 		});
 		
 		// Preview Email Theme Selector
@@ -472,7 +477,11 @@
 			if (confirm_result) {
 				jQuery('#theme-commit').css({display:"none"});
 
-				save_option ( 'ec_template', jQuery('#ec_email_theme_preview').val() /*, function() { reload_preview(); }*/ );
+				save_option({
+					'field_name'  : 'ec_template',
+					'field_value' : jQuery('#ec_email_theme_preview').val(),
+					'field_type'  : 'option',
+				});
 
 				jQuery('#ec_email_theme_active').val( jQuery('#ec_email_theme').val() );
 				jQuery('#ec_email_theme_preview').val("");
@@ -706,7 +715,7 @@
 
 			location_array = document.location.hash.split('/');
 
-			if ( location_array[0] == '#customize' ) {
+			if ( location_array[0] == '#show-customizer' ) {
 				jQuery('#ec_edit_content').click();
 			}
 		}
@@ -789,18 +798,21 @@ function ec_loading_end() {
 
 function ec_toggle_header_info() {
 	
-	if ( jQuery("#preview-email-iframe").contents().find(".header-info-holder").is(":visible") ) {
+	if ( ! jQuery( '#header_info_userspecifc' ).is(':checked') ) {
+		
+		// Close.
 		jQuery("#preview-email-iframe").contents().find(".header-info-holder").slideUp({ duration: 300 });
 		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-up").fadeOut(50);
 		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-down").fadeIn(50);
 	}
 	else {
+		
+		// Open.
 		jQuery("#preview-email-iframe").contents().find(".header-info-holder").slideDown({ duration: 300 });
 		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-up").fadeIn(50);
 		jQuery("#preview-email-iframe").contents().find(".hide-icon.hide-down").fadeOut(50);
 	}
 }
-
 
 function ec_set_to_email(address) {
 	

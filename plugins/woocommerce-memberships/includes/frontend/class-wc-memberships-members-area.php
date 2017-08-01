@@ -281,7 +281,7 @@ class WC_Memberships_Members_Area {
 
 				    $my_account_page = get_post( wc_get_page_id( 'myaccount' ) );
 
-				    if ( $my_account_page ) {
+				    if ( $my_account_page && SV_WC_Plugin_Compatibility::is_wc_version_lt_2_6() ) {
 					    $shortcode      = '[' . apply_filters( 'woocommerce_my_account_shortcode_tag', 'woocommerce_my_account' ) . ']';
 					    $content_pieces = explode( $shortcode, $my_account_page->post_content );
                     }

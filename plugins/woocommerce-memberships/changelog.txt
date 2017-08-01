@@ -1,5 +1,20 @@
 *** WooCommerce Memberships Changelog ***
 
+2017.07.27 - version 1.8.7
+ * Fix - If a Subscription sign up fee is discounted by 100% there's a possibility to incur in a division by 0 error
+ * Fix - Ensure that the HTML price of Subscription products that may have sign up fee discounts is displayed correctly when a member is logged in
+ * Fix - Address potential issues with active memberships trying to access content for which they should have immediate access and instead receive a delayed access notice
+ * Fix - When bbPress is enabled and there are hidden forums these might not have shown up to keymasters and moderators
+
+2017.06.28 - version 1.8.6
+ * Fix - Ensure that discounting of Subscriptions signup fees is consistent with Memberships product settings
+ * Fix - Ensure "Expiring soon" emails are scheduled for short membership plans of two days or less when these are supposed to be sent one day before membership expiration
+ * Fix - Content on the account page could be duplicated in the Members Area with WooCommerce 2.6+
+ * Fix - Ensure hidden variations aren't shown in restriction messages with WooCommerce 3.0+
+ * Fix - Warn admins against using a deprecated order_count parameter in woocommerce_my_account shortcode which could trigger server errors when viewing the Members Area
+ * Fix - Ensure that memberships with specific end dates don't get extended extra times when manually changing an order status from processing to completed
+ * Misc - Added support for WooCommerce 3.1
+
 2017.05.31 - version 1.8.5
  * Fix - Incorrect Subscription signup fees when excluded from member discounts
  * Fix - Really long membership plan names may have caused Membership panels on post and product pages to hide some options

@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: cxThemes
 Tags: woocommerce, email, customize, customise, edit, colors, text, preview, template, communication, send, test
-Stable tag: 3.11
+Stable tag: 3.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,13 @@ Please see the included PDF for full instructions on how to use this plugin.
  
  
 == Changelog ==
+
+= 3.13 =
+* Add feature to 'Show Error Notices' so you can optionally see any error notices that are generated when the email templates get combined to construct the email preview (These notices do not appear in the email when it is sent by WooCommerce).
+
+= 3.12 =
+* Small changes to the html elements used to display the product meta in the templates.
+* Fix error notice about `customer_note` and `payment_method_title` in some of the emails.
 
 = 3.11 =
 * Move the registering of the template functions out of the email-header.php. This should prevent the error `ec_special_title()` function doesn't exist.

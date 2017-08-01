@@ -91,7 +91,7 @@ class WC_Authorize_Net_CIM_API_Customer_Profile_Response extends WC_Authorize_Ne
 
 			foreach ( $this->response_xml->profile->paymentProfiles as $profile ) {
 
-				// card type, and exp date are not included in the response
+				// exp date is not included in the response
 				$data = array(
 					'type'                => isset( $profile->payment->creditCard ) ? 'credit_card' : 'echeck',
 					'last_four'           => ltrim( ( isset( $profile->payment->creditCard->cardNumber ) ? (string) $profile->payment->creditCard->cardNumber : (string) $profile->payment->bankAccount->accountNumber ), 'X' ),
@@ -108,6 +108,10 @@ class WC_Authorize_Net_CIM_API_Customer_Profile_Response extends WC_Authorize_Ne
 						'phone'      => isset( $profile->billTo->phoneNumber ) ? (string) $profile->billTo->phoneNumber : '',
 					),
 				);
+
+				if ( isset( $profile->payment->creditCard->cardType ) ) {
+					$data['card_type'] = SV_WC_Payment_Gateway_Helper::normalize_card_type( (string) $profile->payment->creditCard->cardType );
+				}
 
 				$profiles[ (string) $profile->customerPaymentProfileId ] = new WC_Authorize_Net_CIM_Payment_Profile( (string) $profile->customerPaymentProfileId, $data );
 			}

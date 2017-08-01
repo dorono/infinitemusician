@@ -196,11 +196,12 @@ else{
 
 /* ORDER ITEMS TABLE - DETAILS INNER */
 .order_items_table_product_details_inner {  }
-.order_items_table_product_details_inner_td { vertical-align: top; }
+.order_items_table_product_details_inner_td { font-size: 13px; vertical-align: top; }
 .order_items_table_product_details_inner_td.order_items_table_product_details_inner_td_image { padding-right: 15px; }
 .order_items_table_product_details_inner_td.order_items_table_product_details_inner_td_text {  }
-.order_items_table_product_details_inner img { border-radius: 3px; padding-top: 4px; margin: 0; }
-.order_items_table_product_details_inner .order_items_table_product_details_inner_title { font-size: 15px; }
+.order_items_table_product_details_inner_td.order_items_table_product_details_inner_td_text strong { font-weight: normal; }
+.order_items_table_product_details_inner img { border-radius: 3px; padding: 0; margin: 0; }
+.order_items_table_product_details_inner .order_items_table_product_details_inner_title { font-weight: bold; font-size: 15px; padding-bottom: 3px; }
 .order_items_table_product_details_inner small {  }
 
 /* FOOTER */

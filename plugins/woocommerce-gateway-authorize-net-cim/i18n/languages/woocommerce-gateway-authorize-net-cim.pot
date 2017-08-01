@@ -2,7 +2,7 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Authorize.Net CIM Gateway 2.6.3\n"
+"Project-Id-Version: WooCommerce Authorize.Net CIM Gateway 2.7.0\n"
 "Report-Msgid-Bugs-To: https://woocommerce.com/my-account/tickets/\n"
 "POT-Creation-Date: 2014-06-15 22:41:25+00:00\n"
 "MIME-Version: 1.0\n"
@@ -93,55 +93,55 @@ msgid ""
 "CIM."
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:83
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:84
 #: includes/class-wc-gateway-authorize-net-cim-echeck.php:72
 msgid "Production"
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:83
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:84
 #: includes/class-wc-gateway-authorize-net-cim-echeck.php:72
 msgid "Test"
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:115
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:130
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:116
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:131
 msgid "Accept.js"
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:118
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:133
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:119
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:134
 msgid ""
 "Enable Accept.js to minimize PCI compliance and send credit card details "
 "directly to Authorize.Net"
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:120
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:135
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:121
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:136
 msgid ""
 "You must obtain a Client Key to use Accept.js at checkout. %1$sLearn more "
 "&raquo;%2$s"
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:124
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:139
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:125
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:140
 msgid "Client Key"
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:220
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:221
 msgid "An error occurred, please try again or try an alternate form of payment."
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:380
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:403
 msgid "Order is missing customer profile ID."
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:391
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:419
 msgid ""
 "Order is missing the last four digits or expiration date of the credit card "
 "used."
 msgstr ""
 
-#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:396
+#: includes/class-wc-gateway-authorize-net-cim-credit-card.php:424
 msgid "%s Refund error - %s"
 msgstr ""
 
@@ -243,65 +243,65 @@ msgstr ""
 msgid "WooCommerce Authorize.Net CIM Gateway"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:291
+#: woocommerce-gateway-authorize-net-cim.php:293
 msgid "Province"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:296
+#: woocommerce-gateway-authorize-net-cim.php:298
 msgid "Island"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:300
+#: woocommerce-gateway-authorize-net-cim.php:302
 msgid "State"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:305
+#: woocommerce-gateway-authorize-net-cim.php:307
 msgid "County"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:311
+#: woocommerce-gateway-authorize-net-cim.php:313
 msgid "District"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:315
+#: woocommerce-gateway-authorize-net-cim.php:317
 msgid "Region"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:338
+#: woocommerce-gateway-authorize-net-cim.php:340
 msgid "Configure Credit Cards"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:338
+#: woocommerce-gateway-authorize-net-cim.php:340
 msgid "Configure eChecks"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:360
+#: woocommerce-gateway-authorize-net-cim.php:362
 msgid ""
 "Thanks for installing the WooCommerce Authorize.Net CIM Gateway! To start "
 "accepting payments, %sset your Authorize.Net API credentials%s. Need help? "
 "See the %sdocumentation%s."
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:383
+#: woocommerce-gateway-authorize-net-cim.php:385
 msgid ""
 "The CIM Add-On is not enabled on your Authorize.Net account. Please "
 "%scontact Authorize.Net%s to enable CIM. You will be unable to process "
 "transactions until CIM is enabled. "
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:394
+#: woocommerce-gateway-authorize-net-cim.php:396
 msgid "%s: A valid Client Key is required to use Accept.js at checkout."
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:396
+#: woocommerce-gateway-authorize-net-cim.php:398
 msgid "%s: SSL is required to use Accept.js at checkout."
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:437
+#: woocommerce-gateway-authorize-net-cim.php:446
 msgid "Shipping Address ID"
 msgstr ""
 
-#: woocommerce-gateway-authorize-net-cim.php:446
+#: woocommerce-gateway-authorize-net-cim.php:460
 msgid "The shipping profile ID for the user. Only edit this if necessary."
 msgstr ""
 

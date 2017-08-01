@@ -122,6 +122,25 @@ class SV_WC_Plugin_Compatibility {
 
 
 	/**
+	 * Backports wc_shipping_enabled() to < 2.6.0
+	 *
+	 * @since 4.7.0
+	 * @return bool
+	 */
+	public static function wc_shipping_enabled() {
+
+		if ( self::is_wc_version_gte_2_6() ) {
+
+			return wc_shipping_enabled();
+
+		} else {
+
+			return 'yes' === get_option( 'woocommerce_calc_shipping' );
+		}
+	}
+
+
+	/**
 	 * Backports wc_help_tip() to WC 2.4.x
 	 *
 	 * @link https://github.com/woothemes/woocommerce/pull/9417
@@ -223,6 +242,29 @@ class SV_WC_Plugin_Compatibility {
 		return self::get_wc_version() && version_compare( self::get_wc_version(), '3.0', '<' );
 	}
 
+
+	/**
+	 * Determines if the installed version of WooCommerce is 3.1 or greater.
+	 *
+	 * @since 4.6.5
+	 * @return bool
+	 */
+	public static function is_wc_version_gte_3_1() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '3.1', '>=' );
+	}
+
+
+	/**
+	 * Determines if the installed version of WooCommerce is less than 3.1.
+	 *
+	 * @since 4.6.5
+	 * @return bool
+	 */
+	public static function is_wc_version_lt_3_1() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '3.1', '<' );
+	}
+
+
 	/**
 	 * Returns true if the installed version of WooCommerce is greater than $version
 	 *
@@ -246,8 +288,8 @@ class SV_WC_Plugin_Compatibility {
 	 * TODO: Add WP version check when https://core.trac.wordpress.org/ticket/18857 is addressed {BR 2016-12-12}
 	 *
 	 * @since 4.6.0
-	 * @param string $slug The slug for the screen ID to normalize (minus `woocommerce_page_`).
-	 * @return string Normalized screen ID.
+	 * @param string $slug slug for the screen ID to normalize (minus `woocommerce_page_`)
+	 * @return string normalized screen ID
 	 */
 	public static function normalize_wc_screen_id( $slug = 'wc-settings' ) {
 

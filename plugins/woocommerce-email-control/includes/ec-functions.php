@@ -135,3 +135,9 @@ function ec_order_get_billing_last_name( $order ) {
 function ec_order_get_billing_email( $order ) {
 	return method_exists( $order, 'get_billing_email' ) ? $order->get_billing_email() : $order->billing_email;
 }
+function ec_order_get_customer_note( $order ) {
+	return method_exists( $order, 'get_customer_note' ) ? $order->get_customer_note() : $order->customer_note;
+}
+function ec_order_get_payment_method_title( $order ) {
+	return method_exists( $order, 'get_payment_method_title' ) ? $order->get_payment_method_title() : $order->payment_method_title;
+}

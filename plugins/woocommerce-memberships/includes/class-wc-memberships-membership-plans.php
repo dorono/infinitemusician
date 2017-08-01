@@ -379,11 +379,12 @@ class WC_Memberships_Membership_Plans {
 
 
 	/**
-	 * Grant customer access to membership when making a purchase
+	 * Grant customer access to membership when making a purchase.
 	 *
-	 * Note: this method runs also when an order is manually added in WC admin
+	 * Note: this method runs also when an order is manually added in WC admin.
 	 *
 	 * @since 1.7.0
+	 *
 	 * @param int|\WC_Order $order WC_Order id or object
 	 */
 	public function grant_access_to_membership_from_order( $order ) {
@@ -415,6 +416,13 @@ class WC_Memberships_Membership_Plans {
 
 			if ( ! empty( $access_granting_product_ids ) ) {
 
+				// We check if the order has granted access already before looping products,
+				// so we can allow the purchase of multiple access granting products to extend the duration of a plan,
+				// should multiple products grant access to the same plan having a specific end date (relative to now).
+				/** @see wc_memberships_cumulative_granting_access_orders_allowed() */
+				/** @var \WC_Memberships_Membership_Plan::grant_access_from_purchase() */
+				$order_granted_access_already = wc_memberships_has_order_granted_access( $order, array( 'membership_plan' => $plan ) );
+
 				foreach ( $access_granting_product_ids as $product_id ) {
 
 					// sanity check: make sure the selected product ID in fact does grant access
@@ -426,21 +434,20 @@ class WC_Memberships_Membership_Plans {
 					 * Confirm grant access from new purchase to paid plan
 					 *
 					 * @since 1.3.5
-					 * @param bool $grant_access true by default
+					 * @param bool $grant_access by default true unless the order already granted access to the plan
 					 * @param array $args {
 					 *      @type int $user_id Customer id for purchase order
 					 *      @type int $product_id Id of product that grants access
 					 *      @type int $order_id Order id containing the product
 					 * }
 					 */
-					$grant_access = (bool) apply_filters( 'wc_memberships_grant_access_from_new_purchase', true, array(
+					$grant_access = (bool) apply_filters( 'wc_memberships_grant_access_from_new_purchase', ! $order_granted_access_already, array(
 						'user_id'    => (int) $user_id,
 						'product_id' => (int) $product_id,
 						'order_id'   => (int) SV_WC_Order_Compatibility::get_prop( $order, 'id' ),
 					) );
 
 					if ( $grant_access ) {
-
 						// delegate granting access to the membership plan instance
 						$plan->grant_access_from_purchase( $user_id, $product_id, (int) SV_WC_Order_Compatibility::get_prop( $order, 'id' ) );
 					}

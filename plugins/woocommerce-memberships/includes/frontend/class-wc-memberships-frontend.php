@@ -509,6 +509,11 @@ class WC_Memberships_Frontend {
 
 					if ( $product instanceof WC_Product && $product->is_purchasable() && $product->is_visible() ) {
 
+						// double-check for WC 3.0, as a variation is always visible, but the parent could be hidden
+						if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && $product->is_type( 'variation' ) && ! SV_WC_Product_Compatibility::get_parent( $product )->is_visible() ) {
+							continue;
+						}
+
 						$products[] = $product_id;
 					}
 				}

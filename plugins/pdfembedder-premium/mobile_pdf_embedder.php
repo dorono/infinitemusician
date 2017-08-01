@@ -4,7 +4,7 @@
  * Plugin Name: PDF Embedder Premium
  * Plugin URI: http://wp-pdf.com/
  * Description: Embed mobile-friendly PDFs straight into your posts and pages. No third-party services required.
- * Version: 3.1.2
+ * Version: 3.1.5
  * Author: Dan Lester
  * Author URI: http://wp-pdf.com/
  * Text Domain: pdf-embedder
@@ -37,7 +37,7 @@ require_once( plugin_dir_path(__FILE__).'/core/commercial_pdf_embedder.php' );
 
 class pdfemb_premium_mobile_pdf_embedder extends pdfemb_commerical_pdf_embedder {
 
-	protected $PLUGIN_VERSION = '3.1.2';
+	protected $PLUGIN_VERSION = '3.1.5';
     protected $WPPDF_STORE_URL = 'http://wp-pdf.com/';
     protected $WPPDF_ITEM_NAME = 'PDF Embedder Premium';
 	protected $WPPDF_ITEM_ID = 287;

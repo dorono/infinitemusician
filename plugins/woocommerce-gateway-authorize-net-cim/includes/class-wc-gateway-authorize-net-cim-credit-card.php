@@ -78,6 +78,7 @@ class WC_Gateway_Authorize_Net_CIM_Credit_Card extends WC_Gateway_Authorize_Net_
 					self::FEATURE_VOIDS,
 					self::FEATURE_CUSTOMER_ID,
 					self::FEATURE_ADD_PAYMENT_METHOD,
+					self::FEATURE_APPLE_PAY,
 				 ),
 				'payment_type'       => self::PAYMENT_TYPE_CREDIT_CARD,
 				'environments'       => array( 'production' => __( 'Production', 'woocommerce-gateway-authorize-net-cim' ), 'test' => __( 'Test', 'woocommerce-gateway-authorize-net-cim' ) ),
@@ -341,9 +342,31 @@ class WC_Gateway_Authorize_Net_CIM_Credit_Card extends WC_Gateway_Authorize_Net_
 			$order->payment->account_number = $order->payment->last_four = SV_WC_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-last-four' );
 
 			// nonce data
-			$order->payment->descriptor = SV_WC_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-payment-descriptor' );
-			$order->payment->nonce      = $nonce;
+			$order->payment->opaque_descriptor = SV_WC_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-payment-descriptor' );
+			$order->payment->opaque_value      = $nonce;
 		}
+
+		return $order;
+	}
+
+
+	/**
+	 * Adds Apple Pay payment data to the order.
+	 *
+	 * @since 2.6.5-dev.1
+	 * @see \SV_WC_Payment_Gateway::get_order_for_apple_pay()
+	 *
+	 * @param \WC_Order $order the order object
+	 * @param \SV_WC_Payment_Gateway_Apple_Pay_API_Payment_Response $response the authorized payment response
+	 * @return \WC_Order
+	 */
+	public function get_order_for_apple_pay( WC_Order $order, SV_WC_Payment_Gateway_Apple_Pay_Payment_Response $response ) {
+
+		$order = parent::get_order_for_apple_pay( $order, $response );
+
+		// opaque data
+		$order->payment->opaque_value      = base64_encode( json_encode( $response->get_payment_data() ) );
+		$order->payment->opaque_descriptor = 'COMMON.APPLE.INAPP.PAYMENT';
 
 		return $order;
 	}
@@ -384,7 +407,12 @@ class WC_Gateway_Authorize_Net_CIM_Credit_Card extends WC_Gateway_Authorize_Net_
 
 			// non-profile refund/void
 			$order->refund->last_four = $this->get_order_meta( $order, 'account_four' );
-			$order->refund->expiry_date = date( 'm-Y', strtotime( '20' . $this->get_order_meta( $order, 'card_expiry_date' ) ) );
+
+			if ( $expiry_date = $this->get_order_meta( $order, 'card_expiry_date' ) ) {
+				$order->refund->expiry_date = date( 'm-Y', strtotime( '20' . $expiry_date ) );
+			} else {
+				$order->refund->expiry_date = 'XXXX';
+			}
 
 			if ( empty( $order->refund->last_four ) || empty( $order->refund->expiry_date ) ) {
 

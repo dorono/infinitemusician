@@ -5,7 +5,7 @@
  * Description: Adds the Authorize.Net CIM Payment Gateway to your WooCommerce site, allowing customers to securely save their credit card or bank account to their account for use with single purchases, pre-orders, subscriptions, and more!
  * Author: SkyVerge
  * Author URI: http://www.woocommerce.com/
- * Version: 2.6.3
+ * Version: 2.7.0
  * Text Domain: woocommerce-gateway-authorize-net-cim
  * Domain Path: /i18n/languages/
  *
@@ -19,6 +19,8 @@
  * @category    Payment-Gateways
  * @copyright   Copyright (c) 2013-2017, SkyVerge, Inc.
  * @license     http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
+ *
+ * Woo: 178481:8b61524fe53add7fdd1a8d1b00b9327d
  */
 
 defined( 'ABSPATH' ) or exit;
@@ -41,7 +43,7 @@ if ( ! class_exists( 'SV_WC_Framework_Bootstrap' ) ) {
 	require_once( plugin_dir_path( __FILE__ ) . 'lib/skyverge/woocommerce/class-sv-wc-framework-bootstrap.php' );
 }
 
-SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.6.4', __( 'WooCommerce Authorize.Net CIM Gateway', 'woocommerce-gateway-authorize-net-cim' ), __FILE__, 'init_woocommerce_gateway_authorize_net_cim', array(
+SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.7.0', __( 'WooCommerce Authorize.Net CIM Gateway', 'woocommerce-gateway-authorize-net-cim' ), __FILE__, 'init_woocommerce_gateway_authorize_net_cim', array(
 	'is_payment_gateway'   => true,
 	'minimum_wc_version'   => '2.5.5',
 	'minimum_wp_version'   => '4.1',
@@ -122,7 +124,7 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 
 
 	/** string version number */
-	const VERSION = '2.6.3';
+	const VERSION = '2.7.0';
 
 	/** @var WC_Authorize_Net_CIM single instance of this plugin */
 	protected static $instance;
@@ -420,6 +422,13 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 		}
 
 		$unique_meta_key = '';
+		$environments    = array();
+
+		foreach ( $this->get_gateways() as $gateway ) {
+			$environments[] = $gateway->get_environment();
+		}
+
+		$environments = array_unique( $environments );
 
 		foreach ( $this->get_gateways() as $gateway ) {
 
@@ -435,6 +444,11 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 			}
 
 			$label = __( 'Shipping Address ID', 'woocommerce-gateway-authorize-net-cim' );
+
+			if ( count( $environments ) > 1 ) {
+				$label .= ' (' . $gateway->get_environment_name() . ')';
+			}
+
 			$value = get_user_meta( $user->ID, $meta_key, true );
 
 			?>

@@ -1,5 +1,15 @@
 *** WooCommerce Authorize.Net CIM Gateway Changelog ***
 
+2017.07.25 - version 2.7.0
+ * Fix - Ensure the admin Shipping Address ID user fields are labelled for their environment when needed
+ * Tweak - Fill a payment method's card type when returned by the API
+ * Dev - Added Apple Pay framework
+
+2017.06.28 - version 2.6.4
+ * Tweak - Force TLS 1.2 for API requests when available
+ * Misc - Add an admin notice for hosting environments that are not compatible with Authorize.Net's upcoming security requirements
+ * Misc - Update the SkyVerge plugin framework
+
 2017.05.23 - version 2.6.3
  * Tweak - Add an admin user field for updating customer shipping address IDs if necessary
  * Fix - Ensure subscriptions are not affected if Change Payment fails due to declines or other problems

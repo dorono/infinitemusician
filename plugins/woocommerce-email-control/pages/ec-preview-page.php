@@ -1,8 +1,9 @@
 <?php
-if ( ! current_user_can( 'manage_woocommerce' ) )
+if ( ! current_user_can( 'manage_woocommerce' ) ) {
 	wp_die( __( 'Cheatin&#8217; uh?', 'email-control' ) );
+}
 
-global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_control;
+global $wp_scripts, $wpdb, $current_user, $order, $cxec_email_control;
 ?>
 <html>
 <head>
@@ -21,11 +22,11 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 <body id="ec-theme" class="ec-theme" >
 	
 	<?php
-	$mails = $woocommerce->mailer()->get_emails();
+	$mails = WC()->mailer()->get_emails();
 	
 	// Ensure gateways are loaded in case they need to insert data into the emails
-	$woocommerce->payment_gateways();
-	$woocommerce->shipping();
+	WC()->payment_gateways();
+	WC()->shipping();
 	
 	/* Get Email to Show */
 	if ( isset( $_REQUEST['ec_email_type'] ) )
@@ -51,8 +52,8 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 			'posts_per_page'	=> 1,
 		));
 		$order_collection = $order_collection->posts;
-		$latest_order = current( $order_collection )->ID;
-		$order_id_to_show = $latest_order;
+		$latest_order = current( $order_collection );
+		$order_id_to_show = ec_order_get_id( $latest_order );
 	}
 	
 	if ( ! get_post( $order_id_to_show ) ) :
@@ -127,7 +128,7 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 					$compat_warning = $cxec_email_control->populate_mail_object( $order, $mail );
 					
 					// Info Meta Swicth on/off
-					$header = ( get_user_meta( $current_user->ID, 'header_info_userspecifc', true) ) ? get_user_meta( $current_user->ID, 'header_info_userspecifc', true ) : 'off' ;
+					$header = ( get_user_meta( $current_user->ID, 'ec_header_info_userspecifc', true) ) ? get_user_meta( $current_user->ID, 'ec_header_info_userspecifc', true ) : 'off' ;
 					?>
 					
 					<div class="email-preview pe-in-admin-page">
@@ -183,7 +184,7 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 										
 										<div class="header-info-meta-block header-info-meta-block-subject">
 											<div class="header-info-meta-heading">
-												<?php _e( "Subject", "email-control" ) ; ?>
+												<?php _e( "Subject", 'email-control' ) ; ?>
 											</div>
 											<div class="header-info-meta">
 												<span class="meta-value"><?php echo $mail->get_subject() ?></span> 
@@ -290,11 +291,19 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 								<!-- ----------  Email Content ---------- -->
 								
 								<?php
+								// Info Meta Swicth on/off
+								$show_errors = ( get_user_meta( $current_user->ID, 'ec_show_errors_userspecifc', true) ) ? get_user_meta( $current_user->ID, 'ec_show_errors_userspecifc', true ) : 'off' ;
+								
 								// Get the email contents. using @ to block ugly error messages showing in the preview.
 								// The following mimics what WooCommerce does in it's `->send` method of WC_Email.
-								@ $email_message = $mail->get_content();
-								$email_message   = $mail->style_inline( $email_message );
-								$email_message   = apply_filters( 'woocommerce_mail_content', $email_message );
+								if ( 'on' == $show_errors ) {
+									$email_message = $mail->get_content(); // Show error notices.
+								}
+								else {
+									@ $email_message = $mail->get_content(); // Hide error notices.
+								}
+								$email_message = $mail->style_inline( $email_message );
+								$email_message = apply_filters( 'woocommerce_mail_content', $email_message );
 								
 								// Convert line breaks to <br>'s if the mail is type 'plain'.
 								if ( 'plain' === $mail->email_type )

@@ -39,18 +39,18 @@ class WC_Memberships_Integration_Bbpress {
 	 */
 	public function __construct() {
 
-		add_action( 'init', array( $this, 'bbpress_init' ) );
+		add_action( 'init', array( $this, 'bbpress_init' ), 40 );
 	}
 
 
 	/**
-	 * When hidden or private forums exist, no posts shows in the members area content.
+	 * When hidden or private forums exists, no posts shows in the members area content.
 	 *
 	 * This is due to a bug in bbPress where the meta_query it adds via pre_get_posts excludes Hidden or Private forums for all queries that include the forum post type.
 	 * Memberships is affected as it checks for posts of all post types when querying for a plan's restricted content.
 	 * Our workaround merely consists of suppressing bbPress pre_get_posts filtering.
 	 *
-	 * TODO version 2.6 of bbPress might fix this, making this workaround useful only in bbPress versions before 2.5 {FN 2017-05-19}
+	 * TODO version 2.6 of bbPress might fix this, making this workaround useful only in bbPress versions 2.5.x and earlier {FN 2017-05-19}
 	 *
 	 * @internal
 	 *
@@ -60,9 +60,50 @@ class WC_Memberships_Integration_Bbpress {
 
 		$bbpress = bbpress();
 
-		if ( ! is_bbpress() && isset( $bbpress->version ) && version_compare( $bbpress->version, '2.6', '<' ) ) {
+		if (      isset( $bbpress->version )
+		     &&   version_compare( $bbpress->version, '2.6', '<' )
+		     &&   $this->is_members_area()
+		     && ! is_bbpress() ) {
+
 			remove_action( 'pre_get_posts', 'bbp_pre_get_posts_normalize_forum_visibility', 4 );
 		}
+	}
+
+
+	/**
+	 * Check if the current page is the members area.
+	 *
+	 * Note: this is not the best way to determine if we are on the members area, but bbPress itself with pre_get_posts filtering may prevent determining it via query vars.
+	 * @see \WC_Memberships_Integration_Bbpress::bbpress_init()
+	 * @see \WC_Memberships_Members_Area::is_members_area()
+	 *
+	 * @since 1.8.7
+	 *
+	 * @return bool
+	 */
+	private function is_members_area() {
+
+		$is_endpoint_url = false;
+
+		if ( isset( $_SERVER['REQUEST_URI'] ) && get_option( 'permalink_structure' ) ) {
+
+			$members_area_sections = wc_memberships_get_members_area_sections();
+
+			if ( ! empty( $members_area_sections ) ) {
+				foreach ( array_keys( $members_area_sections ) as $members_area_section ) {
+					if ( (bool) strpos( $_SERVER['REQUEST_URI'], $members_area_section ) ) {
+						$is_endpoint_url = true;
+						break;
+					}
+				}
+			}
+
+		} else {
+
+			$is_endpoint_url = ! empty( $_GET['members_area'] ) && is_numeric( $_GET['members_area'] );
+		}
+
+		return $is_endpoint_url;
 	}
 
 

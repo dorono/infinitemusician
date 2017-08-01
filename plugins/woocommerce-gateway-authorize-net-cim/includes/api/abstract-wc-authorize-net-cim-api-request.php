@@ -76,12 +76,12 @@ abstract class WC_Authorize_Net_CIM_API_Request extends SV_WC_API_XML_Request im
 		if ( 'credit_card' === $this->order->payment->type ) {
 
 			// Accept.js payment
-			if ( isset( $this->order->payment->nonce ) ) {
+			if ( isset( $this->order->payment->opaque_value ) ) {
 
 				$payment = array(
 					'opaqueData' => array(
-						'dataDescriptor' => $this->order->payment->descriptor,
-						'dataValue'      => $this->order->payment->nonce,
+						'dataDescriptor' => $this->order->payment->opaque_descriptor,
+						'dataValue'      => $this->order->payment->opaque_value,
 					),
 				);
 
@@ -318,6 +318,10 @@ abstract class WC_Authorize_Net_CIM_API_Request extends SV_WC_API_XML_Request im
 		// routing number
 		if ( preg_match( '/<routingNumber>(\d+)<\/routingNumber>/', $string, $matches ) ) {
 			$string = preg_replace( '/<routingNumber>\d+<\/routingNumber>/', '<routingNumber>' . str_repeat( '*', strlen( $matches[1] ) ) . '</routingNumber>', $string );
+		}
+
+		if ( preg_match( '/<dataValue>(\w+)<\/dataValue>/', $string, $matches ) ) {
+			$string = preg_replace( '/<dataValue>\w+<\/dataValue>/', '<dataValue>' . str_repeat( '*', 10 ) . '</dataValue>', $string );
 		}
 
 		return $this->prettify_xml( $string );

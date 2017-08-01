@@ -30,8 +30,12 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
         this._onmousewheel = this._onmousewheel.bind(this);
         this._endPan = this._endPan.bind(this);
 
+        this._ondocumenttouchmove = this._ondocumenttouchmove.bind(this);
+
         this._onkeyboardpan = this._onkeyboardpan.bind(this);
         this.element.addEventListener("pdfembKeyboardPan", this._onkeyboardpan, false);
+
+        this.preventDocTouchScroll = false;
 
         // This overlay will be inserted in the document when the mouse moves during
         // a grab operation, to ensure that the cursor has the desired appearance.
@@ -59,6 +63,10 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
 
                 this.element.addEventListener('touchstart', this._ontouchstart);
 
+                // jQuery(document).on('touchmove', this._ondocumenttouchmove);
+                document.addEventListener('touchmove', this._ondocumenttouchmove);
+
+
                 this.element.classList.add(this.CSS_CLASS_GRAB);
                 if (this.onActiveChanged) {
                     this.onActiveChanged(true);
@@ -74,6 +82,11 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
                 this.active = false;
                 this.element.removeEventListener('mousedown', this._onmousedown, true);
                 this._endPan();
+
+                // jQuery(document).off('touchmove', this._ondocumenttouchmove);
+                document.removeEventListener('touchmove', this._ondocumenttouchmove, false);
+
+
                 this.element.classList.remove(this.CSS_CLASS_GRAB);
                 if (this.onActiveChanged) {
                     this.onActiveChanged(false);
@@ -171,8 +184,11 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
 
             this.scaledForMagnification = false;
 
+
             this.document.addEventListener('touchmove', this._ontouchmove);
             this.document.addEventListener('touchend', this._ontouchend);
+
+
 
             if (event.touches.length != 1) {
                 // Prevent default for zooms
@@ -223,7 +239,7 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
                 this.element.scrollLeft = this.scrollLeftStart - xDiff;
 
                 if ((this.element.scrollTop == this.scrollTopStart && yDiff != 0)
-                    || (this.element.scrollLeft == this.scrollLeftStart && xDiff != 0)) {
+                    /* || (this.element.scrollLeft == this.scrollLeftStart && xDiff != 0) */) {
                     preventDefault = false;
                 }
             }
@@ -244,7 +260,10 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
 
             if (preventDefault) {
                 event.preventDefault();
-                event.stopPropagation();
+                this.preventDocTouchScroll = true;
+            }
+            else {
+                this.preventDocTouchScroll = false;
             }
 
             if (isNaN(this.distStart)) {
@@ -279,15 +298,36 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
 
         },
 
-        /**
+        _ondocumenttouchmove: function GrabToPan__ondocumenttouchmove(event) {
+            // Mainly for Safari on iPhone/iPad where document seems to scroll behind the embed
+            if (this.preventDocTouchScroll) {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
+        },
+
+            /**
          * @private
          */
         _onmousewheel: function GrabToPan__onmousewheel(event) {
             this.element.removeEventListener('scroll', this._endPan, true);
 
-            var MOUSE_WHEEL_DELTA_FACTOR = 40;
-            var ticks = event.deltaY ? -event.deltaY/ MOUSE_WHEEL_DELTA_FACTOR : (
-                 event.wheelDelta ? event.wheelDelta / MOUSE_WHEEL_DELTA_FACTOR : -event.detail
+            var MOUSE_WHEEL_DELTA_FACTOR = 0.5;
+
+            if (event.deltaMode) {
+                // if 0, means measured in pixels
+                if (event.deltaMode == 1) { //Measured in lines
+                    MOUSE_WHEEL_DELTA_FACTOR = 10;
+                }
+                if (event.deltaMode == 2) { // Measured in pages
+                    MOUSE_WHEEL_DELTA_FACTOR = 1000;
+                }
+            }
+
+            var ticks = event.deltaY ? -event.deltaY  // 'wheel'
+                : ( event.wheelDelta ? event.wheelDelta  // 'mousewheel'
+                        : -event.detail // 'DOMMouseScroll'
                 );
 
             this.scrollLeftStart = this.element.scrollLeft;
@@ -335,6 +375,9 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
             this.document.removeEventListener('mouseup', this._endPan, true);
             this.document.removeEventListener('touchmove', this._ontouchmove, false);
             this.document.removeEventListener('touchend', this._ontouchend, false);
+
+            this.preventDocTouchScroll = false;
+
             if (this.overlay.parentNode) {
                 this.overlay.parentNode.removeChild(this.overlay);
             }

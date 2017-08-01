@@ -1105,9 +1105,10 @@ class WC_Memberships_Restrictions {
 
 
 	/**
-	 * Restrict product purchasing based on restriction rules
+	 * Restrict product purchasing based on restriction rules.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param bool $purchasable whether the product is purchasable
 	 * @param \WC_Product|\WC_Product_Variation $product the product
 	 * @return bool
@@ -1116,25 +1117,38 @@ class WC_Memberships_Restrictions {
 
 		$product_id = $product->get_id();
 
-		// product is not purchasable if the current user can't view or purchase
-		// the product, or they do not have access yet (due to dripping)
-		if (    ! current_user_can( 'wc_memberships_view_restricted_product',     $product_id )
-		     || ! current_user_can( 'wc_memberships_purchase_restricted_product', $product_id )
-		     || ! current_user_can( 'wc_memberships_purchase_delayed_product',    $product_id ) ) {
+		// product is not purchasable if:
+		// - the current user can't view or purchase the product
+		// - the customer does not have access yet (due to dripping)
+		if ( $purchasable ) {
+			if (    ! current_user_can( 'wc_memberships_view_restricted_product',     $product_id )
+			     || ! current_user_can( 'wc_memberships_purchase_restricted_product', $product_id )
+			     || ! current_user_can( 'wc_memberships_purchase_delayed_product',    $product_id ) ) {
 
-			$purchasable = false;
+				$purchasable = false;
+			}
 		}
 
-		// double-check for variations
-		if ( $product->is_type( array( 'variation', 'subscription_variation' ) ) ) {
+		// double-check for variations: if variation is initially purchasable, but parent isn't, then neither should be the variation
+		if ( $purchasable && $product->is_type( array( 'variation', 'subscription_variation' ) ) ) {
 
-			$parent = SV_WC_Product_Compatibility::get_parent( $product );
+			$parent_product = SV_WC_Product_Compatibility::get_parent( $product );
 
-			if ( $parent instanceof WC_Product  ) {
+			// we can check if parent is purchasable recursively while removing our filter to avoid loops
+			if ( $parent_product instanceof WC_Product ) {
 
-				// if parent is not purchasable, then neither should be the variation,
-				// if parent is forced public, ensure the variation is as well
-				$purchasable = $purchasable ? $parent->is_purchasable() : 'yes' === wc_memberships_get_content_meta( $parent->get_id(), '_wc_memberships_force_public', true );
+				remove_filter( 'woocommerce_is_purchasable',           array( $this, 'product_is_purchasable' ), 10 );
+				remove_filter( 'woocommerce_variation_is_purchasable', array( $this, 'product_is_purchasable' ), 10 );
+
+				$purchasable = $this->product_is_purchasable( $parent_product->is_purchasable(), $parent_product );
+
+				add_filter( 'woocommerce_is_purchasable',           array( $this, 'product_is_purchasable' ), 10, 2 );
+				add_filter( 'woocommerce_variation_is_purchasable', array( $this, 'product_is_purchasable' ), 10, 2 );
+			}
+
+			// if variation ends up not being purchasable, but its parent is forced public, ensure the setting is inherited by its variations
+			if ( ! $purchasable && 'yes' === wc_memberships_get_content_meta( $parent_product, '_wc_memberships_force_public' ) ) {
+				$purchasable = true;
 			}
 		}
 

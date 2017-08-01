@@ -2,7 +2,7 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Memberships 1.8.5\n"
+"Project-Id-Version: WooCommerce Memberships 1.8.7\n"
 "Report-Msgid-Bugs-To: https://woocommerce.com/my-account/tickets/\n"
 "POT-Creation-Date: 2015-10-09 20:38:01+00:00\n"
 "MIME-Version: 1.0\n"
@@ -342,15 +342,26 @@ msgid ""
 "membership."
 msgstr ""
 
-#: includes/admin/class-wc-memberships-admin.php:845
+#: includes/admin/class-wc-memberships-admin.php:697
+#. translators: Placeholders: %1$s - the 'woocommerce_my_account' shortcode,
+#. %2$s - the 'order_count' shortcode attribute
+msgid ""
+"It looks like you might be using the %1$s shortcode with deprecated "
+"attributes, such as %2$s. These attributes have been deprecated since "
+"WooCommerce 2.6 and may no longer have any effect on the shortcode output. "
+"Furthermore, they might cause a server error when visiting the Members Area "
+"while WooCommerce Memberships is active."
+msgstr ""
+
+#: includes/admin/class-wc-memberships-admin.php:885
 msgid "Active Memberships:"
 msgstr ""
 
-#: includes/admin/class-wc-memberships-admin.php:871
+#: includes/admin/class-wc-memberships-admin.php:911
 msgid "none"
 msgstr ""
 
-#: includes/admin/class-wc-memberships-admin.php:1290
+#: includes/admin/class-wc-memberships-admin.php:1330
 #: includes/admin/class-wc-memberships-import-export-handler.php:214
 msgid "You are not allowed to perform this action."
 msgstr ""
@@ -1599,8 +1610,8 @@ msgstr ""
 
 #: includes/admin/meta-boxes/views/class-wc-memberships-meta-box-view-membership-note.php:68
 #: includes/admin/meta-boxes/views/class-wc-memberships-meta-box-view-membership-recent-activity-note.php:83
-#: includes/class-wc-memberships-user-membership.php:1626
-#: includes/class-wc-memberships-user-membership.php:1628
+#: includes/class-wc-memberships-user-membership.php:1633
+#: includes/class-wc-memberships-user-membership.php:1635
 msgid "WooCommerce"
 msgstr ""
 
@@ -2015,27 +2026,27 @@ msgid ""
 "cannot be purchased."
 msgstr ""
 
-#: includes/class-wc-memberships-user-membership.php:1127
+#: includes/class-wc-memberships-user-membership.php:1134
 msgid "Membership paused."
 msgstr ""
 
-#: includes/class-wc-memberships-user-membership.php:1153
+#: includes/class-wc-memberships-user-membership.php:1160
 msgid "Membership cancelled."
 msgstr ""
 
-#: includes/class-wc-memberships-user-membership.php:1196
+#: includes/class-wc-memberships-user-membership.php:1203
 msgid "Membership expired."
 msgstr ""
 
-#: includes/class-wc-memberships-user-membership.php:1240
+#: includes/class-wc-memberships-user-membership.php:1247
 msgid "Membership resumed."
 msgstr ""
 
-#: includes/class-wc-memberships-user-membership.php:1244
+#: includes/class-wc-memberships-user-membership.php:1251
 msgid "Membership activated."
 msgstr ""
 
-#: includes/class-wc-memberships-user-membership.php:1528
+#: includes/class-wc-memberships-user-membership.php:1535
 #. translators: Membership transferred from user %1$s to user %2$s
 msgid "Membership transferred from %1$s to %2$s."
 msgstr ""
@@ -2302,35 +2313,35 @@ msgstr ""
 msgid "This item is discounted for members. %1$sLog in%2$s to claim it."
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:860
+#: includes/frontend/class-wc-memberships-frontend.php:865
 #. translators: {date} is a merge tag to display the Membership access date
 msgid ""
 "This product is part of your membership, but not yet! You will gain access "
 "on {date}"
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:863
+#: includes/frontend/class-wc-memberships-frontend.php:868
 #. translators: {date} is a merge tag to display the Membership access date
 msgid ""
 "This product is part of your membership, but not yet! You can purchase it "
 "on {date}"
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:870
+#: includes/frontend/class-wc-memberships-frontend.php:875
 #. translators: {date} is a merge tag to display the Membership access date
 msgid ""
 "This page is part of your membership, but not yet! You will gain access on "
 "{date}"
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:875
+#: includes/frontend/class-wc-memberships-frontend.php:880
 #. translators: {date} is a merge tag to display the Membership access date
 msgid ""
 "This post is part of your membership, but not yet! You will gain access on "
 "{date}"
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:880
+#: includes/frontend/class-wc-memberships-frontend.php:885
 #: includes/functions/wc-memberships-functions-template.php:121
 #. translators: {date} is a merge tag to display the Membership access date
 msgid ""
@@ -2338,7 +2349,7 @@ msgid ""
 "on {date}"
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:915
+#: includes/frontend/class-wc-memberships-frontend.php:920
 #. translators: %1$s - {products} merge tag, %2$s - link to 'My Account' page
 #. opening <a> tag, %3$s - closing </a> link tag
 msgid ""
@@ -2346,11 +2357,11 @@ msgid ""
 "sign up by purchasing %1$s, or %2$slog in%3$s if you are a member."
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:920
+#: includes/frontend/class-wc-memberships-frontend.php:925
 msgid "This product category can only be viewed by members."
 msgstr ""
 
-#: includes/frontend/class-wc-memberships-frontend.php:950
+#: includes/frontend/class-wc-memberships-frontend.php:955
 msgid ""
 "This product category is part of your membership, but not yet! You will "
 "gain access on {date}"
@@ -2372,16 +2383,16 @@ msgstr ""
 msgid "or"
 msgstr ""
 
-#: includes/functions/wc-memberships-functions-orders.php:286
+#: includes/functions/wc-memberships-functions-orders.php:282
 msgid "Thanks for purchasing a membership!"
 msgstr ""
 
-#: includes/functions/wc-memberships-functions-orders.php:291
+#: includes/functions/wc-memberships-functions-orders.php:287
 #. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
 msgid "You can view more details about your membership from %1$syour account%2$s."
 msgstr ""
 
-#: includes/functions/wc-memberships-functions-orders.php:295
+#: includes/functions/wc-memberships-functions-orders.php:291
 msgid "You can view details for each membership in your account:"
 msgstr ""
 
@@ -2592,11 +2603,11 @@ msgstr ""
 msgid "Subscription-tied membership plan: %s"
 msgstr ""
 
-#: includes/integrations/subscriptions/class-wc-memberships-integration-subscriptions-discounts.php:223
+#: includes/integrations/subscriptions/class-wc-memberships-integration-subscriptions-discounts.php:234
 msgid "Discounts apply to subscriptions sign up fees"
 msgstr ""
 
-#: includes/integrations/subscriptions/class-wc-memberships-integration-subscriptions-discounts.php:224
+#: includes/integrations/subscriptions/class-wc-memberships-integration-subscriptions-discounts.php:235
 msgid ""
 "If enabled, membership discounts will also apply to sign up fees of "
 "subscription products."

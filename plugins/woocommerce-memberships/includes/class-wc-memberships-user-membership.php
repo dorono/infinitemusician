@@ -255,15 +255,14 @@ class WC_Memberships_User_Membership {
 	public function set_start_date( $date ) {
 
 		$start_date = wc_memberships_parse_date( $date, 'mysql' );
-		$now        = current_time( 'timestamp', true );
 
 		if ( ! $start_date ) {
-			$start_date = date( 'Y-m-d H:i:s', $now );
+			$start_date = date( 'Y-m-d H:i:s', current_time( 'timestamp', true ) );
 		}
 
 		update_post_meta( $this->id, $this->start_date_meta, $start_date );
 
-		if ( 'delayed' !== $this->get_status() && strtotime( 'today', strtotime( $start_date ) ) > $now ) {
+		if ( 'delayed' !== $this->get_status() && strtotime( 'today', strtotime( $start_date ) ) > current_time( 'timestamp', true ) ) {
 
 			$this->update_status( 'delayed' );
 		}
@@ -350,7 +349,7 @@ class WC_Memberships_User_Membership {
 		$date = get_post_meta( $this->id, $this->end_date_meta, true );
 
 		// adjust end/expiry date if paused date exists
-		if ( $date && $include_paused && $paused_date = $this->get_paused_date( 'timestamp' ) ) {
+		if ( $date && $include_paused && ( $paused_date = $this->get_paused_date( 'timestamp' ) ) ) {
 
 			$difference    = current_time( 'timestamp', true ) - $paused_date;
 			$end_timestamp = strtotime( $date ) + $difference;
@@ -536,7 +535,7 @@ class WC_Memberships_User_Membership {
 				}
 
 			// this might be the case where a paused membership didn't have interval tracking yet
-			} elseif ( $this->is_paused() && $paused_date = $this->get_paused_date( 'timestamp' ) ) {
+			} elseif ( $this->is_paused() && ( $paused_date = $this->get_paused_date( 'timestamp' ) ) ) {
 
 				$intervals[ (int) $paused_date ] = (int) $time;
 			}
@@ -693,37 +692,43 @@ class WC_Memberships_User_Membership {
 
 
 	/**
-	 * Set expiration events for this membership
+	 * Set expiration events for this membership.
 	 *
-	 * Note: the renewal reminder is only set contextually when the membership is expired
+	 * Note: the renewal reminder is only set contextually when the membership is expired.
 	 *
 	 * @see \WC_Memberships_User_Membership::set_end_date()
 	 * @see \WC_Memberships_User_Membership::expire_membership()
 	 * @see WC_Memberships_User_Memberships::trigger_expiration_events()
 	 *
 	 * @since 1.7.0
-	 * @param int|null $end_timestamp Membership end date timestamp
-	 *                                When empty (unlimited membership), it will just clear any existing scheduled event
+	 * @param int|null $end_timestamp membership end date timestamp: when empty (unlimited membership), it will just clear any existing scheduled event
 	 */
 	public function schedule_expiration_events( $end_timestamp = null ) {
+
+		$now = current_time( 'timestamp', true );
 
 		// always unschedule events for the same membership first
 		$this->unschedule_expiration_events();
 
-		// schedule membership expiration hooks, provided there's an end date
-		if ( is_numeric( $end_timestamp ) && (int) $end_timestamp > strtotime( 'today', current_time( 'timestamp', true ) ) ) {
+		// schedule membership expiration hooks, provided there's an end date and it's after the beginning of today's date
+		if ( is_numeric( $end_timestamp ) && (int) $end_timestamp > strtotime( 'today', $now ) ) {
 
 			$hook_args = array( 'user_membership_id' => $this->id );
 
-			// schedule the membership expiration event
+			// Schedule the membership expiration event:
 			wc_schedule_single_action( $end_timestamp, 'wc_memberships_user_membership_expiry', $hook_args, 'woocommerce-memberships' );
 
-			// schedule the membership ending soon event
+			// Schedule the membership ending soon event:
 			$days_before_expiry = $this->get_expiring_soon_time_before( $end_timestamp );
+			if ( $end_timestamp - $days_before_expiry >= DAY_IN_SECONDS ) {
+				if ( $days_before_expiry > $now ) {
+					// if there's at least one day before the expiry date, use the email setting (days before)
+					wc_schedule_single_action( $days_before_expiry, 'wc_memberships_user_membership_expiring_soon', $hook_args, 'woocommerce-memberships' );
+				} elseif ( $end_timestamp > $now && $median_time = absint( ( $now + $end_timestamp ) / 2 ) ) {
+					// if it's less than one day, schedule as a median time between now and the effective end date (in the course of the last remaining day)
+					wc_schedule_single_action( $median_time, 'wc_memberships_user_membership_expiring_soon', $hook_args, 'woocommerce-memberships' );
+				}
 
-			// make sure it's scheduled no less than one day before expiry date
-			if ( $end_timestamp - $days_before_expiry > DAY_IN_SECONDS ) {
-				wc_schedule_single_action( $days_before_expiry, 'wc_memberships_user_membership_expiring_soon', $hook_args, 'woocommerce-memberships' );
 			}
 		}
 	}
@@ -1028,7 +1033,7 @@ class WC_Memberships_User_Membership {
 		if ( 'delayed' === $this->get_status() ) {
 
 			// always perform a check until start date is in the past...
-			if ( $this->get_start_date( 'timestamp' ) < current_time( 'timestamp', true ) ) {
+			if ( $this->get_start_date( 'timestamp' ) <= current_time( 'timestamp', true ) ) {
 				// ... so we can activate the membership finally
 				$this->activate_membership();
 			} else {
@@ -1057,9 +1062,10 @@ class WC_Memberships_User_Membership {
 		$active_period  = $this->is_in_active_period();
 		$is_active      = in_array( $current_status, wc_memberships()->get_user_memberships_instance()->get_active_access_membership_statuses(), true );
 
-		// sanity check: an active membership should always lie within the active period
+		// sanity check: an active membership should always be within the active period time range
 		if ( $is_active && ! $active_period ) {
 
+			// this means the status is active, but the current time is out of the start/end dates boundaries
 			if ( $this->get_start_date( 'timestamp' ) > current_time( 'timestamp', true ) ) {
 				// if we're before the start date, membership should be delayed
 				$this->update_status( 'delayed' );
@@ -1070,6 +1076,7 @@ class WC_Memberships_User_Membership {
 
 			$is_active = false;
 
+		// the membership status is not active, yet the current time is between the start/end dates, so perhaps should be activated
 		} elseif ( $active_period ) {
 
 			if ( 'delayed' === $current_status ) {
@@ -1081,7 +1088,7 @@ class WC_Memberships_User_Membership {
 
 			} elseif ( 'expired' ===  $current_status ) {
 
-				// if the membership is expired, it can't be in active period
+				// if the membership is expired, we don't reactivate it, but it can't be in active period, so we update the end date to now
 				$this->set_end_date( current_time( 'mysql', true ) );
 
 				$is_active = false;

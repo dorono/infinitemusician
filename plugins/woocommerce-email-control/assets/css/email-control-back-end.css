@@ -22,7 +22,8 @@
 .ec-admin-panel .controls-label {display: block;/* width: 90px; */font-size: 14px;margin: 0 -6px 9px 0;padding: 0;font-weight: 500;/* text-transform: uppercase; */white-space: nowrap;text-overflow: ellipsis;overflow: hidden;}
 .ec-admin-panel .main-controls-element.ec-half .controls-label {letter-spacing: -.4px;}
 .ec-admin-panel .controls-field {margin: 0 0 9px;}
-.ec-admin-panel label {}
+.ec-admin-panel label { display: block; margin-bottom: 6px; }
+.ec-admin-panel label:last-child { margin-bottom: 0; }
 .ec-admin-panel select,
 .ec-admin-panel input[type="text"],
 .ec-admin-panel input[type="number"],

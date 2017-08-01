@@ -579,7 +579,7 @@ if ( ! function_exists( 'storefront_product_categories' ) ) {
 
 				do_action( 'storefront_homepage_after_product_categories_title' );
 
-				echo wp_kses_post( $shortcode_content );
+				echo $shortcode_content;
 
 				do_action( 'storefront_homepage_after_product_categories' );
 
@@ -609,10 +609,10 @@ if ( ! function_exists( 'storefront_recent_products' ) ) {
 				'title'				=> __( 'New In', 'storefront' ),
 			) );
 
-			$shortcode_content = storefront_do_shortcode( 'recent_products', array(
+			$shortcode_content = storefront_do_shortcode( 'recent_products', apply_filters( 'storefront_recent_products_shortcode_args', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
-			) );
+			) ) );
 
 			/**
 			 * Only display the section if the shortcode returns products
@@ -627,7 +627,7 @@ if ( ! function_exists( 'storefront_recent_products' ) ) {
 
 				do_action( 'storefront_homepage_after_recent_products_title' );
 
-				echo wp_kses_post( $shortcode_content );
+				echo $shortcode_content;
 
 				do_action( 'storefront_homepage_after_recent_products' );
 
@@ -659,12 +659,12 @@ if ( ! function_exists( 'storefront_featured_products' ) ) {
 				'title'   => __( 'We Recommend', 'storefront' ),
 			) );
 
-			$shortcode_content = storefront_do_shortcode( 'featured_products', array(
+			$shortcode_content = storefront_do_shortcode( 'featured_products', apply_filters( 'storefront_featured_products_shortcode_args', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
 				'orderby'  => esc_attr( $args['orderby'] ),
 				'order'    => esc_attr( $args['order'] ),
-			) );
+			) ) );
 
 			/**
 			 * Only display the section if the shortcode returns products
@@ -679,7 +679,7 @@ if ( ! function_exists( 'storefront_featured_products' ) ) {
 
 				do_action( 'storefront_homepage_after_featured_products_title' );
 
-				echo wp_kses_post( $shortcode_content );
+				echo $shortcode_content;
 
 				do_action( 'storefront_homepage_after_featured_products' );
 
@@ -709,10 +709,10 @@ if ( ! function_exists( 'storefront_popular_products' ) ) {
 				'title'   => __( 'Fan Favorites', 'storefront' ),
 			) );
 
-			$shortcode_content = storefront_do_shortcode( 'top_rated_products', array(
+			$shortcode_content = storefront_do_shortcode( 'top_rated_products', apply_filters( 'storefront_popular_products_shortcode_args', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
-			) );
+			) ) );
 
 			/**
 			 * Only display the section if the shortcode returns products
@@ -727,7 +727,7 @@ if ( ! function_exists( 'storefront_popular_products' ) ) {
 
 				do_action( 'storefront_homepage_after_popular_products_title' );
 
-				echo wp_kses_post( $shortcode_content );
+				echo $shortcode_content;
 
 				do_action( 'storefront_homepage_after_popular_products' );
 
@@ -757,10 +757,10 @@ if ( ! function_exists( 'storefront_on_sale_products' ) ) {
 				'title'   => __( 'On Sale', 'storefront' ),
 			) );
 
-			$shortcode_content = storefront_do_shortcode( 'sale_products', array(
+			$shortcode_content = storefront_do_shortcode( 'sale_products', apply_filters( 'storefront_on_sale_products_shortcode_args', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
-			) );
+			) ) );
 
 			/**
 			 * Only display the section if the shortcode returns products
@@ -775,7 +775,7 @@ if ( ! function_exists( 'storefront_on_sale_products' ) ) {
 
 				do_action( 'storefront_homepage_after_on_sale_products_title' );
 
-				echo wp_kses_post( $shortcode_content );
+				echo $shortcode_content;
 
 				do_action( 'storefront_homepage_after_on_sale_products' );
 
@@ -804,10 +804,10 @@ if ( ! function_exists( 'storefront_best_selling_products' ) ) {
 				'title'	  => esc_attr__( 'Best Sellers', 'storefront' ),
 			) );
 
-			$shortcode_content = storefront_do_shortcode( 'best_selling_products', array(
+			$shortcode_content = storefront_do_shortcode( 'best_selling_products', apply_filters( 'storefront_best_selling_products_shortcode_args', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
-			) );
+			) ) );
 
 			/**
 			 * Only display the section if the shortcode returns products
@@ -822,7 +822,7 @@ if ( ! function_exists( 'storefront_best_selling_products' ) ) {
 
 				do_action( 'storefront_homepage_after_best_selling_products_title' );
 
-				echo wp_kses_post( $shortcode_content );
+				echo $shortcode_content;
 
 				do_action( 'storefront_homepage_after_best_selling_products' );
 
@@ -934,50 +934,55 @@ if ( ! function_exists( 'storefront_init_structured_data' ) ) {
 			$image = wp_get_attachment_image_src( get_post_thumbnail_id( get_the_ID() ), 'normal' );
 			$logo  = wp_get_attachment_image_src( get_theme_mod( 'custom_logo' ), 'full' );
 
-			$json['@type']            = 'BlogPosting';
+			$json = array();
+			
+			$json['@type'] = 'BlogPosting';
 
 			$json['mainEntityOfPage'] = array(
-				'@type'                 => 'webpage',
-				'@id'                   => get_the_permalink(),
+				'@type' => 'webpage',
+				'@id'   => get_the_permalink(),
 			);
 
-			$json['publisher']        = array(
-				'@type'                 => 'organization',
-				'name'                  => get_bloginfo( 'name' ),
-				'logo'                  => array(
-					'@type'               => 'ImageObject',
-					'url'                 => $logo[0],
-					'width'               => $logo[1],
-					'height'              => $logo[2],
-				),
+			$json['publisher'] = array(
+				'@type' => 'organization',
+				'name'  => get_bloginfo( 'name' ),
 			);
 
-			$json['author']           = array(
-				'@type'                 => 'person',
-				'name'                  => get_the_author(),
-			);
-
-			if ( $image ) {
-				$json['image']            = array(
-					'@type'                 => 'ImageObject',
-					'url'                   => $image[0],
-					'width'                 => $image[1],
-					'height'                => $image[2],
+			if ( $logo ) {
+				$json['publisher']['logo'] = array(
+					'@type'  => 'ImageObject',
+					'url'    => $logo[0],
+					'width'  => $logo[1],
+					'height' => $logo[2],
 				);
 			}
 
-			$json['datePublished']    = get_post_time( 'c' );
-			$json['dateModified']     = get_the_modified_date( 'c' );
-			$json['name']             = get_the_title();
-			$json['headline']         = $json['name'];
-			$json['description']      = get_the_excerpt();
+			$json['author'] = array(
+				'@type' => 'person',
+				'name'  => get_the_author(),
+			);
+
+			if ( $image ) {
+				$json['image'] = array(
+					'@type'  => 'ImageObject',
+					'url'    => $image[0],
+					'width'  => $image[1],
+					'height' => $image[2],
+				);
+			}
+			
+			$json['datePublished'] = get_post_time( 'c' );
+			$json['dateModified']  = get_the_modified_date( 'c' );
+			$json['name']          = get_the_title();
+			$json['headline']      = $json['name'];
+			$json['description']   = get_the_excerpt();
 
 		// Page's structured data.
 		} elseif ( is_page() ) {
-			$json['@type']            = 'WebPage';
-			$json['url']              = get_the_permalink();
-			$json['name']             = get_the_title();
-			$json['description']      = get_the_excerpt();
+			$json['@type']       = 'WebPage';
+			$json['url']         = get_the_permalink();
+			$json['name']        = get_the_title();
+			$json['description'] = get_the_excerpt();
 		}
 
 		if ( isset( $json ) ) {

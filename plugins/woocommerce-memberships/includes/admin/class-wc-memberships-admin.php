@@ -631,7 +631,7 @@ class WC_Memberships_Admin {
 
 
 	/**
-	 * Render tabs on our custom post types pages
+	 * Render tabs on our custom post types pages.
 	 *
 	 * @internal
 	 *
@@ -640,19 +640,20 @@ class WC_Memberships_Admin {
 	public function render_tabs() {
 		global $typenow;
 
+		// handle tabs on the relevant WooCommerce pages
 		if (    $this->is_import_export_admin_page()
 		     || ( is_string( $typenow ) && in_array( $typenow, array( 'wc_user_membership', 'wc_membership_plan' ), true ) ) ) :
 
 			?>
 			<div class="wrap woocommerce">
 				<?php
-					/**
-					 * Filter the current Memberships Admin tab
-					 *
-					 * @since 1.0.0
-					 * @param string $current_tab
-					 */
-					$current_tab = apply_filters( 'wc_memberships_admin_current_tab', '' );
+				/**
+				 * Filter the current Memberships Admin tab.
+				 *
+				 * @since 1.0.0
+				 * @param string $current_tab
+				 */
+				$current_tab = apply_filters( 'wc_memberships_admin_current_tab', '' );
 				?>
 				<h2 class="nav-tab-wrapper woo-nav-tab-wrapper">
 					<?php $tabs = $this->get_tabs(); ?>
@@ -663,6 +664,45 @@ class WC_Memberships_Admin {
 				</h2>
 			</div>
 			<?php
+
+		// warn users against the usage of 'woocommerce_my_account' deprecated shortcode attributes as these could conflict with Memberships and trigger a server error in the Members Area
+		elseif ( 'page' === $typenow  ) :
+			global $post;
+
+			if ( $post && ( (int) $post->ID === (int) wc_get_page_id( 'myaccount' ) || has_shortcode( $post->post_content, 'woocommerce_my_account' ) ) ) :
+
+				preg_match_all('/' . get_shortcode_regex() .'/s', $post->post_content, $matches );
+
+				if ( isset( $matches[2], $matches[3] ) && ( is_array( $matches[2] ) && is_array( $matches[3] ) ) ) {
+
+					$position = null;
+
+					foreach ( $matches[2] as $key => $found_shortcode ) {
+						if ( 'woocommerce_my_account' === $found_shortcode ) {
+							$position = $key;
+							break;
+						}
+					}
+
+					if ( null !== $position && ! empty( $matches[3][ $position ] ) ) {
+
+						$has_atts = trim( $matches[3][ $position ] );
+
+						if ( ! empty( $has_atts ) ) {
+
+							?>
+							<div class="notice notice-warning">
+								<p><?php
+									/* translators: Placeholders: %1$s - the 'woocommerce_my_account' shortcode, %2$s - the 'order_count' shortcode attribute */
+									printf( __( 'It looks like you might be using the %1$s shortcode with deprecated attributes, such as %2$s. These attributes have been deprecated since WooCommerce 2.6 and may no longer have any effect on the shortcode output. Furthermore, they might cause a server error when visiting the Members Area while WooCommerce Memberships is active.', 'woocommerce-memberships' ), '<code>woocommerce_my_account</code>', '<code>order_count</code>' );
+									?></p>
+							</div>
+							<?php
+						}
+					}
+				}
+
+			endif;
 
 		endif;
 	}

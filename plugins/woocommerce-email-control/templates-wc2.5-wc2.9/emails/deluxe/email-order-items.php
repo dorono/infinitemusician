@@ -32,7 +32,7 @@ foreach ( $items as $item_id => $item ) :
 						?>
 						<td class="order_items_table_product_details_inner_td order_items_table_product_details_inner_td_text" width="100%">
 							
-							<span class="order_items_table_product_details_inner_title">
+							<div class="order_items_table_product_details_inner_title">
 								<?php
 								// Product name
 								echo apply_filters( 'woocommerce_order_item_name', $item['name'], $item, false );
@@ -42,7 +42,7 @@ foreach ( $items as $item_id => $item ) :
 									echo ' (#' . $_product->get_sku() . ')';
 								}
 								?>
-							</span>
+							</div>
 							
 							<?php
 							// allow other plugins to add additional product information here
@@ -51,7 +51,10 @@ foreach ( $items as $item_id => $item ) :
 							
 							// Variation
 							if ( ! empty( $item_meta->meta ) ) {
-								echo '<br/><small>' . nl2br( $item_meta->display( true, true, '_', "\n" ) ) . '</small>';
+								// echo '<br/><small>ONE ' . nl2br( $item_meta->display( true, true, '_', "\n" ) ) . ' TWO</small>';
+								echo '<div class="wc-item-meta"><div>';
+								echo $item_meta->display( true, true, '_', "</div><div>" );
+								echo '</div></div>';
 							}
 				
 							// File URLs

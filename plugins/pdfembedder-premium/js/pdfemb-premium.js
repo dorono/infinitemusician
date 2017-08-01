@@ -75,7 +75,7 @@ jQuery(document).ready(function($) {
         var divContainer = this.divContainer;
         var pagesContainer = divContainer.find('div.pdfemb-pagescontainer');
         if (wantMobile) {
-            if (pagesContainer.find('.pdfemb-inner-div-wantmobile').length == 0) {
+            if (divContainer.find('.pdfemb-wantmobile').length == 0) {
 
                 var wantMobileWrapper = $('<div></div>', {'class': 'pdfemb-inner-div-wantmobile pdfemb-wantmobile'});
 
@@ -86,8 +86,8 @@ jQuery(document).ready(function($) {
 
                 this.bindFullScreen(wantMobileFS);
 
-                pagesContainer.prepend(wantMobileWrapper);
-                pagesContainer.prepend(wantMobileFSWrapper);
+                divContainer.prepend(wantMobileWrapper);
+                divContainer.prepend(wantMobileFSWrapper);
 
                 // Hide toolbars
                 divContainer.find('.pdfemb-toolbar-fixed').hide();
@@ -96,7 +96,7 @@ jQuery(document).ready(function($) {
             }
         }
         else {
-            pagesContainer.find('.pdfemb-wantmobile').remove();
+            divContainer.find('.pdfemb-wantmobile').remove();
 
             divContainer.find('.pdfemb-toolbar-fixed').show();
             divContainer.find('.pdfemb-toolbar-hover').data('no-hover', false);

@@ -40,10 +40,38 @@ p.no-comments {
 	}
 }
 @media (min-width: 768px) {
-	.storefront-full-width-content.single-product div.product .images {
-		margin-bottom: 0;
+	.storefront-full-width-content {
+		&.single-product div.product .images,
+		&.woocommerce-checkout .entry-header {
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
+
+		ul {
+			&.order_details {
+				margin-top: 0;
+			}
+		}
+	}
+
+	.hentry.type-page .entry-header {
+		padding-bottom: 0;
 	}
 }
+
+table.shop_table_responsive {
+	th,
+	td {
+		padding: 1em 10px;
+	}
+
+	td {
+		.button {
+			display: inline-block;
+		}
+	}
+}
+
 /* HOMEPAGE */
 .info-box {
 	background: #f3dfa3;

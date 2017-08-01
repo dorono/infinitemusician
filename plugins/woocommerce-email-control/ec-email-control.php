@@ -5,7 +5,7 @@
  * Description: WooCommerce Email Customizer plugin allows you to fully customize the styling, colors, logo and text in the emails sent from your WooCommerce store.
  * Author: cxThemes
  * Author URI: https://codecanyon.net/item/email-customizer-for-woocommerce/8654473?ref=cxThemes&utm_source=email%20customizer&utm_campaign=commercial%20plugin%20upsell&utm_medium=plugins%20page%20view%20details
- * Version: 3.11
+ * Version: 3.13
  * Text Domain: email-control
  * Domain Path: /languages/
  *
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Define Constants
  */
-define( 'WC_EMAIL_CONTROL_VERSION', '3.11' );
+define( 'WC_EMAIL_CONTROL_VERSION', '3.13' );
 define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', 2.5 );
 define( 'WC_EMAIL_CONTROL_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
@@ -141,8 +141,8 @@ class WC_Email_Control {
 		add_action( 'wp_ajax_nopriv_save_meta', array( $this, 'nopriv_save_meta' ) );
 		
 		// Ajax saving of options new
-		add_action( 'wp_ajax_save_option', array( $this, 'save_option' ) );
-		add_action( 'wp_ajax_nopriv_save_option', array( $this, 'nopriv_save_option' ) );
+		add_action( 'wp_ajax_ec_save_option', array( $this, 'ec_save_option' ) );
+		add_action( 'wp_ajax_ec_nopriv_save_option', array( $this, 'nopriv_ec_save_option' ) );
 		
 		// Ajax send email
 		add_action( 'wp_ajax_ec_send_email', array( $this, 'send_email' ) );
@@ -394,22 +394,33 @@ class WC_Email_Control {
 	*  @date	20-08-2014
 	*  @since	1.0
 	*/
-	function save_option() {
-		/*
-		if ( ! wp_verify_nonce( $_REQUEST['nonce'], "save_option_nonce")) {
-		  exit("No naughty business please");
+	function ec_save_option() {
+		global $current_user;
+		
+		/*if ( ! wp_verify_nonce( $_REQUEST['nonce'], "save_option_nonce")) {
+			exit("No naughty business please");
+		}*/
+		
+		$field_name = ( isset( $_REQUEST['field_name'] ) ) ? $_REQUEST['field_name'] : '' ;
+		$field_value = ( isset( $_REQUEST['field_value'] ) ) ? $_REQUEST['field_value'] : '' ;
+		$field_type = ( isset( $_REQUEST['field_type'] ) ) ? $_REQUEST['field_type'] : '' ; // option | user
+		
+		// Whether to save as a user_meta or option.
+		if ( 'user' == $field_type ) {
+			
+			// User.
+			update_user_meta( $current_user->ID, $field_name, $field_value );
 		}
-		*/
-		
-		$field_name  = ( isset( $_REQUEST["field_name"] ) ) ? $_REQUEST["field_name"] : "" ;
-		$field_value  = ( isset( $_REQUEST["field_value"] ) ) ? $_REQUEST["field_value"] : "" ;
-		
-		update_option( $field_name, $field_value );
+		else {
+			
+			// Option.
+			update_option( $field_name, $field_value );
+		}
 		
 		die();
 	}
 	
-	function nopriv_save_option() {
+	function nopriv_ec_save_option() {
 		_e( 'You must be logged in', 'email-control' );
 		die();
 	}
@@ -490,7 +501,7 @@ class WC_Email_Control {
 		$email_addresses = str_replace( " ", "", $email_addresses );
 		$email_addresses = explode( ",", $email_addresses );
 		
-		$mail->object		= new WC_Order( $order );
+		$mail->object = new WC_Order( $order );
 		
 		$mail->find[] = '{order_date}';
 		$mail->replace[] = date_i18n( wc_date_format(), strtotime( ec_order_get_date_created( $mail->object ) ) );
@@ -498,14 +509,12 @@ class WC_Email_Control {
 		$mail->find[] = '{order_number}';
 		$mail->replace[] = $mail->object->get_order_number();
 		
+		$mail->recipient = ec_order_get_billing_email( $mail->object );
 		
-		$mail->recipient	= $mail->object->billing_email;
-		
-		$email_subject		= $mail->get_subject();
-		$email_content		= $mail->get_content();
-		$email_headers		= $mail->get_headers();
-		$email_attachments	= $mail->get_attachments();
-		
+		$email_subject = $mail->get_subject();
+		$email_content = $mail->get_content();
+		$email_headers = $mail->get_headers();
+		$email_attachments = $mail->get_attachments();
 		
 		foreach ( $email_addresses as $email_address ) {
 			echo $mail->send( $email_address, $email_subject, $email_content, $email_headers, $email_attachments );

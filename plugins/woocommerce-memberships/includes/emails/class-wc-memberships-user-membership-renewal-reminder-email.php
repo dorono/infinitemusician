@@ -142,7 +142,7 @@ class WC_Memberships_User_Membership_Renewal_Reminder_Email extends WC_Membershi
 					'custom_attributes' => array(
 						'step' => 1,
 						'min'  => 1,
-						'max'  => 60,
+						'max'  => 180,
 					),
 				),
 			) );

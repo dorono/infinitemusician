@@ -57,25 +57,25 @@ class WC_Email_Theme_WooCommerce {
 		
 		$sections = array(
 			array(
-				"name" => __( "Text", "email-control" ),
+				"name" => __( "Text", 'email-control' ),
 				"id"   => "text_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Appearance", "email-control" ),
+				"name" => __( "Appearance", 'email-control' ),
 				"id"   => "appearance_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Header", "email-control" ),
+				"name" => __( "Header", 'email-control' ),
 				"id"   => "header_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Footer", "email-control" ),
+				"name" => __( "Footer", 'email-control' ),
 				"id"   => "footer_section",
 				"desc" => "",
 				"tip"  => "",
@@ -104,7 +104,7 @@ class WC_Email_Theme_WooCommerce {
 			
 			// New Order (new_order, admin-new-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
 				"default" => __( "New customer order", 'email-control' ),
@@ -114,7 +114,7 @@ class WC_Email_Theme_WooCommerce {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
 				"default" => __( "You have received an order from [ec_firstname] [ec_lastname]. The order is as follows:", 'email-control' ),
@@ -129,20 +129,20 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Cancelled Order (cancelled_order, admin-cancelled-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
-				"default" => __( "Cancelled order", "email-control" ),
+				"default" => __( "Cancelled order", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "cancelled_order",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "The order [ec_order] for [ec_firstname] [ec_lastname] has been cancelled.", "email-control" ),
+				"default" => __( "The order [ec_order] for [ec_firstname] [ec_lastname] has been cancelled.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "cancelled_order",
@@ -154,20 +154,20 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Failed Order (failed_order, admin-failed-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
-				"default" => __( "Failed order", "email-control" ),
+				"default" => __( "Failed order", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "failed_order",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Payment for order [ec_order] from [ec_firstname] [ec_lastname] has failed.", "email-control" ),
+				"default" => __( "Payment for order [ec_order] from [ec_firstname] [ec_lastname] has failed.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "failed_order",
@@ -179,20 +179,20 @@ class WC_Email_Theme_WooCommerce {
 			
 			// On-hold Order (customer_on_hold_order, customer-on-hold-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
-				"default" => __( "Thank you for your order", "email-control" ),
+				"default" => __( "Thank you for your order", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_on_hold_order",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Your order is on-hold until we confirm payment has been received. Your order details are shown below for your reference:", "email-control" ),
+				"default" => __( "Your order is on-hold until we confirm payment has been received. Your order details are shown below for your reference:", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_on_hold_order",
@@ -204,20 +204,20 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Processing Order (customer_processing_order, customer-processing-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
-				"default" => __( "Thank you for your order", "email-control" ),
+				"default" => __( "Thank you for your order", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_processing_order",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Your order has been received and is now being processed. Your order details are shown below for your reference:", "email-control" ),
+				"default" => __( "Your order has been received and is now being processed. Your order details are shown below for your reference:", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_processing_order",
@@ -229,7 +229,7 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Completed Order (customer_completed_order, customer-completed-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
 				"default" => __( "Your order is complete", 'email-control' ),
@@ -239,7 +239,7 @@ class WC_Email_Theme_WooCommerce {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
 				"default" => __( "Hi there. Your recent order on [ec_site_name] has been completed. Your order details are shown below for your reference:", 'email-control' ),
@@ -254,20 +254,20 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Refunded Order - full (customer_refunded_order, customer-refunded-order.php)
 			array(
-				"name"    => __( "Heading (full)", "email-control" ),
+				"name"    => __( "Heading (full)", 'email-control' ),
 				"id"      => "heading_full",
 				"type"    => "text",
-				"default" => __( "Your order has been fully refunded", "email-control" ),
+				"default" => __( "Your order has been fully refunded", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text_full",
 				"type"    => "textarea",
-				"default" => __( "Hi there. Your order on [ec_site_name] has been refunded.", "email-control" ),
+				"default" => __( "Hi there. Your order on [ec_site_name] has been refunded.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
@@ -276,20 +276,20 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Refunded Order - partial (customer_refunded_order, customer-refunded-order.php)
 			array(
-				"name"    => __( "Heading (partial)", "email-control" ),
+				"name"    => __( "Heading (partial)", 'email-control' ),
 				"id"      => "heading_partial",
 				"type"    => "text",
-				"default" => __( "You have been partially refunded", "email-control" ),
+				"default" => __( "You have been partially refunded", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text_partial",
 				"type"    => "textarea",
-				"default" => __( "Hi there. Your order on [ec_site_name] has been partially refunded.", "email-control" ),
+				"default" => __( "Hi there. Your order on [ec_site_name] has been partially refunded.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
@@ -301,7 +301,7 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Customer Invoice - payment pending (customer_invoice, customer-invoice.php)
 			array(
-				"name"    => __( "Heading (payment pending)", "email-control" ),
+				"name"    => __( "Heading (payment pending)", 'email-control' ),
 				"id"      => "heading_pending",
 				"type"    => "text",
 				"default" => __( "Order [ec_order show='#,number' hide='container'] details", 'email-control' ),
@@ -311,7 +311,7 @@ class WC_Email_Theme_WooCommerce {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text_pending",
 				"type"    => "textarea",
 				"default" => __( "An order has been created for you on [ec_site_link]. To pay for this order please use the following link: [ec_pay_link]", 'email-control' ),
@@ -323,7 +323,7 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Customer Invoice - payment complete (customer_invoice, customer-invoice.php)
 			array(
-				"name"    => __( "Heading (payment complete)", "email-control" ),
+				"name"    => __( "Heading (payment complete)", 'email-control' ),
 				"id"      => "heading_complete",
 				"type"    => "text",
 				"default" => __( "Order [ec_order show='#,number' hide='container'] details", 'email-control' ),
@@ -333,7 +333,7 @@ class WC_Email_Theme_WooCommerce {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text_complete",
 				"type"    => "textarea",
 				"default" => "",
@@ -348,7 +348,7 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Customer Note (customer_note, customer-note.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
 				"default" => "A note has been added to your order",
@@ -358,7 +358,7 @@ class WC_Email_Theme_WooCommerce {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
 				"default" => __( "Hello, a note has just been added to your order:\n\n[ec_customer_note]\n\nFor your reference, your order details are shown below.\n\n", 'email-control' ),
@@ -373,20 +373,20 @@ class WC_Email_Theme_WooCommerce {
 			
 			// Reset Password (customer_reset_password, customer-reset-password.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
-				"default" => __( "Password Reset Instructions", "email-control" ),
+				"default" => __( "Password Reset Instructions", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_reset_password",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Someone requested that the password be reset for the following account:\n\nUsername: [ec_user_login]\n\nIf this was a mistake, just ignore this email and nothing will happen.\n\nTo reset your password, visit the following address:\n[ec_reset_password_link]", "email-control" ),
+				"default" => __( "Someone requested that the password be reset for the following account:\n\nUsername: [ec_user_login]\n\nIf this was a mistake, just ignore this email and nothing will happen.\n\nTo reset your password, visit the following address:\n[ec_reset_password_link]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_reset_password",
@@ -398,30 +398,30 @@ class WC_Email_Theme_WooCommerce {
 			
 			// New Account (customer_new_account, customer-new-account.php)
 			array(
-				"name"    => __( "Heading", "email-control" ),
+				"name"    => __( "Heading", 'email-control' ),
 				"id"      => "heading",
 				"type"    => "text",
-				"default" => __( "Welcome to [ec_site_name hide='container']", "email-control" ),
+				"default" => __( "Welcome to [ec_site_name hide='container']", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_new_account",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ),
+				"name"    => __( "Main Text", 'email-control' ),
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Thanks for creating an account on [ec_site_name]. Your username is [ec_user_login].\n\nYou can access your account area to view your orders and change your password here: [ec_account_link].", "email-control" ),
+				"default" => __( "Thanks for creating an account on [ec_site_name]. Your username is [ec_user_login].\n\nYou can access your account area to view your orders and change your password here: [ec_account_link].", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_new_account",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Password Regenerated Text", "email-control" ),
+				"name"    => __( "Password Regenerated Text", 'email-control' ),
 				"id"      => "main_text_generate_pass",
 				"type"    => "textarea",
-				"default" => __( "Your password has been automatically generated: [ec_user_password]", "email-control" ),
+				"default" => __( "Your password has been automatically generated: [ec_user_password]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_new_account",
@@ -434,7 +434,7 @@ class WC_Email_Theme_WooCommerce {
 			// all
 			
 			array(
-				"name"     => __( "Base Color", "email-control" ),
+				"name"     => __( "Base Color", 'email-control' ),
 				"id"       => "base_color",
 				"type"     => "color",
 				"default"  => "#557da1",
@@ -446,7 +446,7 @@ class WC_Email_Theme_WooCommerce {
 			),
 			
 			array(
-				"name"     => __( "Background Colour", "email-control" ),
+				"name"     => __( "Background Colour", 'email-control' ),
 				"id"       => "background_color",
 				"type"     => "color",
 				"default"  => "#f5f5f5",
@@ -458,7 +458,7 @@ class WC_Email_Theme_WooCommerce {
 			),
 			
 			array(
-				"name"     => __( "Body Background Colour", "email-control" ),
+				"name"     => __( "Body Background Colour", 'email-control' ),
 				"id"       => "body_background_color",
 				"type"     => "color",
 				"default"  => "#fdfdfd",
@@ -470,7 +470,7 @@ class WC_Email_Theme_WooCommerce {
 			),
 			
 			array(
-				"name"     => __( "Body Text Colour", "email-control" ),
+				"name"     => __( "Body Text Colour", 'email-control' ),
 				"id"       => "body_text_color",
 				"type"     => "color",
 				"default"  => "#505050",
@@ -482,7 +482,7 @@ class WC_Email_Theme_WooCommerce {
 			),
 			
 			array(
-				"name"    => __( "Product Images", "email-control" ),
+				"name"    => __( "Product Images", 'email-control' ),
 				"id"      => "product_thumbnail",
 				"type"    => 'checkbox',
 				"default" => 'no',
@@ -499,7 +499,7 @@ class WC_Email_Theme_WooCommerce {
 			
 			
 			array(
-				"name"    => __( "Logo", "email-control" ),
+				"name"    => __( "Logo", 'email-control' ),
 				"id"      => "header_image",
 				"type"    => "image_upload",
 				"default" => get_option( 'woocommerce_email_header_image' ),
@@ -510,7 +510,7 @@ class WC_Email_Theme_WooCommerce {
 			),
 			
 			array(
-				"name"    => __( "Footer Text", "email-control" ),
+				"name"    => __( "Footer Text", 'email-control' ),
 				"id"      => "footer_text",
 				"type"    => "textarea",
 				"default" => __( "[ec_site_name] – Powered by WooCommerce", 'email-control' ),

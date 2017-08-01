@@ -118,49 +118,49 @@ class WC_Email_Theme_Vanilla {
 		
 		$sections = array(
 			array(
-				"name" => __( "Text", "email-control" ),
+				"name" => __( "Text", 'email-control' ),
 				"id"   => "text_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Appearance", "email-control" ),
+				"name" => __( "Appearance", 'email-control' ),
 				"id"   => "appearance_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Header", "email-control" ),
+				"name" => __( "Header", 'email-control' ),
 				"id"   => "header_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Links", "email-control" ),
+				"name" => __( "Links", 'email-control' ),
 				"id"   => "links_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Section Headings", "email-control" ),
+				"name" => __( "Section Headings", 'email-control' ),
 				"id"   => "section_headings_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Order Items Table", "email-control" ),
+				"name" => __( "Order Items Table", 'email-control' ),
 				"id"   => "order_items_table_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Footer", "email-control" ),
+				"name" => __( "Footer", 'email-control' ),
 				"id"   => "footer_section",
 				"desc" => "",
 				"tip"  => "",
 			),
 			array(
-				"name" => __( "Custom CSS", "email-control" ),
+				"name" => __( "Custom CSS", 'email-control' ),
 				"id"   => "custom_css_section",
 				"desc" => "",
 				"tip"  => "",
@@ -189,10 +189,10 @@ class WC_Email_Theme_Vanilla {
 		
 			// New Order (new_order, admin-new-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "New order received!", "email-control" ),
+				"default" => __( "New order received!", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "new_order",
@@ -200,10 +200,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "You have received an order from [ec_firstname] [ec_lastname].\n\nTheir order is as follows: [ec_order]", "email-control" ),
+				"default" => __( "You have received an order from [ec_firstname] [ec_lastname].\n\nTheir order is as follows: [ec_order]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "new_order",
@@ -215,10 +215,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Cancelled Order (cancelled_order, admin-cancelled-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "Cancelled order", "email-control" ),
+				"default" => __( "Cancelled order", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "cancelled_order",
@@ -226,10 +226,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "The order [ec_order] for [ec_firstname] [ec_lastname] has been cancelled.", "email-control" ),
+				"default" => __( "The order [ec_order] for [ec_firstname] [ec_lastname] has been cancelled.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "cancelled_order",
@@ -241,10 +241,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Failed Order (failed_order, admin-failed-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "Failed order", "email-control" ),
+				"default" => __( "Failed order", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "failed_order",
@@ -252,10 +252,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Payment for order [ec_order] from [ec_firstname] [ec_lastname] has failed.", "email-control" ),
+				"default" => __( "Payment for order [ec_order] from [ec_firstname] [ec_lastname] has failed.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "failed_order",
@@ -267,20 +267,20 @@ class WC_Email_Theme_Vanilla {
 			
 			// On-hold Order (customer_on_hold_order, customer-on-hold-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "Thank you for your order", "email-control" ),
+				"default" => __( "Thank you for your order", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_on_hold_order",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Your order is on-hold until we confirm payment has been received. Your order details are shown below for your reference:", "email-control" ),
+				"default" => __( "Your order is on-hold until we confirm payment has been received. Your order details are shown below for your reference:", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_on_hold_order",
@@ -292,10 +292,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Processing Order (customer_processing_order, customer-processing-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "Your order is being processed", "email-control" ),
+				"default" => __( "Your order is being processed", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_processing_order",
@@ -303,10 +303,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Your order [ec_order] has been received and is now being processed.", "email-control" ),
+				"default" => __( "Your order [ec_order] has been received and is now being processed.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_processing_order",
@@ -318,10 +318,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Completed Order (customer_completed_order, customer-completed-order.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "Your order is complete", "email-control" ),
+				"default" => __( "Your order is complete", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_completed_order",
@@ -329,10 +329,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Your order [ec_order] at [ec_site_name] has been completed.\n\nWe're just letting you know. No further action is required.", "email-control" ),
+				"default" => __( "Your order [ec_order] at [ec_site_name] has been completed.\n\nWe're just letting you know. No further action is required.", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_completed_order",
@@ -344,10 +344,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Refunded Order - full (customer_refunded_order, customer-refunded-order.php)
 			array(
-				"name"    => __( "Heading (full)", "email-control" ), // YES
+				"name"    => __( "Heading (full)", 'email-control' ), // YES
 				"id"      => "heading_full",
 				"type"    => "textarea",
-				"default" => __( "Your order has been refunded", "email-control" ),
+				"default" => __( "Your order has been refunded", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
@@ -355,10 +355,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text_full",
 				"type"    => "textarea",
-				"default" => __( "Your order [ec_order] has been refunded. Thanks", "email-control" ),
+				"default" => __( "Your order [ec_order] has been refunded. Thanks", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
@@ -367,10 +367,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Refunded Order - partial (customer_refunded_order, customer-refunded-order.php)
 			array(
-				"name"    => __( "Heading (partial)", "email-control" ), // YES
+				"name"    => __( "Heading (partial)", 'email-control' ), // YES
 				"id"      => "heading_partial",
 				"type"    => "textarea",
-				"default" => __( "You have been partially refunded", "email-control" ),
+				"default" => __( "You have been partially refunded", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
@@ -378,10 +378,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text_partial",
 				"type"    => "textarea",
-				"default" => __( "Your order [ec_order] has been partially refunded. Thanks", "email-control" ),
+				"default" => __( "Your order [ec_order] has been partially refunded. Thanks", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_refunded_order",
@@ -393,10 +393,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Customer Invoice - payment pending (customer_invoice, customer-invoice.php)
 			array(
-				"name"    => __( "Heading (payment pending)", "email-control" ), // YES
+				"name"    => __( "Heading (payment pending)", 'email-control' ), // YES
 				"id"      => "heading_pending",
 				"type"    => "textarea",
-				"default" => __( "Invoice for order #[ec_order show=\"number\"]", "email-control" ),
+				"default" => __( "Invoice for order #[ec_order show=\"number\"]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_invoice",
@@ -404,10 +404,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text_pending",
 				"type"    => "textarea",
-				"default" => __( "Thanks for your order on [ec_site_link].\n\nTo pay for this order please use the following link: [ec_pay_link]", "email-control" ),
+				"default" => __( "Thanks for your order on [ec_site_link].\n\nTo pay for this order please use the following link: [ec_pay_link]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_invoice",
@@ -416,10 +416,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Customer Invoice - payment complete (customer_invoice, customer-invoice.php)
 			array(
-				"name"    => __( "Heading (payment complete)", "email-control" ), // YES
+				"name"    => __( "Heading (payment complete)", 'email-control' ), // YES
 				"id"      => "heading_complete",
 				"type"    => "textarea",
-				"default" => __( "Invoice for order #[ec_order show=\"number\"]", "email-control" ),
+				"default" => __( "Invoice for order #[ec_order show=\"number\"]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_invoice",
@@ -427,7 +427,7 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text_complete",
 				"type"    => "textarea",
 				"default" => "",
@@ -442,7 +442,7 @@ class WC_Email_Theme_Vanilla {
 			
 			// Customer Note (customer_note, customer-note.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
 				"default" => "",
@@ -453,10 +453,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "[ec_customer_note]", "email-control" ),
+				"default" => __( "[ec_customer_note]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_note",
@@ -468,10 +468,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// Reset Password (customer_reset_password, customer-reset-password.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "Password Reset", "email-control" ),
+				"default" => __( "Password Reset", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_reset_password",
@@ -479,10 +479,10 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Someone requested that the password be reset for the following account:\n[ec_user_login]\n\nIf this was a mistake, just ignore this email and nothing will happen.\n\nTo reset your password, visit the following address:\n[ec_reset_password_link]", "email-control" ),
+				"default" => __( "Someone requested that the password be reset for the following account:\n[ec_user_login]\n\nIf this was a mistake, just ignore this email and nothing will happen.\n\nTo reset your password, visit the following address:\n[ec_reset_password_link]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_reset_password",
@@ -494,10 +494,10 @@ class WC_Email_Theme_Vanilla {
 			
 			// New Account (customer_new_account, customer-new-account.php)
 			array(
-				"name"    => __( "Heading", "email-control" ), // YES
+				"name"    => __( "Heading", 'email-control' ), // YES
 				"id"      => "heading",
 				"type"    => "textarea",
-				"default" => __( "Your account has been created", "email-control" ),
+				"default" => __( "Your account has been created", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_new_account",
@@ -505,20 +505,20 @@ class WC_Email_Theme_Vanilla {
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Main Text", "email-control" ), // YES
+				"name"    => __( "Main Text", 'email-control' ), // YES
 				"id"      => "main_text",
 				"type"    => "textarea",
-				"default" => __( "Thanks for creating an account on [ec_site_name].\nYour username is: [ec_user_login].\n\nYou can access your account area to view your orders and change your password here: [ec_account_link]", "email-control" ),
+				"default" => __( "Thanks for creating an account on [ec_site_name].\nYour username is: [ec_user_login].\n\nYou can access your account area to view your orders and change your password here: [ec_account_link]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_new_account",
 				"section" => "text_section",
 			),
 			array(
-				"name"    => __( "Password Regenerated Text", "email-control" ), // YES
+				"name"    => __( "Password Regenerated Text", 'email-control' ), // YES
 				"id"      => "main_text_generate_pass",
 				"type"    => "textarea",
-				"default" => __( "Your password has been automatically generated: [ec_user_password]", "email-control" ),
+				"default" => __( "Your password has been automatically generated: [ec_user_password]", 'email-control' ),
 				"desc"    => "",
 				"tip"     => "",
 				"email-type" => "customer_new_account",
@@ -531,7 +531,7 @@ class WC_Email_Theme_Vanilla {
 			// all
 			
 			array(
-				"name"    => __( "Email Width", "email-control" ), // YES
+				"name"    => __( "Email Width", 'email-control' ), // YES
 				"id"      => "email_width",
 				"type"    => "number",
 				"default" => "660",
@@ -543,7 +543,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Background Color", "email-control" ), // YES
+				"name"    => __( "Background Color", 'email-control' ), // YES
 				"id"      => "background_color",
 				"type"    => "color",
 				"default" => "#f7f7f7",
@@ -555,7 +555,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"       => __( "Text Color", "email-control" ), // YES
+				"name"       => __( "Text Color", 'email-control' ), // YES
 				"id"         => "text_color",
 				"type"       => "color",
 				"default"    => "#858585",
@@ -570,7 +570,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Heading Color", "email-control" ), // YES
+				"name"    => __( "Heading Color", 'email-control' ), // YES
 				"id"      => "heading_color",
 				"type"    => "color",
 				"default" => "#555555",
@@ -582,7 +582,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Text Accent Color", "email-control" ), // YES
+				"name"    => __( "Text Accent Color", 'email-control' ), // YES
 				"id"      => "text_accent_color",
 				"type"    => "color",
 				"default" => "#fd535c",
@@ -594,7 +594,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Main Heading size", "email-control" ), // YES
+				"name"    => __( "Main Heading size", 'email-control' ), // YES
 				"id"      => "heading_1_size",
 				"type"    => "number",
 				"default" => "34",
@@ -606,7 +606,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			$settings[] =array(
-				"name"    => __( "Product Images", "email-control" ),
+				"name"    => __( "Product Images", 'email-control' ),
 				"id"      => "product_thumbnail",
 				"type"    => 'checkbox',
 				"default" => 'yes',
@@ -621,11 +621,11 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Logo", "email-control" ), // YES
+				"name"    => __( "Logo", 'email-control' ), // YES
 				"id"      => "header_logo",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"section" => "header_section",
@@ -636,7 +636,7 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Link 1 Text", "email-control" ), // YES
+				"name"    => __( "Link 1 Text", 'email-control' ), // YES
 				"id"      => "link_1_text",
 				"type"    => "text",
 				"default" => "",
@@ -648,7 +648,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 1 URL", "email-control" ), // YES
+				"name"    => __( "Link 1 URL", 'email-control' ), // YES
 				"id"      => "link_1_url",
 				"type"    => "text",
 				"default" => "",
@@ -660,11 +660,11 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 1 Image", "email-control" ), // YES
+				"name"    => __( "Link 1 Image", 'email-control' ), // YES
 				"id"      => "link_1_image",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"class"   => "ec-condensed",
@@ -674,7 +674,7 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Link 2 Text", "email-control" ),  // YES
+				"name"    => __( "Link 2 Text", 'email-control' ),  // YES
 				"id"      => "link_2_text",
 				"type"    => "text",
 				"default" => "",
@@ -686,7 +686,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 2 URL", "email-control" ),  // YES
+				"name"    => __( "Link 2 URL", 'email-control' ),  // YES
 				"id"      => "link_2_url",
 				"type"    => "text",
 				"default" => "",
@@ -698,11 +698,11 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 2 Image", "email-control" ),  // YES
+				"name"    => __( "Link 2 Image", 'email-control' ),  // YES
 				"id"      => "link_2_image",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"class"   => "ec-condensed",
@@ -712,7 +712,7 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Link 3 Text", "email-control" ),  // YES
+				"name"    => __( "Link 3 Text", 'email-control' ),  // YES
 				"id"      => "link_3_text",
 				"type"    => "text",
 				"default" => "",
@@ -724,7 +724,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 3 URL", "email-control" ),  // YES
+				"name"    => __( "Link 3 URL", 'email-control' ),  // YES
 				"id"      => "link_3_url",
 				"type"    => "text",
 				"default" => "",
@@ -736,11 +736,11 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 3 Image", "email-control" ),  // YES
+				"name"    => __( "Link 3 Image", 'email-control' ),  // YES
 				"id"      => "link_3_image",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"class"   => "ec-condensed",
@@ -750,7 +750,7 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Link 4 Text", "email-control" ),  // YES
+				"name"    => __( "Link 4 Text", 'email-control' ),  // YES
 				"id"      => "link_4_text",
 				"type"    => "text",
 				"default" => "",
@@ -762,7 +762,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 4 URL", "email-control" ),  // YES
+				"name"    => __( "Link 4 URL", 'email-control' ),  // YES
 				"id"      => "link_4_url",
 				"type"    => "text",
 				"default" => "",
@@ -774,11 +774,11 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 4 Image", "email-control" ),  // YES
+				"name"    => __( "Link 4 Image", 'email-control' ),  // YES
 				"id"      => "link_4_image",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"class"   => "ec-condensed",
@@ -788,7 +788,7 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Link 5 Text", "email-control" ),  // YES
+				"name"    => __( "Link 5 Text", 'email-control' ),  // YES
 				"id"      => "link_5_text",
 				"type"    => "text",
 				"default" => "",
@@ -800,7 +800,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 5 URL", "email-control" ),  // YES
+				"name"    => __( "Link 5 URL", 'email-control' ),  // YES
 				"id"      => "link_5_url",
 				"type"    => "text",
 				"default" => "",
@@ -812,11 +812,11 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 5 Image", "email-control" ),  // YES
+				"name"    => __( "Link 5 Image", 'email-control' ),  // YES
 				"id"      => "link_5_image",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"class"   => "ec-condensed",
@@ -826,7 +826,7 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Link 6 Text", "email-control" ),  // YES
+				"name"    => __( "Link 6 Text", 'email-control' ),  // YES
 				"id"      => "link_6_text",
 				"type"    => "text",
 				"default" => "",
@@ -838,7 +838,7 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 6 URL", "email-control" ),  // YES
+				"name"    => __( "Link 6 URL", 'email-control' ),  // YES
 				"id"      => "link_6_url",
 				"type"    => "text",
 				"default" => "",
@@ -850,11 +850,11 @@ class WC_Email_Theme_Vanilla {
 			),
 			
 			array(
-				"name"    => __( "Link 6 Image", "email-control" ),  // YES
+				"name"    => __( "Link 6 Image", 'email-control' ),  // YES
 				"id"      => "link_6_image",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"class"   => "ec-condensed",
@@ -865,18 +865,18 @@ class WC_Email_Theme_Vanilla {
 			
 			
 			array(
-				"name"    => __( "Footer Image", "email-control" ), // YES
+				"name"    => __( "Footer Image", 'email-control' ), // YES
 				"id"      => "footer_image",
 				"type"    => "image_upload",
 				"default" => "",
-				"desc"    => __( "Enter a URL or upload an image", "email-control" ),
+				"desc"    => __( "Enter a URL or upload an image", 'email-control' ),
 				"tip"     => "",
 				"email-type" => "all",
 				"section" => "footer_section",
 			),
 			
 			array(
-				"name"    => __( "Footer Text", "email-control" ), // YES
+				"name"    => __( "Footer Text", 'email-control' ), // YES
 				"id"      => "footer_text",
 				"type"    => "textarea",
 				"default" => "",

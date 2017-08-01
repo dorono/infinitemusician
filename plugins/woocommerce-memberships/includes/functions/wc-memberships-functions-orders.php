@@ -46,12 +46,12 @@ function wc_memberships_get_order_access_granted_memberships( $order ) {
 
 
 /**
- * Check whether an order has granted access to a plan or a user membership
+ * Check whether an order has granted access to a plan or a user membership.
  *
  * @since 1.7.0
- * @param int|\WC_Order $order The order id or object
- * @param array $args An associative array either with an user membership or a membership plan id or object:
- *                    for example: array( 'user_membership' => 123 ) or array( 'membership_plan' => $plan_object )
+ *
+ * @param int|\WC_Order $order the order id or object
+ * @param array $args an associative array either with an user membership or a membership plan id or object: or example: array( 'user_membership' => 123 ) or array( 'membership_plan' => $plan_object )
  * @return bool
  */
 function wc_memberships_has_order_granted_access( $order, $args ) {
@@ -70,7 +70,7 @@ function wc_memberships_has_order_granted_access( $order, $args ) {
 			}
 
 			if ( $user_membership instanceof WC_Memberships_User_Membership ) {
-				$has_granted = isset( $access_granted_memberships[ $user_membership->get_id() ] );
+				$has_granted = array_key_exists( $user_membership->get_id(), $access_granted_memberships );
 			}
 
 		} elseif ( isset( $args['membership_plan'] ) ) {
@@ -91,7 +91,6 @@ function wc_memberships_has_order_granted_access( $order, $args ) {
 					$user_membership = wc_memberships_get_user_membership( $user_membership_id );
 
 					if ( $user_membership && $membership_plan_id === $user_membership->get_plan_id() ) {
-
 						$has_granted = true;
 						break;
 					}
@@ -105,13 +104,13 @@ function wc_memberships_has_order_granted_access( $order, $args ) {
 
 
 /**
- * Set memberships an order granted access to meta
+ * Set memberships an order granted access to meta.
  *
  * @since 1.7.0
  *
- * @param int|\WC_Order $order
- * @param int|\WC_Memberships_User_Membership $user_membership
- * @param array $args Meta value details to save (optional)
+ * @param int|\WC_Order $order the order to set the flag for
+ * @param int|\WC_Memberships_User_Membership $user_membership user membership being granted access from order
+ * @param array $args optional: additional details to record in the same array meta
  */
 function wc_memberships_set_order_access_granted_membership( $order, $user_membership, $args = array() ) {
 
@@ -119,37 +118,34 @@ function wc_memberships_set_order_access_granted_membership( $order, $user_membe
 		$order = wc_get_order( (int) $order );
 	}
 
-	if ( ! $order instanceof WC_Order ) {
-		return;
+	if ( $order instanceof WC_Order ) {
+
+		if ( is_numeric( $user_membership ) ) {
+			$user_membership = wc_memberships_get_user_membership( (int) $user_membership );
+		}
+
+		if ( $user_membership instanceof WC_Memberships_User_Membership ) {
+
+			$user_membership_id = $user_membership->get_id();
+			$meta               = wc_memberships_get_order_access_granted_memberships( $order );
+			$details            = wp_parse_args( $args, array(
+				'already_granted'       => 'yes',
+				'granting_order_status' => $order->get_status(),
+			) );
+
+			$meta[ $user_membership_id ] = $details;
+
+			SV_WC_Order_Compatibility::update_meta_data( $order, '_wc_memberships_access_granted', $meta );
+		}
 	}
-
-	if ( is_numeric( $user_membership ) ) {
-		$user_membership = wc_memberships_get_user_membership( (int) $user_membership );
-	}
-
-	if ( $user_membership instanceof WC_Memberships_User_Membership ) {
-		$user_membership_id = $user_membership->get_id();
-	} else {
-		return;
-	}
-
-	$meta    = wc_memberships_get_order_access_granted_memberships( $order );
-	$details = wp_parse_args( $args, array(
-		'already_granted'       => 'yes',
-		'granting_order_status' => $order->get_status(),
-	) );
-
-	$meta[ $user_membership_id ] = $details;
-
-	SV_WC_Order_Compatibility::update_meta_data( $order, '_wc_memberships_access_granted', $meta );
 }
 
 
 /**
- * Check if purchasing products that grant access to a membership
- * in the same order allow to extend the length of the membership
+ * Check if purchasing products that grant access to a membership in the same order allow to extend the length of the membership.
  *
  * @since 1.6.0
+ *
  * @return bool
  */
 function wc_memberships_cumulative_granting_access_orders_allowed() {

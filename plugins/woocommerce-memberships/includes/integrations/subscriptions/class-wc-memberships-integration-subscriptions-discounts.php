@@ -32,11 +32,14 @@ defined( 'ABSPATH' ) or exit;
 class WC_Memberships_Integration_Subscriptions_Discounts {
 
 
-	/** @var bool Whether to apply discounts to sign up fees (user setting) */
+	/** @var bool whether to apply discounts to sign up fees (user setting) */
 	private $apply_member_discounts_to_sign_up_fees = false;
 
-	/** @var array Memoized discounted sign up fees for caching and to avoid double filtering */
-	private $sign_up_fee = array();
+	/** @var array applied sign up fee discount cache (associative array) */
+	private $discounted_sign_up_fee = array();
+
+	/** @var array compiled subscription products HTML prices (associative array) */
+	private $subscription_product_price_html = array();
 
 
 	/**
@@ -80,7 +83,7 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 			add_filter( 'wc_memberships_get_price_html_before_discount',  array( $this, 'handle_subscription_product_discounted_price_html' ), 10, 3 );
 
 			// make sure that product sign ups are handled according to discount setting
-			add_filter( 'woocommerce_subscriptions_product_sign_up_fee', array( $this, 'maybe_adjust_product_sign_up_fee' ), 1000, 2 );
+			add_filter( 'woocommerce_subscriptions_product_sign_up_fee', array( $this, 'maybe_adjust_product_sign_up_fee' ), 999, 2 );
 		}
 	}
 
@@ -95,47 +98,57 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 	 *
 	 * @since 1.8.0
 	 *
-	 * @param string $html_price The price HTML.
-	 * @param \WC_Product_Subscription|\WC_Product_Variable_Subscription $product A subscription product.
-	 *
+	 * @param string $html_price the price HTML
+	 * @param \WC_Product_Subscription|\WC_Product_Variable_Subscription $product a subscription product
 	 * @return string HTML
 	 */
 	public function get_subscription_product_price_html( $html_price, $product ) {
 
-		// execute only on subscription products that have active member discounts
-		if (      $product->is_type( array( 'subscription', 'variable-subscription', 'subscription_variation' ) )
-		     && ! wc_memberships()->get_member_discounts_instance()->product_is_on_sale_before_discount( $product )
-		     &&   wc_memberships()->get_rules_instance()->product_has_member_discount( $product->get_id() ) ) {
+		$product_id = $product->get_id();
 
-			do_action( 'wc_memberships_discounts_disable_price_adjustments' );
+		if ( isset( $this->subscription_product_price_html[ $product_id ] ) && $product->is_type( 'variable-subscription' ) ) {
 
-			$price_before_discount = $product->get_price();
+			$html_price = $this->subscription_product_price_html[ $product_id ];
 
-			do_action( 'wc_memberships_discounts_enable_price_adjustments' );
+		} else {
 
-			$price_after_discount  = $product->get_price();
+			// execute only on subscription products that have active member discounts
+			if (       $product->is_type( array( 'subscription', 'variable-subscription', 'subscription_variation' ) )
+			      && ! wc_memberships()->get_member_discounts_instance()->product_is_on_sale_before_discount( $product )
+			      &&   wc_memberships()->get_rules_instance()->product_has_member_discount( $product->get_id() ) ) {
 
-			if ( $price_before_discount !== $price_after_discount ) {
+				do_action( 'wc_memberships_discounts_disable_price_adjustments' );
 
-				if ( 'variable-subscription' === $product->get_type() ) {
+				$price_before_discount = $product->get_price();
 
-					// With variable subscription product we need to insert the before price after the "From:" string.
-					$from_text = SV_WC_Product_Compatibility::wc_get_price_html_from_text( $product );
+				do_action( 'wc_memberships_discounts_enable_price_adjustments' );
 
-					if ( SV_WC_Helper::str_starts_with( $html_price, $from_text ) || ( is_rtl() && SV_WC_Helper::str_ends_with( $html_price, $from_text ) ) ) {
+				$price_after_discount  = $product->get_price();
 
-						// Strip the "From: " text from the price HTML string.
-						$html_price = str_replace( $from_text, '', $html_price );
-						// For sanity remove the prices too, before reinserting them.
-						$html_price = str_replace( wc_price( $price_before_discount ), '', $html_price );
-						$html_price = str_replace( wc_price( $price_after_discount ), '', $html_price );
-						// Rebuild the HTML string with the strikethrough discount text.
-						$html_price = $from_text . ' ' . '<del>' . wc_price( $price_before_discount ) . '</del> ' . wc_price( $price_after_discount ) . $html_price;
+				if ( $price_before_discount !== $price_after_discount ) {
+
+					if ( 'variable-subscription' === $product->get_type() ) {
+
+						// with variable subscription product we need to insert the before price after the "From:" string
+						$from_text = SV_WC_Product_Compatibility::wc_get_price_html_from_text( $product );
+
+						if ( SV_WC_Helper::str_starts_with( $html_price, $from_text ) || ( is_rtl() && SV_WC_Helper::str_ends_with( $html_price, $from_text ) ) ) {
+
+							// strip the "From: " text from the price HTML string
+							$html_price = str_replace( $from_text, '', $html_price );
+							// for sanity remove the prices too, before reinserting them
+							$html_price = str_replace( wc_price( $price_before_discount ), '', $html_price );
+							$html_price = str_replace( wc_price( $price_after_discount ), '', $html_price );
+							// rebuild the HTML string with the strikethrough discount text
+							$html_price = $from_text . ' ' . '<del>' . wc_price( $price_before_discount ) . '</del> ' . wc_price( $price_after_discount ) . $html_price;
+						}
+
+					} else {
+
+						$html_price = '<del>' . wc_price( $price_before_discount ) . '</del> ' . $html_price;
 					}
 
-				} else {
-
-					$html_price = '<del>' . wc_price( $price_before_discount ) . '</del> ' . $html_price;
+					$this->subscription_product_price_html[ $product_id ] = $html_price;
 				}
 			}
 		}
@@ -151,10 +164,9 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 	 *
 	 * @since 1.8.0
 	 *
-	 * @param string $price_html The price HTML (before or after memberships discounts).
-	 * @param \WC_Product $product The product, which might be a subscription product.
-	 * @param string $original_price_html The original price HTML.
-	 *
+	 * @param string $price_html the price HTML (before or after memberships discounts)
+	 * @param \WC_Product $product the product, which might be a subscription product
+	 * @param string $original_price_html the original price HTML
 	 * @return string HTML
 	 */
 	public function handle_subscription_product_discounted_price_html( $price_html, $product, $original_price_html ) {
@@ -211,7 +223,6 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 	 * @since 1.6.0
 	 *
 	 * @param $product_settings
-	 *
 	 * @return array
 	 */
 	public function enable_discounts_to_sign_up_fees( $product_settings ) {
@@ -235,29 +246,30 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 	/**
 	 * Maybe filter the sign up fee for handling member discounts.
 	 *
-	 * TODO this method and the approach to discount the sign up fee may require an update since it's not consistent between Subscriptions 2.1.x and 2.2.x: @link https://github.com/Prospress/woocommerce-subscriptions/issues/1987 {FN 2017-04-19}
-	 *
 	 * @internal
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param float|int $sign_up_fee The sign up fee which is probably discounted
-	 * @param \WC_Product_Subscription $subscription_product The subscription product the sign up fee is for
-	 *
+	 * @param float|int $sign_up_fee the sign up fee which is probably discounted
+	 * @param \WC_Product_Subscription $subscription_product the subscription product the sign up fee is for
 	 * @return float|int
 	 */
 	public function maybe_adjust_product_sign_up_fee( $sign_up_fee, $subscription_product ) {
 
-		if ( ! isset( $this->sign_up_fee[ $subscription_product->get_id() ] ) ) {
+		$subscription_product_id = $subscription_product->get_id();
+		$cache_key               = $subscription_product_id . ':' . $sign_up_fee;
 
+		if ( ! isset( $this->discounted_sign_up_fee[ $cache_key ] ) ) {
 			if ( $this->apply_member_discounts_to_sign_up_fees && wc_memberships()->get_member_discounts_instance()->user_has_member_discount( $subscription_product ) ) {
-				$this->sign_up_fee[ $subscription_product->get_id() ] = $sign_up_fee;
+				// this is discounted already as it passed through price filters in WC_Memberships_Member_Discounts
+				$this->discounted_sign_up_fee[ $cache_key ] = $sign_up_fee;
 			} else {
-				$this->sign_up_fee[ $subscription_product->get_id() ] = $this->get_original_sign_up_fee( $sign_up_fee, $subscription_product, get_current_user_id() );
+				// since the sign up comes here already discounted, a workaround is to reverse the discount, based on the discounted price and discount rules that produced such price
+				$this->discounted_sign_up_fee[ $cache_key ] = $this->get_original_sign_up_fee( $sign_up_fee, $subscription_product, get_current_user_id() );
 			}
 		}
 
-		return $this->sign_up_fee[ $subscription_product->get_id() ];
+		return $this->discounted_sign_up_fee[ $cache_key ];
 	}
 
 
@@ -271,75 +283,63 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 	 *
 	 * @since 1.8.1
 	 *
-	 * @param float $discounted_sign_up_fee The discounted sign up fee we need to retrieve the original of
-	 * @param \WC_Product_Subscription $subscription_product The product the sign up fee is for
-	 * @param int $member_id The current logged in user (member) ID
-	 *
+	 * @param float $discounted_sign_up_fee the discounted sign up fee we need to retrieve the original of
+	 * @param \WC_Product_Subscription $subscription_product the product the sign up fee is for
+	 * @param int $member_id the current logged in user (member) ID
 	 * @return int|float
 	 */
 	private function get_original_sign_up_fee( $discounted_sign_up_fee, $subscription_product, $member_id ) {
 
-		if ( $this->apply_member_discounts_to_sign_up_fees ) {
+		$original_sign_up_fee = $discounted_sign_up_fee;
+		$discount_rules       = array();
 
-			$discount_rules = array();
-
-			if ( $subscription_product instanceof WC_Product && $member_id > 0 ) {
-				$discount_rules = wc_memberships()->get_rules_instance()->get_user_product_purchasing_discount_rules( $member_id, $subscription_product->get_id() );
-			}
-
-			if ( ! empty( $discount_rules ) ) {
-
-				/** this filter is documented in includes/class-wc-memberships-member-discounts.php */
-				$cumulative_discounts  = apply_filters( 'wc_memberships_allow_cumulative_member_discounts', true, $member_id, $subscription_product );
-				$original_sign_up_fees = array();
-				$original_sign_up_fee  = 0;
-
-				// find out the discounted price for the current user
-				foreach ( $discount_rules as $rule ) {
-
-					$discount_amount = (float) $rule->get_discount_amount();
-
-					switch ( $rule->get_discount_type() ) {
-
-						case 'percentage':
-							$original_sign_up_fee = 100 * ( $discounted_sign_up_fee / ( 100 - $discount_amount ) );
-						break;
-
-						case 'amount':
-							$original_sign_up_fee = $discounted_sign_up_fee + $discount_amount;
-						break;
-					}
-
-					// Make sure that the lowest price gets applied and doesn't become negative.
-					if ( $original_sign_up_fee > $discounted_sign_up_fee ) {
-						if ( false === $cumulative_discounts ) {
-							$original_sign_up_fee    = max( $original_sign_up_fee, 0 );
-						} else {
-							$original_sign_up_fees[] = max( $original_sign_up_fee, 0 );
-						}
-					}
-				}
-
-				// pick the highest price
-				if ( ! empty( $original_sign_up_fees ) ) {
-					$original_sign_up_fee = max( $original_sign_up_fees );
-				}
-
-				// sanity check
-				if ( $original_sign_up_fee <= $discounted_sign_up_fee ) {
-					$original_sign_up_fee = $discounted_sign_up_fee;
-				}
-
-			} else {
-
-				$original_sign_up_fee = $discounted_sign_up_fee;
-			}
-
-		} else {
-
-			$original_sign_up_fee = $discounted_sign_up_fee;
+		if ( $subscription_product instanceof WC_Product && $member_id > 0 ) {
+			$discount_rules = wc_memberships()->get_rules_instance()->get_user_product_purchasing_discount_rules( $member_id, $subscription_product->get_id() );
 		}
 
+		if ( ! empty( $discount_rules ) ) {
+
+			/** this filter is documented in includes/class-wc-memberships-member-discounts.php */
+			$cumulative_discounts  = apply_filters( 'wc_memberships_allow_cumulative_member_discounts', true, $member_id, $subscription_product );
+			$original_sign_up_fees = array();
+			$original_sign_up_fee  = 0;
+
+			// find out the discounted price for the current user
+			foreach ( $discount_rules as $rule ) {
+
+				$discount_amount = (float) $rule->get_discount_amount();
+
+				switch ( $rule->get_discount_type() ) {
+
+					case 'percentage':
+						$original_sign_up_fee = (float) 100 === $discount_amount ? $original_sign_up_fee : 100 * ( $discounted_sign_up_fee / ( 100 - $discount_amount ) );
+					break;
+
+					case 'amount':
+						$original_sign_up_fee = $discounted_sign_up_fee + $discount_amount;
+					break;
+				}
+
+				// make sure that the lowest price gets applied and doesn't become negative
+				if ( $original_sign_up_fee > $discounted_sign_up_fee ) {
+					if ( false === $cumulative_discounts ) {
+						$original_sign_up_fee    = max( $original_sign_up_fee, 0 );
+					} else {
+						$original_sign_up_fees[] = max( $original_sign_up_fee, 0 );
+					}
+				}
+			}
+
+			// pick the highest price
+			if ( ! empty( $original_sign_up_fees ) ) {
+				$original_sign_up_fee = max( $original_sign_up_fees );
+			}
+
+			// sanity check
+			if ( $original_sign_up_fee <= $discounted_sign_up_fee ) {
+				$original_sign_up_fee = $discounted_sign_up_fee;
+			}
+		}
 
 		return $original_sign_up_fee;
 	}

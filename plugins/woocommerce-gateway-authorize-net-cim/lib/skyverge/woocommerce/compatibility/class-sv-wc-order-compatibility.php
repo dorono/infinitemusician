@@ -282,6 +282,84 @@ class SV_WC_Order_Compatibility extends SV_WC_Data_Compatibility {
 
 
 	/**
+	 * Order item CRUD compatibility method to add a shipping line to an order.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @param \WC_Order $order order object
+	 * @param \WC_Shipping_Rate $shipping_rate shipping rate to add
+	 * @return int the order item ID
+	 */
+	public static function add_shipping( WC_Order $order, $shipping_rate ) {
+
+		if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) {
+
+			$item = new WC_Order_Item_Shipping();
+
+			$item->set_props( array(
+				'method_title' => $shipping_rate->label,
+				'method_id'    => $shipping_rate->id,
+				'total'        => wc_format_decimal( $shipping_rate->cost ),
+				'taxes'        => $shipping_rate->taxes,
+				'order_id'     => $order->get_id(),
+			) );
+
+			foreach ( $shipping_rate->get_meta_data() as $key => $value ) {
+				$item->add_meta_data( $key, $value, true );
+			}
+
+			$item->save();
+
+			$order->add_item( $item );
+
+			return $item->get_id();
+
+		} else {
+
+			return $order->add_shipping( $shipping_rate );
+		}
+	}
+
+
+	/**
+	 * Order item CRUD compatibility method to add a tax line to an order.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @param \WC_Order $order order object
+	 * @param int $tax_rate_id tax rate ID
+	 * @param float $tax_amount cart tax amount
+	 * @param float $shipping_tax_amount shipping tax amount
+	 * @return int order item ID
+	 */
+	public static function add_tax( WC_Order $order, $tax_rate_id, $tax_amount = 0, $shipping_tax_amount = 0 ) {
+
+		if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) {
+
+			$item = new WC_Order_Item_Tax();
+
+			$item->set_props( array(
+				'rate_id'            => $tax_rate_id,
+				'tax_total'          => $tax_amount,
+				'shipping_tax_total' => $shipping_tax_amount,
+			) );
+
+			$item->set_rate( $tax_rate_id );
+			$item->set_order_id( $order->get_id() );
+			$item->save();
+
+			$order->add_item( $item );
+
+			return $item->get_id();
+
+		} else {
+
+			return $order->add_tax( $tax_rate_id, $tax_amount, $shipping_tax_amount );
+		}
+	}
+
+
+	/**
 	 * Order item CRUD compatibility method to update an order coupon.
 	 *
 	 * @since 4.6.0
@@ -429,6 +507,44 @@ class SV_WC_Order_Compatibility extends SV_WC_Data_Compatibility {
 	public static function has_shipping_address( WC_Order $order ) {
 
 		return self::get_prop( $order, 'shipping_address_1' ) || self::get_prop( $order, 'shipping_address_2' );
+	}
+
+
+	/**
+	 * Gets the formatted meta data for an order item.
+	 *
+	 * @since 4.6.5
+	 *
+	 * @param \WC_Order_Item|array $item order item object or array
+	 * @param string $hideprefix prefix for meta that is considered hidden
+	 * @param bool $include_all whether to include all meta (attributes, etc...), or just custom fields
+	 * @return array $item_meta {
+	 *     @type string $label meta field label
+	 *     @type mixed  $value meta value
+ 	 * }
+	 */
+	public static function get_item_formatted_meta_data( $item, $hideprefix = '_', $include_all = false ) {
+
+		if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_1() && $item instanceof WC_Order_Item ) {
+
+			$meta_data = $item->get_formatted_meta_data( $hideprefix, $include_all );
+			$item_meta = array();
+
+			foreach ( $meta_data as $meta ) {
+
+				$item_meta[] = array(
+					'label' => $meta->display_key,
+					'value' => $meta->value,
+				);
+			}
+
+		} else {
+
+			$item_meta = new WC_Order_Item_Meta( $item );
+			$item_meta = $item_meta->get_formatted( $hideprefix );
+		}
+
+		return $item_meta;
 	}
 
 

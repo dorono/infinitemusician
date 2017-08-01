@@ -817,14 +817,14 @@ class EC_Shortcodes {
 			$order_id = ec_order_get_id( $order );
 			
 			// Get Delivery Note.
-			$ec_email_args['delivery_note'] = $order->customer_note; // "The blue house at the end of the street".
+			$ec_email_args['delivery_note'] = ec_order_get_customer_note( $order ); // "The blue house at the end of the street".
 			
 			// Get Shipping Method.
 			if ( 'yes' == get_option( 'woocommerce_calc_shipping' ) )
 				$ec_email_args['shipping_method'] = $order->get_shipping_method(); // "Free Shipping".
 			
 			// Get Payment Method.
-			$ec_email_args['payment_method'] = $order->payment_method_title; // "Paypal".
+			$ec_email_args['payment_method'] = ec_order_get_payment_method_title( $order ); // "Paypal".
 			
 			// Get Coupon Names.
 			if ( $order->get_used_coupons() ) {

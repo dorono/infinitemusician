@@ -830,4 +830,15 @@ class WC_Authorize_Net_CIM_API extends SV_WC_API_Base implements SV_WC_Payment_G
 	}
 
 
+	/**
+	 * Determine if TLS v1.2 is required for API requests.
+	 *
+	 * @since 2.6.4
+	 * @return bool
+	 */
+	public function require_tls_1_2() {
+		return true;
+	}
+
+
 }

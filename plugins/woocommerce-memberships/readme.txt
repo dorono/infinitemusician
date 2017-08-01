@@ -2,9 +2,9 @@
 Author: woothemes, skyverge
 Tags: woocommerce
 Requires at least: 4.4
-Tested up to: 4.7.5
-Requires WooCommerce at least: 2.5.5
-Tested WooCommerce up to: 3.0.7
+Tested up to: 4.8
+WC requires at least: 2.5.5
+WC tested up to: 3.1.1
 
 See https://docs.woocommerce.com/document/woocommerce-memberships/ for full documentation.
 
