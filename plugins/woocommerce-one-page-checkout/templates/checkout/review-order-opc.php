@@ -8,10 +8,12 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-
 ?>
+
+<?php if ( ! is_ajax() ) : ?>
 <div class="opc_order_review">
 	<input type="hidden" name="is_opc" value="1" />
+<?php endif; ?>
 	<table class="shop_table woocommerce-checkout-review-order-table">
 		<thead>
 			<tr>
@@ -31,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 					if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters( 'woocommerce_checkout_cart_item_visible', true, $cart_item, $cart_item_key ) ) {
 						?>
-						<tr class="<?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item opc_cart_item', $cart_item, $cart_item_key ) ); ?>" data-add_to_cart="<?php echo $_product->variation_id ? $_product->variation_id : $_product->id; ?>" data-update_key="<?php echo $cart_item_key; ?>">
+						<tr class="<?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item opc_cart_item', $cart_item, $cart_item_key ) ); ?>" data-add_to_cart="<?php echo $_product->get_id(); ?>" data-update_key="<?php echo $cart_item_key; ?>">
 							<td class="product-name">
 								<div class="product-remove" >
 									<?php echo apply_filters( 'woocommerce_cart_item_remove_link', sprintf( '<a href="%s" class="remove" title="%s">&times;</a>', esc_url( WC()->cart->get_remove_url( $cart_item_key ) ), __( 'Remove this item', 'wcopc' ) ), $cart_item_key ); ?>
@@ -126,4 +128,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		</tfoot>
 	</table>
-</div>
+<?php if ( ! is_ajax() ) : ?></div><?php endif; ?>

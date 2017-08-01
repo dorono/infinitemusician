@@ -2,10 +2,10 @@
 Theme Name:       Homestore
 Theme URI:        https://www.woocommerce.com/products/homestore/
 Description:      A storefront child theme for webshops selling homeware goods.
-Author:           WooThemes
+Author:           WooCommerce
 Author URI:       https://woocommerce.com
 Template:         storefront
-Version:          2.0.10
+Version:          2.0.20
 License:          GNU General Public License v2 or later
 License URI:      http://www.gnu.org/licenses/gpl-2.0.html
 Tags:             light, dark, two-columns, right-sidebar, left-sidebar, responsive-layout, accessibility-ready
@@ -309,7 +309,6 @@ table {
 
 		th {
 			font-weight: 600;
-			display: none;
 		}
 
 	}
@@ -391,10 +390,6 @@ table.cart {
 
 	font-size: 1.05em;
 
-	thead {
-		display: none;
-	}
-
 	.qty {
 		padding-left: 0.15em;
 		padding-right: 0.15em;
@@ -411,10 +406,7 @@ table.cart {
 
 	margin-bottom: $section_sep;
 	background-size: cover;
-
-	body:not(.sd-header-sticky) & {
-		position: relative;
-	}
+	position: relative;
 
 	body.page-template-template-homepage & {
 		margin-bottom: 28px;
@@ -437,6 +429,7 @@ table.cart {
 
 .site-header {
 
+	border-bottom: none;
 	padding-top: 0;
 
 	.hs-primary-navigation {
@@ -457,7 +450,8 @@ table.cart {
 		margin-right: 0;
 		width: 100%;
 
-		h1 a {
+		h1 a,
+		.site-title a {
 			font-family: $headings;
 			letter-spacing: -0.05em;
 			font-size: 2em;
@@ -490,6 +484,16 @@ table.cart {
 
 }
 
+body.sd-header-sticky,
+body.sp-header-sticky {
+	#masthead {
+		position: fixed;
+	}
+
+	.site-content {
+		padding-top: 2em;
+	}
+}
 
 /* Header / search
 -------------------------------------------------------------- */
@@ -613,9 +617,9 @@ table.cart {
 }
 
 .site-header .site-branding,
-.site-header .site-logo-anchor,
-.site-header .site-logo-link,
-.site-header .custom-logo-link {
+.site-header .col-full > .site-logo-anchor,
+.site-header .col-full > .site-logo-link,
+.site-header .col-full > .custom-logo-link {
 	padding: 3em 0;
 	margin-bottom: 0;
 }
@@ -736,6 +740,24 @@ table.cart {
 /* Product lists
 -------------------------------------------------------------- */
 
+.page-template-template-homepage-php {
+	.site-main {
+		.columns-5 {
+			ul.products {
+				li.product.product-category {
+					margin-top: 0;
+				}
+			}
+		}
+
+		> .type-page {
+			margin-left: 0 !important;
+			width: auto !important;
+			border: 0 !important;
+		}
+	}
+}
+
 ul.products {
 
 	$vsep: 1.35*$vsep; // Original value multiplier
@@ -817,7 +839,6 @@ ul.products {
 	li.product.product-category {
 
 		position: relative;
-		overflow: hidden;
 
 		img {
 			margin: 0;
@@ -826,7 +847,9 @@ ul.products {
 			height: auto;
 		}
 
-		h3 {
+		h3,
+		h2,
+		.woocommerce-loop-category__title {
 			position: absolute;
 			background: rgba(white, 0.95);
 			padding: 1em 1em;
@@ -899,7 +922,7 @@ ul.products {
 	display: inline-block;
 	font-weight: 500;
 	background: $bgcolor;
-	padding: 0 0.9em;
+	padding: 0 65px 0 17px;
 	font-size: 1.1em;
 	height: $size;
 	line-height: $size;
@@ -910,7 +933,6 @@ ul.products {
 	clear: both;
 
 	&:after {
-		transform: scaleX(0.9);
 		transform-origin: center left;
 		display: block;
 		position: absolute;
@@ -919,9 +941,9 @@ ul.products {
 		height: 0;
 		border-style: solid;
 		border-width: $size $size 0 0;
-		border-color: $bgcolor transparent transparent transparent;
+		border-color: transparent $white $white $white;
 		top: 0;
-		right: -$size;
+		right: 0;
 	}
 
 }
@@ -942,6 +964,16 @@ ul.products {
 
 .storefront-blog .section-title {
 	float: left;
+}
+
+/* Storefront Powerpack
+-------------------------------------------------------------- */
+.sp-header-active {
+	.site-header {
+		.site-branding {
+			max-width: none;
+		}
+	}
 }
 
 /* Product hero
@@ -1600,7 +1632,7 @@ ul.homestore-section-tabs {
 
 			p.meta {
 
-				margin: 0.7em 0;
+				margin: 0 0 .7em;
 				font-size: 1em;
 				color: darken($gray, 18%);
 
@@ -2078,6 +2110,7 @@ p.stars a:after,
 	ul.page-numbers {
 
 		li {
+			margin-left: .236em;
 
 			.page-numbers {
 
@@ -2547,8 +2580,11 @@ ul.products li.product .star-rating {
 	margin-bottom: 0;
 }
 
-.page-template-template-homepage .site-main {
-	padding-top: 0;
+.page-template-template-homepage {
+	&:not(.has-post-thumbnail) .site-main,
+	.site-main {
+		padding-top: 0;
+	}
 }
 
 .form-row.woocommerce-invalid input.input-text {
@@ -2636,7 +2672,8 @@ a.more-link {
 
 		font-size: 1.05em;
 
-		&.sd-header-sticky #page {
+		&.sd-header-sticky #page,
+		&.sp-header-sticky #page {
 			padding-top: 0 !important;
 		}
 
@@ -2668,9 +2705,9 @@ a.more-link {
 		}
 
 		.site-branding,
-		.site-logo-anchor,
-		.site-logo-link,
-		.custom-logo-link {
+		.col-full > .site-logo-anchor,
+		.col-full > .site-logo-link,
+		.col-full > .custom-logo-link {
 			padding: 1.75em 0;
 		}
 
@@ -2912,10 +2949,15 @@ a.more-link {
 	}
 
 	#order_review .shop_table {
-		margin-bottom: 0;
+		padding-top: 0;
+
 		+ .woocommerce-checkout-payment {
 			border-top: none;
 		}
+	}
+
+	#ship-to-different-address label {
+		font-weight: 600;
 	}
 
 	.hs-header-bar,
@@ -2992,6 +3034,29 @@ a.more-link {
 
 		}
 
+	}
+
+	.sp-header-active.woocommerce-active {
+		.site-header {
+			.site-header-cart {
+				position: static;
+				transform: none;
+				margin-top: 0;
+				padding-top: 0;
+				width: auto;
+				top: 0;
+				right: 0;
+
+				.cart-contents {
+					.count {
+						position: absolute;
+						top: 0;
+						right: 0;
+						margin: 0;
+					}
+				}
+			}
+		}
 	}
 
 	.woocommerce-active.storefront-2x .site-header .site-header-cart .cart-contents:after {
@@ -3148,20 +3213,29 @@ a.more-link {
 
 	}
 
-	.homestore-homepage-menu {
+	.page-template-template-homepage {
 
-		float: left;
+		.homestore-homepage-menu {
 
-		width: $sidebar_width;
-
-		+ .homestore-homepage-content {
-
-			width: $content_width;
-			margin-left: $margin;
 			float: left;
 
-			> .entry-content > .sprh-hero:first-child {
-				margin-top: -1.85em;
+			width: $sidebar_width;
+
+			+ .homestore-homepage-content {
+
+				width: $content_width;
+				margin-left: $margin;
+				float: left;
+
+				> .entry-content > .sprh-hero:first-child {
+					margin-top: -1.85em;
+				}
+
+				.entry-header,
+				.entry-content {
+					text-align: left;
+				}
+
 			}
 
 		}

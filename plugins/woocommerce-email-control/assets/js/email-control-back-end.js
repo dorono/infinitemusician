@@ -472,7 +472,7 @@
 			if (confirm_result) {
 				jQuery('#theme-commit').css({display:"none"});
 
-				save_option ( "ec_template", jQuery('#ec_email_theme_preview').val() /*, function() { reload_preview(); }*/ );
+				save_option ( 'ec_template', jQuery('#ec_email_theme_preview').val() /*, function() { reload_preview(); }*/ );
 
 				jQuery('#ec_email_theme_active').val( jQuery('#ec_email_theme').val() );
 				jQuery('#ec_email_theme_preview').val("");

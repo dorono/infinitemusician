@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
  * @category  Admin
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -33,10 +33,6 @@ defined( 'ABSPATH' ) or exit;
 class WC_Memberships_Meta_Box_Post_Memberships_Data extends WC_Memberships_Meta_Box {
 
 
-	/** @var string meta box id **/
-	protected $id = 'wc-memberships-post-memberships-data';
-
-
 	/**
 	 * Constructor
 	 *
@@ -44,6 +40,7 @@ class WC_Memberships_Meta_Box_Post_Memberships_Data extends WC_Memberships_Meta_
 	 */
 	public function __construct() {
 
+		$this->id      = 'wc-memberships-post-memberships-data';
 		$this->screens = array_keys( wc_memberships()->get_admin_instance()->get_valid_post_types_for_content_restriction() );
 
 		parent::__construct();
@@ -62,69 +59,59 @@ class WC_Memberships_Meta_Box_Post_Memberships_Data extends WC_Memberships_Meta_
 
 
 	/**
+	 * Get content restriction rules
+	 *
+	 * @internal
+	 *
+	 * @since 1.7.0
+	 * @return \WC_Memberships_Membership_Plan_Rule[] Array of plan rules
+	 */
+	public function get_content_restriction_rules() {
+
+		$content_restriction_rules = array();
+
+		if ( $this->post instanceof WP_Post ) {
+
+			// get applied restriction rules to pass to HTML view
+			$content_restriction_rules = (array) wc_memberships()->get_rules_instance()->get_rules( array(
+				'rule_type'         => 'content_restriction',
+				'object_id'         => $this->post->ID,
+				'content_type'      => 'post_type',
+				'content_type_name' => $this->post->post_type,
+				'exclude_inherited' => false,
+				'plan_status'       => 'any',
+			) );
+
+			$membership_plan_options = array_keys( $this->get_membership_plan_options() );
+			$membership_plan_id      = array_shift( $membership_plan_options );
+
+			// add empty option to create a HTML template for new rules
+			$content_restriction_rules['__INDEX__'] = new WC_Memberships_Membership_Plan_Rule( array(
+				'rule_type'          => 'content_restriction',
+				'object_ids'         => array( $this->post->ID ),
+				'id'                 => '',
+				'membership_plan_id' => $membership_plan_id,
+				'access_schedule'    => 'immediate',
+				'access_type'        => '',
+			) );
+		}
+
+		return $content_restriction_rules;
+	}
+
+
+	/**
 	 * Display the restrictions meta box
 	 *
-	 * @param WP_Post $post
+	 * @param \WP_Post $post
 	 * @since 1.0.0
 	 */
 	public function output( WP_Post $post ) {
 
-		// Prepare membership plan options
-		$membership_plan_options = array();
-		$membership_plans = wc_memberships_get_membership_plans( array(
-			'post_status' => array( 'publish', 'private', 'future', 'draft', 'pending', 'trash' )
-		) );
-
-		if ( ! empty( $membership_plans ) ) {
-
-			foreach ( $membership_plans as $membership_plan ) {
-
-				$state = '';
-
-				if ( 'publish' != $membership_plan->post->post_status ) {
-					$state = ' ' . __( '(inactive)', 'woocommerce-memberships' );
-				}
-
-				$membership_plan_options[ $membership_plan->get_id() ] = $membership_plan->get_name() . $state;
-			}
-		}
-
-		// Prepare period options
-		$access_schedule_period_toggler_options = array(
-			'immediate' => __( 'immediately', 'woocommerce-memberships' ),
-			'specific'  => __( 'specify a time', 'woocommerce-memberships' ),
-		);
-
-		$period_options = array(
-			'days'      => __( 'day(s)', 'woocommerce-memberships' ),
-			'weeks'     => __( 'week(s)', 'woocommerce-memberships' ),
-			'months'    => __( 'month(s)', 'woocommerce-memberships' ),
-			'years'     => __( 'year(s)', 'woocommerce-memberships' ),
-		);
-
-		// Get applied restriction rules
-		$content_restriction_rules = wc_memberships()->get_rules_instance()->get_rules( array(
-			'rule_type'         => 'content_restriction',
-			'object_id'         => $post->ID,
-			'content_type'      => 'post_type',
-			'content_type_name' => $post->post_type,
-			'exclude_inherited' => false,
-			'plan_status'       => 'any',
-		) );
-
-		// Add empty option to create a HTML template for new rules
-		$membership_plan_ids = array_keys( $membership_plan_options );
-		$content_restriction_rules['__INDEX__'] = new WC_Memberships_Membership_Plan_Rule( array(
-			'rule_type'          => 'content_restriction',
-			'object_ids'         => array( $post->ID ),
-			'id'                 => '',
-			'membership_plan_id' => array_shift( $membership_plan_ids ),
-			'access_schedule'    => 'immediate',
-			'access_type'        => '',
-		) );
+		$this->post = $post;
 
 		?>
-		<h4><?php esc_html_e( 'Content Restriction' ); ?></h4>
+		<h4><?php esc_html_e( 'Content Restriction', 'woocommerce-memberships' ); ?></h4>
 
 		<?php woocommerce_wp_checkbox( array(
 			'id'          => '_wc_memberships_force_public',
@@ -133,17 +120,27 @@ class WC_Memberships_Meta_Box_Post_Memberships_Data extends WC_Memberships_Meta_
 			'description' => __( 'Check this box if you want to force the content to be public regardless of any restriction rules that may apply now or in the future.', 'woocommerce-memberships' ),
 		) ); ?>
 
-		<div class="js-restrictions <?php if ( get_post_meta( $post->ID, '_wc_memberships_force_public', true ) == 'yes' ) : ?>hide<?php endif; ?>">
+		<div class="js-restrictions <?php if ( 'yes' === wc_memberships_get_content_meta( $post, '_wc_memberships_force_public', true ) ) : ?>hide<?php endif; ?>">
+			<?php
 
-			<?php require( wc_memberships()->get_plugin_path() . '/includes/admin/meta-boxes/views/html-content-restriction-rules.php' ); ?>
+			// load content restriction rules view
+			require( wc_memberships()->get_plugin_path() . '/includes/admin/meta-boxes/views/class-wc-memberships-meta-box-view-content-restriction-rules.php' );
 
-			<?php if ( ! empty( $membership_plans ) ) : ?>
-				<p>
-					<em><?php esc_html_e( 'Need to add or edit a plan?', 'woocommerce-memberships' ); ?></em> <a target="_blank" href="<?php echo esc_url( admin_url( 'edit.php?post_type=wc_membership_plan' ) ); ?>"><?php esc_html_e( 'Manage Membership Plans', 'woocommerce-memberships' ); ?></a>
-				</p>
-			<?php endif; ?>
+			// output content restriction rules view
+			$view = new WC_Memberships_Meta_Box_View_Content_Restriction_Rules( $this );
+			$view->output();
 
-			<h4><?php esc_html_e( 'Custom Restriction Message' ); ?></h4>
+			$membership_plans = $this->get_available_membership_plans();
+
+			if ( ! empty( $membership_plans ) ) :
+
+				?><p><em><?php esc_html_e( 'Need to add or edit a plan?', 'woocommerce-memberships' ); ?></em> <a target="_blank" href="<?php echo esc_url( admin_url( 'edit.php?post_type=wc_membership_plan' ) ); ?>"><?php esc_html_e( 'Manage Membership Plans', 'woocommerce-memberships' ); ?></a></p><?php
+
+			endif;
+
+			?>
+
+			<h4><?php esc_html_e( 'Custom Restriction Message', 'woocommerce-memberships' ); ?></h4>
 
 			<?php woocommerce_wp_checkbox( array(
 				'id'          => '_wc_memberships_use_custom_content_restricted_message',
@@ -152,27 +149,26 @@ class WC_Memberships_Meta_Box_Post_Memberships_Data extends WC_Memberships_Meta_
 				'description' => __( 'Check this box if you want to customize the content restricted message for this content.', 'woocommerce-memberships' ),
 			) ); ?>
 
-			<div class="js-custom-message-editor-container <?php if ( get_post_meta( $post->ID, '_wc_memberships_use_custom_content_restricted_message', true ) !== 'yes' ) : ?>hide<?php endif; ?>">
-				<?php $message = get_post_meta( $post->ID, '_wc_memberships_content_restricted_message', true ); ?>
+			<div class="js-custom-message-editor-container <?php if ( wc_memberships_get_content_meta( $post->ID, '_wc_memberships_use_custom_content_restricted_message', true ) !== 'yes' ) : ?>hide<?php endif; ?>">
+				<?php $message = wc_memberships_get_content_meta( $post->ID, '_wc_memberships_content_restricted_message', true ); ?>
 				<p>
-					<?php
-						printf( /* translators: %1$s and %2$s placeholders are meant for {products} and {login_url} merge tags */
-							__( '<code>%1$s</code> automatically inserts the product(s) needed to gain access. <code>%2$s</code> inserts the URL to my account page. HTML is allowed.', 'woocommerce-memberships' ),
-							'{products}',
-							'{login_url}'
-						);
-					?>
+					<?php /* translators: %1$s and %2$s placeholders are meant for {products} and {login_url} merge tags */
+					printf( __( '%1$s automatically inserts the product(s) needed to gain access. %2$s inserts the URL to my account page. HTML is allowed.', 'woocommerce-memberships' ),
+						'<strong><code>{products}</code></strong>',
+						'<strong><code>{login_url}</code></strong>'
+					); ?>
 				</p>
 				<?php
-					wp_editor( $message, '_wc_memberships_content_restricted_message', array(
-						'textarea_rows' => 5,
-						'teeny'         => true,
-					) );
+
+				wp_editor( $message, '_wc_memberships_content_restricted_message', array(
+					'textarea_rows' => 5,
+					'teeny'         => true,
+				) );
+
 				?>
 			</div>
 
 		</div>
-
 		<?php
 	}
 
@@ -192,7 +188,7 @@ class WC_Memberships_Meta_Box_Post_Memberships_Data extends WC_Memberships_Meta_
 		$admin->update_rules( $post_id, array( 'content_restriction' ), 'post' );
 		$admin->update_custom_message( $post_id, array( 'content_restricted' ) );
 
-		update_post_meta( $post_id, '_wc_memberships_force_public', isset( $_POST[ '_wc_memberships_force_public' ] ) ? 'yes' : 'no' );
+		wc_memberships_set_content_meta(  $post_id, '_wc_memberships_force_public', isset( $_POST[ '_wc_memberships_force_public' ] ) ? 'yes' : 'no' );
 	}
 
 

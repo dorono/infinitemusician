@@ -34,30 +34,10 @@
   .woocommerce-page .no_shipping_address .note-form {
     margin-bottom: 1.618em;
     padding-top: 1em; }
-  .woocommerce-page .ship_address .gift-form label:after,
-  .woocommerce-page .no_shipping_address .gift-form label:after {
-    display: inline-block;
-    font: normal normal normal 1em / 1 FontAwesome;
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    content: "\f06b";
-    margin-left: 0.5407911001em; }
   .woocommerce-page .ship_address .modify-address-button,
   .woocommerce-page .no_shipping_address .modify-address-button {
     display: block;
     margin-top: 1em; }
-    .woocommerce-page .ship_address .modify-address-button:before,
-    .woocommerce-page .no_shipping_address .modify-address-button:before {
-      display: inline-block;
-      font: normal normal normal 1em / 1 FontAwesome;
-      font-size: inherit;
-      text-rendering: auto;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      content: "\f044";
-      margin-right: 0.5407911001em; }
 
 .woocommerce-page .addresses {
   clear: both; }
@@ -78,8 +58,6 @@
       position: static; }
       .woocommerce-page .addresses .address-block .buttons .button {
         width: auto; }
-  .woocommerce-page .addresses + .addresses header.title a:before {
-    content: "\f067"; }
 
 .woocommerce-page.page-template-template-fullwidth-php .ship_address,
 .woocommerce-page.page-template-template-fullwidth-php .no_shipping_address {

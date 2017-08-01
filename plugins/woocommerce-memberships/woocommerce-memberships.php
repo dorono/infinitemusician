@@ -1,22 +1,22 @@
 <?php
 /**
  * Plugin Name: WooCommerce Memberships
- * Plugin URI: http://www.woothemes.com/products/woocommerce-memberships/
+ * Plugin URI: https://www.woocommerce.com/products/woocommerce-memberships/
  * Description: Sell memberships that provide access to restricted content, products, discounts, and more!
- * Author: WooThemes / SkyVerge
- * Author URI: http://www.woothemes.com/
- * Version: 1.6.4
+ * Author: SkyVerge
+ * Author URI: https://www.woocommerce.com/
+ * Version: 1.8.5
  * Text Domain: woocommerce-memberships
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2014-2016 SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2014-2017 SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
  * @package   Memberships
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -40,11 +40,14 @@ if ( ! class_exists( 'SV_WC_Framework_Bootstrap' ) ) {
 	require_once( plugin_dir_path( __FILE__ ) . 'lib/skyverge/woocommerce/class-sv-wc-framework-bootstrap.php' );
 }
 
-SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.4.0', __( 'WooCommerce Memberships', 'woocommerce-memberships' ), __FILE__, 'init_woocommerce_memberships', array(
-	'minimum_wc_version'   => '2.4.13',
-	'minimum_wp_version'   => '4.1',
+SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.6.3', __( 'WooCommerce Memberships', 'woocommerce-memberships' ), __FILE__, 'init_woocommerce_memberships', array(
+	'minimum_wc_version'   => '2.5.5',
+	'minimum_wp_version'   => '4.4',
 	'backwards_compatible' => '4.4.0',
 ) );
+
+// Required Action Scheduler library
+require_once( plugin_dir_path( __FILE__ ) . 'lib/prospress/action-scheduler/action-scheduler.php' );
 
 function init_woocommerce_memberships() {
 
@@ -58,16 +61,13 @@ class WC_Memberships extends SV_WC_Plugin {
 
 
 	/** plugin version number */
-	const VERSION = '1.6.4';
+	const VERSION = '1.8.5';
 
 	/** @var WC_Memberships single instance of this plugin */
 	protected static $instance;
 
 	/** plugin id */
 	const PLUGIN_ID = 'memberships';
-
-	/** plugin text domain, DEPRECATED as of 1.5.0 */
-	const TEXT_DOMAIN = 'woocommerce-memberships';
 
 	/** @var \WC_Memberships_Admin instance */
 	protected $admin;
@@ -107,7 +107,6 @@ class WC_Memberships extends SV_WC_Plugin {
 	 * Initializes the plugin
 	 *
 	 * @since 1.0.0
-	 * @return \WC_Memberships
 	 */
 	public function __construct() {
 
@@ -115,7 +114,11 @@ class WC_Memberships extends SV_WC_Plugin {
 			self::PLUGIN_ID,
 			self::VERSION,
 			array(
-				'dependencies' => array( 'mbstring' ),
+				'text_domain'        => 'woocommerce-memberships',
+				'display_php_notice' => true,
+				'dependencies'       => array(
+					'mbstring',
+				),
 			)
 		);
 
@@ -126,13 +129,8 @@ class WC_Memberships extends SV_WC_Plugin {
 		add_action( 'init', array( $this, 'init' ) );
 
 		// make sure template files are searched for in our plugin
-		// TODO since this seems to affect front end templates only, why not move into front end class? {FN 2016-04-26}
 		add_filter( 'woocommerce_locate_template',      array( $this, 'locate_template' ), 20, 3 );
 		add_filter( 'woocommerce_locate_core_template', array( $this, 'locate_template' ), 20, 3 );
-
-		// TODO move these methods out of the main class {FN 2016-04-26}
-		add_action( 'woocommerce_order_status_completed',  array( $this, 'grant_membership_access' ), 11 );
-		add_action( 'woocommerce_order_status_processing', array( $this, 'grant_membership_access' ), 11 );
 
 		// lifecycle
 		add_action( 'admin_init', array ( $this, 'maybe_activate' ) );
@@ -150,10 +148,8 @@ class WC_Memberships extends SV_WC_Plugin {
 		// load post types
 		require_once( $this->get_plugin_path() . '/includes/class-wc-memberships-post-types.php' );
 
-		// global helper functions
-		require_once( $this->get_plugin_path() . '/includes/wc-memberships-functions.php' );
-		require_once( $this->get_plugin_path() . '/includes/wc-memberships-membership-plan-functions.php' );
-		require_once( $this->get_plugin_path() . '/includes/wc-memberships-user-membership-functions.php' );
+		// load helper functions
+		require_once( $this->get_plugin_path() . '/includes/functions/wc-memberships-functions.php' );
 
 		// init general classes
 		$this->query            = $this->load_class( '/includes/class-wc-memberships-query.php',            'WC_Memberships_Query' );
@@ -181,6 +177,11 @@ class WC_Memberships extends SV_WC_Plugin {
 
 		// load integrations
 		$this->integrations = $this->load_class( '/includes/integrations/class-wc-memberships-integrations.php', 'WC_Memberships_Integrations' );
+
+		// WP CLI support
+		if ( defined( 'WP_CLI' ) && WP_CLI && version_compare( PHP_VERSION, '5.3.0', '>=' ) ) {
+			include_once $this->get_plugin_path() . '/includes/class-wc-memberships-cli.php';
+		}
 	}
 
 
@@ -214,9 +215,6 @@ class WC_Memberships extends SV_WC_Plugin {
 	 * @since 1.0.0
 	 */
 	private function frontend_includes() {
-
-		// helper functions
-		require_once( $this->get_plugin_path() . '/includes/wc-memberships-template-functions.php' );
 
 		// init shortcodes
 		require_once( $this->get_plugin_path() . '/includes/class-wc-memberships-shortcodes.php' );
@@ -353,23 +351,15 @@ class WC_Memberships extends SV_WC_Plugin {
 	 * @since 1.0.0
 	 */
 	public function init() {
+
 		WC_Memberships_Post_Types::initialize();
 	}
 
 
 	/**
-	 * Load plugin text domain.
-	 *
-	 * @since 1.0.0
-	 * @see \SV_WC_Plugin::load_translation()
-	 */
-	public function load_translation() {
-		load_plugin_textdomain( 'woocommerce-memberships', false, dirname( plugin_basename( $this->get_file() ) ) . '/i18n/languages' );
-	}
-
-
-	/**
 	 * Locates the WooCommerce template files from our templates directory
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param string $template Already found template
@@ -418,7 +408,7 @@ class WC_Memberships extends SV_WC_Plugin {
 			$this->get_admin_notice_handler()->add_admin_notice(
 				/* translators: the %s placeholders are meant for pairs of opening <a> and closing </a> link tags */
 				sprintf( __( 'Thanks for installing Memberships! To get started, take a minute to %1$sread the documentation%2$s and then %3$ssetup a membership plan%4$s :)', 'woocommerce-memberships' ),
-					'<a href="http://docs.woothemes.com/document/woocommerce-memberships/" target="_blank">',
+					'<a href="https://docs.woocommerce.com/document/woocommerce-memberships/" target="_blank">',
 					'</a>',
 					'<a href="' . admin_url( 'edit.php?post_type=wc_membership_plan' ) . '">',
 					'</a>' ),
@@ -426,29 +416,6 @@ class WC_Memberships extends SV_WC_Plugin {
 				array( 'always_show_on_settings' => false, 'notice_class' => 'updated' )
 			);
 		}
-	}
-
-
-	/**
-	 * Return a list of edit post links for the provided posts
-	 *
-	 * @since 1.1.0
-	 * @param \WP_Post[] $posts Array of post objects
-	 * @return string
-	 */
-	public function admin_list_post_links( $posts ) {
-
-		if ( empty( $posts ) ) {
-			return '';
-		}
-
-		$items = array();
-
-		foreach ( $posts as $post ) {
-			$items[] = '<a href="' . get_edit_post_link( $post->ID ) . '">' . get_the_title( $post->ID ) . '</a>';
-		}
-
-		return wc_memberships_list_items( $items, __( 'and', 'woocommerce-memberships' ) );
 	}
 
 
@@ -478,7 +445,7 @@ class WC_Memberships extends SV_WC_Plugin {
 	 * @return string
 	 */
 	public function get_documentation_url() {
-		return 'http://docs.woothemes.com/document/woocommerce-memberships/';
+		return 'https://docs.woocommerce.com/document/woocommerce-memberships/';
 	}
 
 
@@ -490,7 +457,7 @@ class WC_Memberships extends SV_WC_Plugin {
 	 * @return string
 	 */
 	public function get_support_url() {
-		return 'http://support.woothemes.com/';
+		return 'https://woocommerce.com/my-account/tickets/';
 	}
 
 
@@ -523,10 +490,15 @@ class WC_Memberships extends SV_WC_Plugin {
 	 *
 	 * @since 1.0.0
 	 * @see \SV_WC_Plugin::is_plugin_settings()
-	 * @return boolean true if on the settings page
+	 * @return bool
 	 */
 	public function is_plugin_settings() {
-		return isset( $_GET['page'] ) && 'wc-settings' === $_GET['page'] && isset( $_GET['tab'] ) && 'memberships' === $_GET['tab'];
+
+		return isset( $_GET['page'] ) && 'wc-settings' === $_GET['page'] && isset( $_GET['tab'] )
+		       // the plugin's main settings page
+		       && ( 'memberships' === $_GET['tab']
+		       // the plugin's email settings pages
+		       || ( 'email' === $_GET['tab'] && isset( $_GET['section'] ) && SV_WC_Helper::str_starts_with( $_GET['section'], 'wc_memberships_membership_' ) ) );
 	}
 
 
@@ -600,6 +572,8 @@ class WC_Memberships extends SV_WC_Plugin {
 	/**
 	 * Handle plugin activation
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function maybe_activate() {
@@ -625,6 +599,8 @@ class WC_Memberships extends SV_WC_Plugin {
 	/**
 	 * Handle plugin deactivation
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function deactivate() {
@@ -642,155 +618,6 @@ class WC_Memberships extends SV_WC_Plugin {
 	}
 
 
-	/** Plugin functionality methods ***************************************/
-
-
-	/**
-	 * Grant customer access to membership when making a purchase
-	 *
-	 * This method is run also when an order is made manually in WC admin
-	 *
-	 * TODO move this callback and actions in constructor out of the main class {FN 2016-04-26}
-	 *
-	 * @since 1.0.0
-	 * @param int $order_id \WC_Order id
-	 */
-	public function grant_membership_access( $order_id ) {
-
-		// get the order and its items to check
-		$order       = wc_get_order( $order_id );
-		$order_items = $order->get_items();
-		$user_id     = $order->get_user_id();
-
-		// skip if there is no user associated with this order or there are no items
-		if ( ! $user_id || empty( $order_items ) ) {
-			return;
-		}
-
-		// get membership plans
-		$membership_plans = $this->plans->get_membership_plans();
-
-		// bail out if there are no membership plans
-		if ( empty( $membership_plans ) ) {
-			return;
-		}
-
-		// loop over all available membership plans
-		foreach ( $membership_plans as $plan ) {
-
-			// skip if no products grant access to this plan
-			if ( ! $plan->has_products() ) {
-				continue;
-			}
-
-			$access_granting_product_ids = $this->get_access_granting_purchased_product_ids( $plan, $order, $order_items );
-
-			foreach( $access_granting_product_ids as $product_id ) {
-
-				// sanity check: make sure the selected product ID in fact does grant access
-				if ( ! $plan->has_product( $product_id ) ) {
-					continue;
-				}
-
-				/**
-				 * Grant Access from New Purchase Filter
-				 *
-				 * Allows actors to override if a new order should grant access
-				 * to a membership plan or not
-				 *
-				 * @since 1.3.5
-				 *
-				 * @param bool $grant_access true by default
-				 * @param array $args {
-				 *      @type int|string $user_id user ID for order
-				 *      @type int|string $product_id product ID that grants access
-				 *      @type int|string $order_id order ID
-				 * }
-				 */
-				$grant_access = apply_filters( 'wc_memberships_grant_access_from_new_purchase', true, array(
-					'user_id'    => $user_id,
-					'product_id' => $product_id,
-					'order_id'   => $order_id
-				) );
-
-
-				if ( $grant_access ) {
-
-					// delegate granting access to the membership plan instance
-					$plan->grant_access_from_purchase( $user_id, $product_id, $order_id );
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Get order products granting access to a membership plan
-	 *
-	 * @since 1.4.0
-	 * @param \WC_Memberships_Membership_Plan $plan Membership plan to check for access
-	 * @param int|\WC_Order|string $order \WC_Order instance or id. Can be empty string if $order_items are provided
-	 * @param array $order_items Array of order items, if empty will try to get those from $order
-	 * @return array|null Array of products granting access, null if $order is not valid
-	 */
-	public function get_access_granting_purchased_product_ids( $plan, $order, $order_items = array() ) {
-
-		if ( empty( $order_items ) ) {
-
-			$order = is_int( $order ) ? wc_get_order( $order ) : $order;
-
-			if ( ! $order instanceof WC_Order ) {
-				return null;
-			}
-
-			$order_items = $order->get_items();
-		}
-
-		$access_granting_product_ids = array();
-
-		// loop over items to see if any of them grant access to any memberships
-		foreach ( $order_items as $key => $item ) {
-
-			// product grants access to this membership
-			if ( $plan->has_product( $item['product_id'] ) ) {
-				$access_granting_product_ids[] = $item['product_id'];
-			}
-
-			// variation access
-			if ( isset( $item['variation_id'] ) && $item['variation_id'] && $plan->has_product( $item['variation_id'] ) ) {
-				$access_granting_product_ids[] = $item['variation_id'];
-			}
-		}
-
-		if ( ! empty( $access_granting_product_ids ) ) {
-
-			// by default we get the first product that grant access...
-			$product_ids = $access_granting_product_ids[0];
-
-			// ...unless option is set, which might trigger a Memberships access length extension
-			if ( wc_memberships_cumulative_granting_access_orders_allowed() ) {
-				$product_ids = $access_granting_product_ids;
-			}
-
-			/**
-			 * Filter the product ID that grants access to the membership plan via purchase
-			 *
-			 * Multiple products from a single order can grant access to a membership plan
-			 * Default behavior is to use the first product that grants access,
-			 * unless overridden by option in settings and/or using this filter
-			 *
-			 * @since 1.0.0
-			 * @param int|array $product_ids
-			 * @param array $access_granting_product_ids Array of product IDs that can grant access to this plan
-			 * @param \WC_Memberships_Membership_Plan $plan Membership plan access will be granted to
-			 */
-			$access_granting_product_ids = (array) apply_filters( 'wc_memberships_access_granting_purchased_product_id', $product_ids, $access_granting_product_ids, $plan );
-		}
-
-		return $access_granting_product_ids;
-	}
-
-
 	/** Deprecated methods ******************************************************/
 
 
@@ -805,71 +632,69 @@ class WC_Memberships extends SV_WC_Plugin {
 	 */
 	public function __get( $property ) {
 
-		$deprecated_since_1_6_0 = '1.6.0';
-
 		switch ( $property ) {
 
 			/** @deprecated since 1.6.0 */
 			case 'admin':
-				_deprecated_function( 'wc_memberships()->admin', $deprecated_since_1_6_0, 'wc_memberships()->get_admin_instance()' );
+				_deprecated_function( 'wc_memberships()->admin', '1.6.0', 'wc_memberships()->get_admin_instance()' );
 				return $this->get_admin_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'ajax':
-				_deprecated_function( 'wc_memberships()->ajax', $deprecated_since_1_6_0, 'wc_memberships()->get_ajax_instance()' );
+				_deprecated_function( 'wc_memberships()->ajax', '1.6.0', 'wc_memberships()->get_ajax_instance()' );
 				return $this->get_ajax_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'capabilities':
-				_deprecated_function( 'wc_memberships()->capabilities', $deprecated_since_1_6_0, 'wc_memberships()->get_capabilities_instance()' );
+				_deprecated_function( 'wc_memberships()->capabilities', '1.6.0', 'wc_memberships()->get_capabilities_instance()' );
 				return $this->get_capabilities_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'checkout':
-				_deprecated_function( 'wc_memberships()->checkout', $deprecated_since_1_6_0, 'wc_memberships()->get_frontend_instance()->get_checkout_instance()' );
+				_deprecated_function( 'wc_memberships()->checkout', '1.6.0', 'wc_memberships()->get_frontend_instance()->get_checkout_instance()' );
 				return $this->get_frontend_instance()->get_checkout_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'emails':
-				_deprecated_function( 'wc_memberships()->emails', $deprecated_since_1_6_0, 'wc_memberships()->get_emails_instance()' );
+				_deprecated_function( 'wc_memberships()->emails', '1.6.0', 'wc_memberships()->get_emails_instance()' );
 				return $this->get_emails_instance();
 			/** @deprecated since 1.6.0 */
 			case 'frontend':
-				_deprecated_function( 'wc_memberships()->frontend', $deprecated_since_1_6_0, 'wc_memberships()->get_frontend_instance()' );
+				_deprecated_function( 'wc_memberships()->frontend', '1.6.0', 'wc_memberships()->get_frontend_instance()' );
 				return $this->get_frontend_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'integrations':
-				_deprecated_function( 'wc_memberships()->integrations', $deprecated_since_1_6_0, 'wc_memberships()->get_integrations_instance()' );
+				_deprecated_function( 'wc_memberships()->integrations', '1.6.0', 'wc_memberships()->get_integrations_instance()' );
 				return $this->get_integrations_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'member_discounts':
-				_deprecated_function( 'wc_memberships()->member_discounts', $deprecated_since_1_6_0, 'wc_memberships()->get_member_discounts_instance()' );
+				_deprecated_function( 'wc_memberships()->member_discounts', '1.6.0', 'wc_memberships()->get_member_discounts_instance()' );
 				return $this->get_member_discounts_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'plans':
-				_deprecated_function( 'wc_memberships()->plans', $deprecated_since_1_6_0, 'wc_memberships()->get_plans_instance()' );
+				_deprecated_function( 'wc_memberships()->plans', '1.6.0', 'wc_memberships()->get_plans_instance()' );
 				return $this->get_plans_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'restrictions':
-				_deprecated_function( 'wc_memberships()->restrictions', $deprecated_since_1_6_0, 'wc_memberships()->get_frontend_instance()->get_restrictions_instance()' );
+				_deprecated_function( 'wc_memberships()->restrictions', '1.6.0', 'wc_memberships()->get_frontend_instance()->get_restrictions_instance()' );
 				return $this->get_frontend_instance()->get_restrictions_instance();
 			/** @deprecated since 1.6.0 */
 			case 'rules':
-				_deprecated_function( 'wc_memberships()->rules', $deprecated_since_1_6_0, 'wc_memberships()->get_rules_instance()' );
+				_deprecated_function( 'wc_memberships()->rules', '1.6.0', 'wc_memberships()->get_rules_instance()' );
 				return $this->get_rules_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'subscriptions':
-				_deprecated_function( 'wc_memberships()->subscriptions', $deprecated_since_1_6_0, 'wc_memberships()->get_integrations()->get_subscriptions_instance()' );
+				_deprecated_function( 'wc_memberships()->subscriptions', '1.6.0', 'wc_memberships()->get_integrations()->get_subscriptions_instance()' );
 				return $this->get_integrations_instance()->get_subscriptions_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'user_memberships':
-				_deprecated_function( 'wc_memberships()->user_memberships', $deprecated_since_1_6_0, 'wc_memberships()->get_user_memberships_instance()' );
+				_deprecated_function( 'wc_memberships()->user_memberships', '1.6.0', 'wc_memberships()->get_user_memberships_instance()' );
 				return $this->get_user_memberships_instance();
 
 			default :
@@ -893,26 +718,24 @@ class WC_Memberships extends SV_WC_Plugin {
 	 */
 	public function __call( $method, $args ) {
 
-		$deprecated_since_1_6_0 = '1.6.0';
-
 		switch ( $method ) {
 
 			/** @deprecated since 1.6.0 */
 			case 'add_endpoints' :
-				_deprecated_function( 'wc_memberships()->add_endpoints()', $deprecated_since_1_6_0, 'wc_memberships()->get_member_area_instance()->add_endpoints()' );
+				_deprecated_function( 'wc_memberships()->add_endpoints()', '1.6.0', 'wc_memberships()->get_members_area_instance()->add_endpoints()' );
 				$this->get_query_instance()->add_endpoints();
 				return null;
 
 			/** @deprecated since 1.6.0 */
 			case 'add_months' :
-				_deprecated_function( 'wc_memberships()->add_months()', $deprecated_since_1_6_0, 'wc_memberships_add_months_to_timestamp()' );
-				$from_timestamp = isset( $args[0] ) ? $args[0] : '';
+				_deprecated_function( 'wc_memberships()->add_months()', '1.6.0', 'wc_memberships_add_months_to_timestamp()' );
+				$from_timestamp = isset( $args[0] ) ? $args[0]       : '';
 				$months_to_add  = isset( $args[1] ) ? (int) $args[1] : 0;
 				return wc_memberships_add_months_to_timestamp( $from_timestamp, $months_to_add );
 
 			/** @deprecated since 1.6.0 */
 			case 'adjust_date_by_timezone' :
-				_deprecated_function( 'wc_memberships()->adjust_date_by_timezone()', $deprecated_since_1_6_0, 'wc_memberships_adjust_date_by_timezone()' );
+				_deprecated_function( 'wc_memberships()->adjust_date_by_timezone()', '1.6.0', 'wc_memberships_adjust_date_by_timezone()' );
 				$date     = isset( $args[0] ) ? $args[0] : $args;
 				$format   = isset( $args[1] ) ? $args[1] : 'mysql';
 				$timezone = isset( $args[2] ) ? $args[2] : 'UTC';
@@ -920,17 +743,17 @@ class WC_Memberships extends SV_WC_Plugin {
 
 			/** @deprecated since 1.6.0 */
 			case 'allow_cumulative_granting_access_orders' :
-				_deprecated_function( 'wc_memberships()->allow_cumulative_granting_access_orders()', $deprecated_since_1_6_0, 'wc_memberships_cumulative_granting_access_orders_allowed' );
+				_deprecated_function( 'wc_memberships()->allow_cumulative_granting_access_orders()', '1.6.0', 'wc_memberships_cumulative_granting_access_orders_allowed' );
 				return wc_memberships_cumulative_granting_access_orders_allowed();
 
 			/** @deprecated since 1.6.0 */
 			case 'array_search_key_value' :
-				_deprecated_function( 'wc_memberships()->array_search_key_value()', $deprecated_since_1_6_0 );
+				_deprecated_function( 'wc_memberships()->array_search_key_value()', '1.6.0' );
 				return false;
 
 			/** @deprecated since 1.6.0 */
 			case 'init_endpoints' :
-				_deprecated_function( 'wc_memberships()->init_endpoints()', $deprecated_since_1_6_0, 'wc_memberships()->get_member_area_instance()' );
+				_deprecated_function( 'wc_memberships()->init_endpoints()', '1.6.0', 'wc_memberships()->get_members_area_instance()' );
 				// this method was removed altogether but it just did the following equivalent,
 				// which now we do in WC_Memberships_Query::__construct(),
 				add_action( 'init', array( $this->get_query_instance(), 'add_endpoints' ), 1 );
@@ -938,31 +761,75 @@ class WC_Memberships extends SV_WC_Plugin {
 
 			/** @deprecated since 1.6.0 */
 			case 'get_members_area_template' :
-				_deprecated_function( 'wc_memberships()->get_members_area_template()', $deprecated_since_1_6_0, 'wc_memberships()->get_frontend_instance()->get_member_area_instance()->get_template()' );
+				_deprecated_function( 'wc_memberships()->get_members_area_template()', '1.6.0', 'wc_memberships()->get_frontend_instance()->get_members_area_instance()->get_template()' );
 				$section     = isset( $args[0] ) ? $args[0] : 'my-membership-content';
 				$method_args = isset( $args[1] ) ? $args[1] : array();
-				$this->get_frontend_instance()->get_member_area_instance()->get_template( $section, $method_args );
+				$this->get_frontend_instance()->get_members_area_instance()->get_template( $section, $method_args );
 				return null;
 
 			/** @deprecated since 1.6.0 */
 			case 'get_subscriptions_integration' :
-				_deprecated_function( 'wc_memberships()->get_subscriptions_integration()', $deprecated_since_1_6_0, 'wc_memberships()->get_integrations_instance()->get_subscriptions_instance()' );
+				_deprecated_function( 'wc_memberships()->get_subscriptions_integration()', '1.6.0', 'wc_memberships()->get_integrations_instance()->get_subscriptions_instance()' );
 				return $this->get_integrations_instance()->get_subscriptions_instance();
 
 			/** @deprecated since 1.6.0 */
 			case 'list_items' :
-				_deprecated_function( 'wc_memberships()->list_items()', $deprecated_since_1_6_0, 'wc_memberships_list_items()' );
+				_deprecated_function( 'wc_memberships()->list_items()', '1.6.0', 'wc_memberships_list_items()' );
 				$items = isset( $args[0] ) ? $args[0] : $args;
 				$glue  = isset( $args[1] ) ? $args[1] : '';
 				return wc_memberships_list_items( $items, $glue );
 
 			/** @deprecated since 1.6.0 */
-			case 'wp_json_encode' :
-				_deprecated_function( 'wc_memberships()->wp_json_encode()', $deprecated_since_1_6_0, 'wp_json_encode()' );
+			case 'wc_memberships_json_encode' :
+				_deprecated_function( 'wc_memberships()->wp_json_encode()', '1.6.0', 'wp_json_encode()' );
 				$data    = isset( $args[0] ) ? $args[0] : $args;
 				$options = isset( $args[1] ) ? $args[1] : 0;
 				$depth   = isset( $args[2] ) ? $args[2] : 512;
-				return wc_memberships_json_encode( $data, $options, $depth );
+				return wp_json_encode( $data, $options, $depth );
+
+			/** @deprecated since 1.7.0 */
+			case 'grant_membership_access' :
+
+				_deprecated_function( 'wc_memberships()->grant_membership_access()', '1.7.0', 'wc_memberships()->get_plans_instance()->grant_access_to_membership_from_order()' );
+
+				$plans     = wc_memberships()->get_plans_instance();
+				$order_id  = isset( $args[0] ) ? $args[0] : $args;
+
+				if ( $plans ) {
+					$plans->grant_access_to_membership_from_order( $order_id );
+				}
+
+				return null;
+
+			/** @deprecated since 1.7.0 */
+			case 'get_access_granting_purchased_product_ids' :
+
+				_deprecated_function( 'wc_memberships()->get_access_granting_purchased_product_ids()', '1.7.0', 'wc_memberships_get_order_access_granting_product_ids()' );
+
+				$plan        = isset( $args[0] ) ? $args[0] : null;
+				$order       = isset( $args[1] ) ? $args[1] : null;
+				$order_items = isset( $args[2] ) ? $args[2] : array();
+
+				return wc_memberships_get_order_access_granting_product_ids( $plan, $order, $order_items );
+
+			/** @deprecated since 1.8.0 */
+			case 'admin_list_post_links' :
+
+				_deprecated_function( 'wc_memberships()->admin_list_post_links()', '1.8.0' );
+
+				$posts = isset( $args[0] ) ? $args[0] : $args;
+
+				if ( empty( $posts ) ) {
+					return '';
+				}
+
+				$items = array();
+
+				foreach ( $posts as $post ) {
+					$items[] = '<a href="' . get_edit_post_link( $post->ID ) . '">' . get_the_title( $post->ID ) . '</a>';
+				}
+
+				return wc_memberships_list_items( $items, __( 'and', 'woocommerce-memberships' ) );
 
 			default :
 
@@ -971,12 +838,12 @@ class WC_Memberships extends SV_WC_Plugin {
 
 					/** @deprecated since 1.6.0 */
 					if ( 'is_product_addons_active' === $method ) {
-						_deprecated_function( 'wc_memberships()->is_product_addons_active()', $deprecated_since_1_6_0, "wc_memberships()->is_plugin_active( 'woocommerce-product-addons.php' )" );
+						_deprecated_function( 'wc_memberships()->is_product_addons_active()', '1.6.0', "wc_memberships()->is_plugin_active( 'woocommerce-product-addons.php' )" );
 						// the whole Product Add Ons integration was deprecated
 						return $this->is_plugin_active( 'woocommerce-product-addons.php' );
 					/** @deprecated since 1.6.0 */
 					} else {
-						_deprecated_function( "wc_memberships()->{$method}", $deprecated_since_1_6_0, "wc_memberships()->get_integrations()->{$method}" );
+						_deprecated_function( "wc_memberships()->{$method}", '1.6.0', "wc_memberships()->get_integrations()->{$method}" );
 						// for example: `is_subscriptions_active()`
 						return $this->get_integrations_instance()->$method();
 					}

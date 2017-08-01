@@ -23,21 +23,6 @@
 .cart .mnm_table_item .mnm_table_item_indent,
 .shop_table .mnm_table_item .mnm_table_item_indent {
   padding-right: 0; }
-  .cart .mnm_table_item .mnm_table_item_indent:before,
-  .shop_table .mnm_table_item .mnm_table_item_indent:before {
-    display: inline-block;
-    font: normal normal normal 1em / 1 FontAwesome;
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
-    -webkit-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    transform: rotate(-90deg);
-    content: "\f148";
-    margin-left: 0.3819820591em;
-    opacity: .25; }
 
 .cart .mnm_table_item .product-name,
 .cart .mnm_table_item .product-price,

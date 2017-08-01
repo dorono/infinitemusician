@@ -13,9 +13,9 @@
  * Allows plugins to use their own update API.
  *
  * @author Pippin Williamson and Dan Lester
- * @version 11
+ * @version 13
  */
-class EDD_SL_Plugin_Updater11 {
+class EDD_SL_Plugin_Updater13 {
 	private $api_url  = '';
 	private $api_data = array();
 	private $name     = '';
@@ -43,7 +43,7 @@ class EDD_SL_Plugin_Updater11 {
 	function __construct( $_api_url, $_plugin_file, $_api_data = null,
 		$license_status_optname = null, $license_settings_url = null, $display_warnings=true ) {
 		$this->api_url  = trailingslashit( $_api_url );
-		$this->api_data = urlencode_deep( $_api_data );
+		$this->api_data = $_api_data;
 		$this->name     = plugin_basename( $_plugin_file );
 		$this->slug     = basename( $_plugin_file, '.php');
 		$this->version  = $_api_data['version'];
@@ -297,7 +297,7 @@ class EDD_SL_Plugin_Updater11 {
 				(isset($api_response->success) && $api_response->success ? 'valid' : 'invalid');
 		}
 
-		if (!in_array($license_status['status'], array('valid', 'invalid', 'missing', 'item_name_mismatch', 'expired', 'site_inactive', 'inactive', 'disabled', 'empty'))) {
+		if (!in_array($license_status['status'], array('valid', 'invalid', 'missing', 'item_name_mismatch', 'invalid_item_id', 'expired', 'site_inactive', 'inactive', 'disabled', 'empty'))) {
 			$license_status['status'] = 'invalid';
 		}
 
@@ -431,7 +431,7 @@ class EDD_SL_Plugin_Updater11 {
 	 */
 	function http_request_args( $args, $url ) {
 		// If it is an https request and we are performing a package download, disable ssl verification
-		if ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' ) ) {
+		if ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd-sl/package_download' ) ) {
 			$args['sslverify'] = false;
 		}
 		return $args;
@@ -476,6 +476,7 @@ class EDD_SL_Plugin_Updater11 {
 			'beta'       => $data['beta']
 		);
 
+		// '?XDEBUG_SESSION_START=7777'
 		$request = wp_remote_post( $this->api_url, array( 'timeout' => $this->get_timeout(), 'sslverify' => false, 'body' => $api_params ) );
 
 		if ( ! is_wp_error( $request ) ) {
@@ -568,7 +569,7 @@ class EDD_SL_Plugin_Updater11 {
 		$api_params = array(
 			'edd_action'=> 'activate_license',
 			'license' 	=> $this->api_data['license'],
-			'item_name' => $this->api_data['item_name'],
+			'item_id' => $this->api_data['item_id'],
 			'beta' => $this->api_data['beta']
 		);
 
@@ -603,12 +604,13 @@ class EDD_SL_Plugin_Updater11 {
 					$license_status['status'] = 'empty';
 				}
 
-				// 'valid', 'invalid', 'missing', 'item_name_mismatch', 'expired', 'site_inactive', 'inactive', 'disabled', 'empty'
+				// 'valid', 'invalid', 'missing', 'item_name_mismatch', 'invalid_item_id', 'expired', 'site_inactive', 'inactive', 'disabled', 'empty'
 				switch ($license_status['status']) {
 					case 'missing':
 						$msg = 'Your license key is not found in our system at all.';
 						break;
 					case 'item_name_mismatch':
+					case 'invalid_item_id':
 						$msg = 'The license key you entered is for a different product.';
 						break;
 					case 'expired':

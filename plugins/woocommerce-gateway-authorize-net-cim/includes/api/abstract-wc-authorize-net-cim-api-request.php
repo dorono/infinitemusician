@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Authorize.Net CIM Gateway to newer
  * versions in the future. If you wish to customize WooCommerce Authorize.Net CIM Gateway for your
- * needs please refer to http://docs.woothemes.com/document/authorize-net-cim/
+ * needs please refer to http://docs.woocommerce.com/document/authorize-net-cim/
  *
  * @package   WC-Gateway-Authorize-Net-CIM/API/Request
  * @author    SkyVerge
- * @copyright Copyright (c) 2011-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2011-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -75,17 +75,30 @@ abstract class WC_Authorize_Net_CIM_API_Request extends SV_WC_API_XML_Request im
 
 		if ( 'credit_card' === $this->order->payment->type ) {
 
-			// credit card payment
-			$payment = array(
-				'creditCard' => array(
-					'cardNumber'     => $this->order->payment->account_number,
-					'expirationDate' => sprintf( '%s-%s', $this->order->payment->exp_month, $this->order->payment->exp_year ),
-				),
-			);
+			// Accept.js payment
+			if ( isset( $this->order->payment->nonce ) ) {
 
-			// add CSC is available
-			if ( ! empty( $this->order->payment->csc ) ) {
-				$payment['creditCard']['cardCode'] = $this->order->payment->csc;
+				$payment = array(
+					'opaqueData' => array(
+						'dataDescriptor' => $this->order->payment->descriptor,
+						'dataValue'      => $this->order->payment->nonce,
+					),
+				);
+
+			// direct credit card payment
+			} else {
+
+				$payment = array(
+					'creditCard' => array(
+						'cardNumber'     => $this->order->payment->account_number,
+						'expirationDate' => sprintf( '%s-%s', $this->order->payment->exp_month, $this->order->payment->exp_year ),
+					),
+				);
+
+				// add CSC is available
+				if ( ! empty( $this->order->payment->csc ) ) {
+					$payment['creditCard']['cardCode'] = $this->order->payment->csc;
+				}
 			}
 
 		} else {
@@ -114,31 +127,31 @@ abstract class WC_Authorize_Net_CIM_API_Request extends SV_WC_API_XML_Request im
 	 */
 	protected function get_address( $type ) {
 
-		$billing_address  = $this->order->billing_address_1 . ( ! empty( $this->order->billing_address_2 ) ? ' ' . $this->order->billing_address_2 : '' );
-		$shipping_address = $this->order->shipping_address_1 . ( ! empty( $this->order->shipping_address_2 ) ? ' ' . $this->order->shipping_address_2 : '' );
+		$billing_address  = trim( SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_address_1' ) . ' ' . SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_address_2' ) );
+		$shipping_address = trim( SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_address_1' ) . ' ' . SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_address_2' ) );
 
 		// address fields
 		$fields = array(
 			'billing'  => array(
-				'firstName'   => array( 'value' => $this->order->billing_first_name,                                    'limit' => 50 ),
-				'lastName'    => array( 'value' => $this->order->billing_last_name,                                     'limit' => 50 ),
-				'company'     => array( 'value' => $this->order->billing_company,                                       'limit' => 50 ),
+				'firstName'   => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_first_name' ),                                    'limit' => 50 ),
+				'lastName'    => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_last_name' ),                                     'limit' => 50 ),
+				'company'     => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_company' ),                                       'limit' => 50 ),
 				'address'     => array( 'value' => $billing_address,                                                    'limit' => 60 ),
-				'city'        => array( 'value' => $this->order->billing_city,                                          'limit' => 40 ),
-				'state'       => array( 'value' => $this->order->billing_state,                                         'limit' => 40 ),
-				'zip'         => array( 'value' => $this->order->billing_postcode,                                      'limit' => 20 ),
-				'country'     => array( 'value' => SV_WC_Helper::convert_country_code( $this->order->billing_country ), 'limit' => 60 ),
-				'phoneNumber' => array( 'value' => $this->order->billing_phone,                                         'limit' => 25 ),
+				'city'        => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_city' ),                                          'limit' => 40 ),
+				'state'       => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_state' ),                                         'limit' => 40 ),
+				'zip'         => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_postcode' ),                                      'limit' => 20 ),
+				'country'     => array( 'value' => SV_WC_Helper::convert_country_code( SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_country' ) ), 'limit' => 60 ),
+				'phoneNumber' => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_phone' ),                                         'limit' => 25 ),
 			),
 			'shipping' => array(
-				'firstName' => array( 'value' => $this->order->shipping_first_name,                                    'limit' => 50 ),
-				'lastName'  => array( 'value' => $this->order->shipping_last_name,                                     'limit' => 50 ),
-				'company'   => array( 'value' => $this->order->shipping_company,                                       'limit' => 50 ),
+				'firstName' => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_first_name' ),                                    'limit' => 50 ),
+				'lastName'  => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_last_name' ),                                     'limit' => 50 ),
+				'company'   => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_company' ),                                       'limit' => 50 ),
 				'address'   => array( 'value' => $shipping_address,                                                    'limit' => 60 ),
-				'city'      => array( 'value' => $this->order->shipping_city,                                          'limit' => 40 ),
-				'state'     => array( 'value' => $this->order->shipping_state,                                         'limit' => 40 ),
-				'zip'       => array( 'value' => $this->order->shipping_postcode,                                      'limit' => 20 ),
-				'country'   => array( 'value' => SV_WC_Helper::convert_country_code( $this->order->shipping_country ), 'limit' => 60 ),
+				'city'      => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_city' ),                                          'limit' => 40 ),
+				'state'     => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_state' ),                                         'limit' => 40 ),
+				'zip'       => array( 'value' => SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_postcode' ),                                      'limit' => 20 ),
+				'country'   => array( 'value' => SV_WC_Helper::convert_country_code( SV_WC_Order_Compatibility::get_prop( $this->order, 'shipping_country' ) ), 'limit' => 60 ),
 			),
 		);
 

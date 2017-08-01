@@ -5,7 +5,7 @@
  * Description: WooCommerce Email Customizer plugin allows you to fully customize the styling, colors, logo and text in the emails sent from your WooCommerce store.
  * Author: cxThemes
  * Author URI: https://codecanyon.net/item/email-customizer-for-woocommerce/8654473?ref=cxThemes&utm_source=email%20customizer&utm_campaign=commercial%20plugin%20upsell&utm_medium=plugins%20page%20view%20details
- * Version: 3.07
+ * Version: 3.11
  * Text Domain: email-control
  * Domain Path: /languages/
  *
@@ -17,13 +17,13 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  * Define Constants
  */
-define( 'WC_EMAIL_CONTROL_VERSION', '3.07' );
-define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', 2.3 );
+define( 'WC_EMAIL_CONTROL_VERSION', '3.11' );
+define( 'WC_EMAIL_CONTROL_REQUIRED_WOOCOMMERCE_VERSION', 2.5 );
 define( 'WC_EMAIL_CONTROL_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_URI', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( 'WC_EMAIL_CONTROL_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); // woocommerce-email-control/ec-email-control.php
@@ -110,30 +110,8 @@ class WC_Email_Control {
 		// Enqueue Scripts/Styles - in head of email preview page
 		add_action( 'ec_render_preview_head_scripts', array( $this, 'ec_head_scripts' ), 102 );
 		
-		// Add menu item
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		
-		// Ajax saving of options
-		add_action( 'wp_ajax_save_meta', array( $this, 'save_meta' ) );
-		add_action( 'wp_ajax_nopriv_save_meta', array( $this, 'nopriv_save_meta' ) );
-		
-		// Ajax saving of options new
-		add_action( 'wp_ajax_save_option',	 array( $this, 'save_option' ) );
-		add_action( 'wp_ajax_nopriv_save_option',	 array( $this, 'nopriv_save_option' ) );
-		
-		// Ajax send email
-		add_action( 'wp_ajax_ec_send_email',	 array( $this, 'send_email' ) );
-		add_action( 'wp_ajax_nopriv_ec_send_email',	 array( $this, 'nopriv_send_email' ) );
-		
-		// Ajax saving of all edit settings
-		add_action( 'wp_ajax_save_edit_email', array( $this, 'save_edit_email' ) );
-		add_action( 'wp_ajax_nopriv_save_edit_email', array( $this, 'nopriv_save_edit_email' ) );
-		
-		// Check Templates
-		add_filter( 'wc_get_template', array( $this, 'ec_get_template' ), 10, 5 );
-		
-		//Email Customizer - Admin and Preview pages only
-		if ( isset( $_REQUEST["page"] ) && $_REQUEST["page"] == $this->id ) {
+		// Email Customizer - Admin and Preview pages only
+		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == $this->id ) {
 			
 			// Remove all notifications
 			remove_all_actions( 'admin_notices' );
@@ -141,7 +119,7 @@ class WC_Email_Control {
 			// Remove admin bar
 			require_once( 'includes/toolbar-removal/wp-toolbar-removal.php');
 						
-			if ( ! isset( $_REQUEST["ec_render_email"] ) ) {
+			if ( ! isset( $_REQUEST['ec_render_email'] ) ) {
 				
 				// Email Customizer - Admin page only
 				add_action( 'in_admin_header', array( $this, 'ec_render_admin_page' ) );
@@ -155,12 +133,31 @@ class WC_Email_Control {
 			}
 		}
 		
-		// Add Button in WooCommerce->Settings->Email
-		add_action( 'woocommerce_settings_tabs_email', array( $this, 'woocommerce_settings_button' ) );
+		// Add menu item
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		
+		// Ajax saving of options
+		add_action( 'wp_ajax_save_meta', array( $this, 'save_meta' ) );
+		add_action( 'wp_ajax_nopriv_save_meta', array( $this, 'nopriv_save_meta' ) );
+		
+		// Ajax saving of options new
+		add_action( 'wp_ajax_save_option', array( $this, 'save_option' ) );
+		add_action( 'wp_ajax_nopriv_save_option', array( $this, 'nopriv_save_option' ) );
+		
+		// Ajax send email
+		add_action( 'wp_ajax_ec_send_email', array( $this, 'send_email' ) );
+		add_action( 'wp_ajax_nopriv_ec_send_email', array( $this, 'nopriv_send_email' ) );
+		
+		// Ajax saving of all edit settings
+		add_action( 'wp_ajax_save_edit_email', array( $this, 'save_edit_email' ) );
+		add_action( 'wp_ajax_nopriv_save_edit_email', array( $this, 'nopriv_save_edit_email' ) );
+		
+		// Check Templates
+		add_filter( 'wc_get_template', array( $this, 'ec_get_template' ), 10, 5 );
 		
 		// Setup global email args.
-		add_action( 'woocommerce_before_template_part', array( $this, 'ec_before_template_prep_email_args_global' ) , 10, 4 );
-		add_action( 'woocommerce_after_template_part', array( $this, 'ec_after_template_prep_email_args_global' ) , 10, 4 );
+		add_action( 'woocommerce_before_template_part', array( $this, 'ec_email_templates_start' ) , 10, 4 );
+		add_action( 'woocommerce_after_template_part', array( $this, 'ec_email_templates_end' ) , 10, 4 );
 		
 		// Setup options filtering.
 		add_action( 'woocommerce_before_template_part', array( $this, 'ec_before_template_filter_options' ) , 10, 4 );
@@ -168,11 +165,14 @@ class WC_Email_Control {
 		// Modify email headers.
 		add_action( 'woocommerce_email_headers', array( $this, 'ec_email_headers' ) );
 		
-		// Complicated method to re-aply inline styling after WooCommerce has,
+		// Complicated method to re-apply inline styling after WooCommerce has,
 		// due to WooCommerce having applied wordwrap 60 to the html before
-		// our css is applied, whcih results in some of the CSS not applying.
+		// our css is applied, which results in some of the CSS not applying.
 		add_filter( 'wc_get_template', array( $this, 'ec_globalize_email_object' ), 10, 5 );
 		add_action( 'woocommerce_mail_content', array( $this, 'ec_style_inline' ), 85 );
+		
+		// Add Button in WooCommerce->Settings->Email
+		add_action( 'woocommerce_settings_tabs_email', array( $this, 'woocommerce_settings_button' ) );
 		
 		// Other simpler WooCommerce emails - Content.
 		// add_filter( 'woocommerce_email_content_low_stock', array( $this, 'woocommerce_simple_email_content' ), 10, 2 );
@@ -492,9 +492,8 @@ class WC_Email_Control {
 		
 		$mail->object		= new WC_Order( $order );
 		
-		
 		$mail->find[] = '{order_date}';
-		$mail->replace[] = date_i18n( wc_date_format(), strtotime( $mail->object->order_date ) );
+		$mail->replace[] = date_i18n( wc_date_format(), strtotime( ec_order_get_date_created( $mail->object ) ) );
 
 		$mail->find[] = '{order_number}';
 		$mail->replace[] = $mail->object->get_order_number();
@@ -654,10 +653,11 @@ class WC_Email_Control {
 	 */
 	function ec_get_template( $located, $template_name, $args, $template_path, $default_path ) {
 		
-		// error_log( $located );
-		
+		// Debugging: short-circuit and temporarily remove our templates.
 		// return $located;
 		
+		// Debugging:
+		// error_log( $located );
 		// echo "<br>";
 		// echo "get_template";
 		// echo "<br>";
@@ -704,7 +704,12 @@ class WC_Email_Control {
 					
 					$this_template_versions = '';
 					// if ( ! version_compare( WC()->version, '2.4', '>=' ) ) $this_template_versions = '-below-wc2.4';
-					if ( ! version_compare( WC()->version, '2.5', '>=' ) ) $this_template_versions = '-below-wc2.5';
+					if ( version_compare( WC()->version, '2.5', '>=' ) && version_compare( WC()->version, '3', '<' ) ) {
+						$this_template_versions = '-wc2.5-wc2.9';
+					}
+					else if ( ! version_compare( WC()->version, '2.5', '>=' ) ) {
+						$this_template_versions = '-below-wc2.5';
+					}
 					
 					$this_template = $located;
 					
@@ -764,7 +769,7 @@ class WC_Email_Control {
 			}
 			
 			// Store the templates used, and whether it was: default | third-party | override
-			if ( ! array_key_exists( $located, $collect_email_template ) ) { // Make sure it doens't already exist.
+			if ( ! array_key_exists( $located, $collect_email_template ) ) { // Make sure it doesn't already exist.
 				$collect_email_template[ $located ] = $status;
 			}
 		}
@@ -801,16 +806,16 @@ class WC_Email_Control {
 		
 		if ( FALSE !== strrpos( $template_name, 'email' ) ) {
 			
-			// Get active themes.
+			// Get active theme.
 			$ec_theme_selected = false;
-			if ( get_option( "ec_template" ) ) {
-				$ec_theme_selected = get_option( "ec_template" );
+			if ( get_option( 'ec_template' ) ) {
+				$ec_theme_selected = get_option( 'ec_template' );
 			}
 			if ( isset( $_REQUEST['ec_email_theme'] ) ) {
 				$ec_theme_selected = $_REQUEST['ec_email_theme'];
 			}
 			
-			// Modify if theres preview fields.
+			// Modify if there's preview fields.
 			$settings = ec_get_settings( $ec_theme_selected );
 			
 			if ( $settings ) {
@@ -839,19 +844,37 @@ class WC_Email_Control {
 	 * @date	20-08-2014
 	 * @since	2.12
 	 */
-	function ec_before_template_prep_email_args_global( $template_name, $template_path, $located, $args ) {
+	function ec_email_templates_start( $template_name, $template_path, $located, $args ) {
 		
 		// Only do this for email templates.
 		if ( FALSE !== strrpos( $template_name, 'email' ) ) {
 			
 			global $ec_email_args;
 			
+			// Only do this if it's not been done once yet, by testing if it's not set yet.
 			if ( NULL == $ec_email_args ) {
 				
-				$ec_email_args = array_merge( $args, array( 'ec_template_name' => $template_name ) );
+				// Store the current $args in a global, so they are available globally to the shortcodes,
+				// and store the starting template name in the $args array or later use in the 'after' function.
+				$ec_email_args = array_merge(
+					$args,
+					array( 'ec_template_name' => $template_name )
+				);
 				
-				// Debugging
-				//echo 'start:&nbsp;' . $template_name;
+				// Get active theme.
+				$ec_theme_selected = false;
+				if ( get_option( 'ec_template' ) ) {
+					$ec_theme_selected = get_option( 'ec_template' );
+				}
+				if ( isset( $_REQUEST['ec_email_theme'] ) ) {
+					$ec_theme_selected = $_REQUEST['ec_email_theme'];
+				}
+				
+				// do action `ec_before_get_email_template`.
+				do_action( 'ec_before_get_email_template', $ec_theme_selected );
+				
+				// do action `ec_before_get_email_template_deluxe`.
+				do_action( 'ec_before_get_email_template_' . $ec_theme_selected );
 			}
 		}
 	}
@@ -862,7 +885,7 @@ class WC_Email_Control {
 	 * @date	09-02-2015
 	 * @since	2.17
 	 */
-	function ec_after_template_prep_email_args_global( $template_name, $template_path, $located, $args ) {
+	function ec_email_templates_end( $template_name, $template_path, $located, $args ) {
 		
 		// Only do this for email templates.
 		if ( FALSE !== strrpos( $template_name, 'email' ) ) {
@@ -917,7 +940,11 @@ class WC_Email_Control {
 		global $cxec_cache_email_object, $cxec_cache_email_formatting_type;
 		
 		// Only if this is an html & email request.
-		if ( isset( $args['email_heading'] ) && isset( $args['plain_text'] ) && FALSE === $args['plain_text'] ) {
+		if (
+				isset( $args['email_heading'] ) &&
+				isset( $args['plain_text'] ) &&
+				FALSE === $args['plain_text']
+			) {
 			
 			add_filter( 'woocommerce_email_styles', array( $this, 'ec_temporarily_empty_css' ) );
 			$cxec_cache_email_formatting_type = 'html';
@@ -1037,7 +1064,7 @@ class WC_Email_Control {
 		 */
 		
 		// Get the Customer user from the order, or the current user ID if guest.
-		if ( 0 === ( $user_id = (int) get_post_meta( $order->id, '_customer_user', TRUE ) ) ) {
+		if ( 0 === ( $user_id = (int) get_post_meta( ec_order_get_id( $order ), '_customer_user', TRUE ) ) ) {
 			$user_id = get_current_user_id();
 		}
 		$user = get_user_by( 'id', $user_id );
@@ -1046,14 +1073,18 @@ class WC_Email_Control {
 		 * Get a Product ID for the preview.
 		 */
 		
-		// Get a product from the order. If it doesnt exist anymore then get the latest product.
+		// Set backup product_id
+		$product_id = -1;
+		
+		// Get a product from the order.
 		$items = $order->get_items();
 		foreach ( $items as $item ) {
 			$product_id = $item['product_id'];
 			if ( NULL !== get_post( $product_id ) ) break;
-			//$product_variation_id = $item['variation_id'];
+			// $product_variation_id = $item['variation_id'];
 		}
 		
+		// If it doesnt exist anymore then get the latest product.
 		if ( NULL === get_post( $product_id ) ){
 			
 			$products_array = get_posts( array(
@@ -1096,7 +1127,7 @@ class WC_Email_Control {
 				$mail->object                  = $order;
 				$mail->find['order-date']      = '{order_date}';
 				$mail->find['order-number']    = '{order_number}';
-				$mail->replace['order-date']   = date_i18n( wc_date_format(), strtotime( $mail->object->order_date ) );
+				$mail->replace['order-date']   = date_i18n( wc_date_format(), strtotime( ec_order_get_date_created( $mail->object ) ) );
 				$mail->replace['order-number'] = $mail->object->get_order_number();
 				break;
 			
@@ -1116,7 +1147,7 @@ class WC_Email_Control {
 				$mail->customer_note           = 'Hello';
 				$mail->find['order-date']      = '{order_date}';
 				$mail->find['order-number']    = '{order_number}';
-				$mail->replace['order-date']   = date_i18n( wc_date_format(), strtotime( $mail->object->order_date ) );
+				$mail->replace['order-date']   = date_i18n( wc_date_format(), strtotime( ec_order_get_date_created( $mail->object ) ) );
 				$mail->replace['order-number'] = $mail->object->get_order_number();
 				break;
 			

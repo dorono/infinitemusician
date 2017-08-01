@@ -3,10 +3,11 @@
  * Email Addresses
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
-
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 ?>
-<table class="addresses" cellpadding="0" cellspacing="0" border="0" align="center">
+<table id="addresses" cellspacing="0" cellpadding="0" align="center" style="width: 100%; vertical-align: top;" border="0">
 	<tr>
 		<td class="addresses-td" width="50%" valign="top" class="addresses-td">
 			<h3><?php _e( "Billing Address", 'email-control' ); ?></h3>

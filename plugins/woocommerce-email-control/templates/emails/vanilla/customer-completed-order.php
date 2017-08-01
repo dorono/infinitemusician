@@ -11,14 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @hooked WC_Emails::email_header() Output the email header
  */
 do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
-
 		
 <div class="top_heading">
 	<?php echo get_option( 'ec_vanilla_customer_completed_order_heading' ); ?>
 </div>
 
 <?php echo get_option( 'ec_vanilla_customer_completed_order_main_text' ); ?>
-
 
 <?php
 

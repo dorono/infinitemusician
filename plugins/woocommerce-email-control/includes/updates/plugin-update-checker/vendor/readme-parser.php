@@ -237,8 +237,8 @@ Class PucReadmeParser {
 		$text = call_user_func( array( __CLASS__, 'code_trick' ), $text, $markdown ); // A better parser than Markdown's for: backticks -> CODE
 
 		if ( $markdown ) { // Parse markdown.
-			if ( !class_exists('Parsedown') ) {
-				require_once(dirname(__FILE__) . '/Parsedown.php');
+			if ( !class_exists('Parsedown', false) ) {
+				require_once(dirname(__FILE__) . '/Parsedown' . (version_compare(PHP_VERSION, '5.3.0', '>=') ? '' : 'Legacy') . '.php');
 			}
 			$instance = Parsedown::instance();
 			$text = $instance->text($text);

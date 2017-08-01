@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Authorize.Net CIM Gateway to newer
  * versions in the future. If you wish to customize WooCommerce Authorize.Net CIM Gateway for your
- * needs please refer to http://docs.woothemes.com/document/authorize-net-cim/
+ * needs please refer to http://docs.woocommerce.com/document/authorize-net-cim/
  *
  * @package   WC-Gateway-Authorize-Net-CIM/API/Request
  * @author    SkyVerge
- * @copyright Copyright (c) 2011-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2011-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -83,11 +83,11 @@ class WC_Authorize_Net_CIM_API_Non_Profile_Transaction_Request extends WC_Author
 		$transaction_type = ( $type === 'auth_only' ) ? self::AUTH_ONLY : self::AUTH_CAPTURE;
 
 		$this->request_data = array(
-			'refId'              => $this->order->id,
+			'refId'              => SV_WC_Order_Compatibility::get_prop( $this->order, 'id' ),
 			'transactionRequest' => array(
 				'transactionType'     => $transaction_type,
 				'amount'              => $this->order->payment_total,
-				'currencyCode'        => $this->order->get_order_currency(),
+				'currencyCode'        => SV_WC_Order_Compatibility::get_prop( $this->order, 'currency', 'view' ),
 				'payment'             => $this->get_payment(),
 				'solution'            => array( 'id' => 'A1000065' ),
 				'order'               => array(
@@ -97,14 +97,14 @@ class WC_Authorize_Net_CIM_API_Non_Profile_Transaction_Request extends WC_Author
 				'lineItems'           => array( 'lineItem' => $this->get_line_items() ),
 				'tax'                 => $this->get_taxes(),
 				'shipping'            => $this->get_shipping(),
-				'poNumber'            => SV_WC_Helper::str_truncate( preg_replace( '/\W/', '', $this->order->po_number ), 25 ),
+				'poNumber'            => SV_WC_Helper::str_truncate( preg_replace( '/\W/', '', $this->order->payment->po_number ), 25 ),
 				'customer'            => array(
 					'id' => $this->order->get_user_id(),
-					'email' => is_email( $this->order->billing_email ) ? $this->order->billing_email : null,
+					'email' => is_email( SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_email' ) ) ? SV_WC_Order_Compatibility::get_prop( $this->order, 'billing_email' ) : null,
 				),
 				'billTo'              => $this->get_address( 'billing' ),
 				'shipTo'              => $this->get_address( 'shipping' ),
-				'customerIP'          => $this->order->customer_ip_address,
+				'customerIP'          => SV_WC_Order_Compatibility::get_prop( $this->order, 'customer_ip_address' ),
 				'transactionSettings' => $this->get_transaction_settings(),
 			),
 		);
@@ -169,8 +169,8 @@ class WC_Authorize_Net_CIM_API_Non_Profile_Transaction_Request extends WC_Author
 		$this->request_data = array(
 			'transactionRequest' => array(
 				'transactionType' => self::PRIOR_AUTH_CAPTURE,
-				'amount'          => $order->capture_total,
-				'refTransId'      => $order->authorize_net_cim_capture_trans_id,
+				'amount'          => $order->capture->amount,
+				'refTransId'      => $order->capture->trans_id,
 			),
 		);
 	}
@@ -186,7 +186,7 @@ class WC_Authorize_Net_CIM_API_Non_Profile_Transaction_Request extends WC_Author
 		$this->order = $order;
 
 		$this->request_data = array(
-			'refId'              => $order->id,
+			'refId'              => SV_WC_Order_Compatibility::get_prop( $this->order, 'id' ),
 			'transactionRequest' => array(
 				'transactionType' => self::REFUND,
 				'amount'          => $order->refund->amount,
@@ -216,7 +216,7 @@ class WC_Authorize_Net_CIM_API_Non_Profile_Transaction_Request extends WC_Author
 		$this->order = $order;
 
 		$this->request_data = array(
-			'refId'              => $order->id,
+			'refId'              => SV_WC_Order_Compatibility::get_prop( $this->order, 'id' ),
 			'transactionRequest' => array(
 				'transactionType' => self::VOID,
 				'refTransId'      => $order->refund->trans_id,

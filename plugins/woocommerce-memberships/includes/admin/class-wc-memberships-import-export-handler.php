@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Admin
  * @author    SkyVerge
  * @category  Admin
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -88,6 +88,8 @@ class WC_Memberships_Admin_Import_Export_Handler {
 	/**
 	 * Set the Memberships admin menu item as active
 	 * while viewing the Import / Export tab page
+	 *
+	 * @internal
 	 *
 	 * @since 1.6.2
 	 * @param string $parent_file
@@ -171,12 +173,14 @@ class WC_Memberships_Admin_Import_Export_Handler {
 	/**
 	 * Add bulk User Memberships export action
 	 *
+	 * @internal
+	 *
 	 * @since 1.6.0
 	 */
 	public function add_bulk_export() {
 		global $post_type;
 
-		if( $post_type === 'wc_user_membership' && current_user_can( 'manage_woocommerce' ) ) :
+		if( $post_type === 'wc_user_membership' && current_user_can( 'manage_woocommerce_user_memberships' ) ) :
 
 			?>
 			<script type="text/javascript">
@@ -194,6 +198,8 @@ class WC_Memberships_Admin_Import_Export_Handler {
 
 	/**
 	 * Process bulk User Memberships export action
+	 *
+	 * @internal
 	 *
 	 * @since 1.6.0
 	 */
@@ -223,6 +229,8 @@ class WC_Memberships_Admin_Import_Export_Handler {
 
 	/**
 	 * Render the page within Memberships admin page tabs
+	 *
+	 * @internal
 	 *
 	 * @since 1.6.0
 	 */

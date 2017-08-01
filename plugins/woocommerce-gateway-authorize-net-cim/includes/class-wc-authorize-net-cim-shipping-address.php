@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Authorize.Net CIM Gateway to newer
  * versions in the future. If you wish to customize WooCommerce Authorize.Net CIM Gateway for your
- * needs please refer to http://docs.woothemes.com/document/authorize-net-cim/
+ * needs please refer to http://docs.woocommerce.com/document/authorize-net-cim/
  *
  * @package   WC-Gateway-Authorize-Net-CIM/Gateway
  * @author    SkyVerge
- * @copyright Copyright (c) 2013-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2013-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -229,6 +229,9 @@ class WC_Authorize_Net_CIM_Shipping_Address {
 	 */
 	public function matches_address( $address ) {
 
+		// convert the country code to 2-character, as stored by WC
+		$address['country'] = ! empty( $address['country'] ) ? SV_WC_Helper::convert_country_code( $address['country'] ) : '';
+
 		return md5( json_encode( $address ) ) === $this->get_hash();
 	}
 
@@ -243,16 +246,34 @@ class WC_Authorize_Net_CIM_Shipping_Address {
 	 */
 	protected function get_shipping_from_object( $object ) {
 
-		return array(
-			'first_name' => $object->shipping_first_name,
-			'last_name'  => $object->shipping_last_name,
-			'company'    => $object->shipping_company,
-			'address'    => trim( $object->shipping_address_1 . ' ' . $object->shipping_address_2 ),
-			'city'       => $object->shipping_city,
-			'state'      => $object->shipping_state,
-			'postcode'   => $object->shipping_postcode,
-			'country'    => $object->shipping_country,
-		);
+		if ( $object instanceof WC_Order ) {
+
+			$shipping = array(
+				'first_name' => SV_WC_Order_Compatibility::get_prop( $object, 'shipping_first_name' ),
+				'last_name'  => SV_WC_Order_Compatibility::get_prop( $object, 'shipping_last_name' ),
+				'company'    => SV_WC_Order_Compatibility::get_prop( $object, 'shipping_company' ),
+				'address'    => trim( SV_WC_Order_Compatibility::get_prop( $object, 'shipping_address_1' ) . ' ' . SV_WC_Order_Compatibility::get_prop( $object, 'shipping_address_2' ) ),
+				'city'       => SV_WC_Order_Compatibility::get_prop( $object, 'shipping_city' ),
+				'state'      => SV_WC_Order_Compatibility::get_prop( $object, 'shipping_state' ),
+				'postcode'   => SV_WC_Order_Compatibility::get_prop( $object, 'shipping_postcode' ),
+				'country'    => SV_WC_Order_Compatibility::get_prop( $object, 'shipping_country' ),
+			);
+
+		} else {
+
+			$shipping = array(
+				'first_name' => $object->shipping_first_name,
+				'last_name'  => $object->shipping_last_name,
+				'company'    => $object->shipping_company,
+				'address'    => trim( $object->shipping_address_1 . ' ' . $object->shipping_address_2 ),
+				'city'       => $object->shipping_city,
+				'state'      => $object->shipping_state,
+				'postcode'   => $object->shipping_postcode,
+				'country'    => $object->shipping_country,
+			);
+		}
+
+		return $shipping;
 	}
 
 

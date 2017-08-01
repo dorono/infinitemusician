@@ -171,10 +171,10 @@ class WCOPC_Admin_Editor {
 	<?php do_action( 'wcopc_shortcode_iframe_before' ); ?>
 	<fieldset id="wcopc_product_ids_fields" style="margin: 1em 0;">
 		<label for="wcopc_product_ids" style="width: 70px; display: inline-block;"><strong><?php _e( 'Products:', 'wcopc' ); ?></strong></label>
-		<?php if ( PP_One_Page_Checkout::is_woocommerce_pre( '2.3' ) ) { ?>
-		<select id="wcopc_product_ids" name="wcopc_product_ids[]" class="ajax_chosen_select_products" multiple="multiple" data-placeholder="<?php _e( 'Search for a product&hellip;', 'wcopc' ); ?>" style="width: 75%;"></select>
-		<?php } else { ?>
+		<?php if ( PP_One_Page_Checkout::is_woocommerce_pre( '3.0' ) ) { ?>
 		<input type="hidden" id="wcopc_product_ids" name="wcopc_product_ids[]" data-multiple="true" class="wc-product-search" data-placeholder="<?php _e( 'Search for a product&hellip;', 'wcopc' ); ?>" style="width: 75%;"/>
+		<?php } else { ?>
+		<select id="wcopc_product_ids" name="wcopc_product_ids[]" class="wc-product-search" multiple="multiple" data-placeholder="<?php _e( 'Search for a product&hellip;', 'wcopc' ); ?>" style="width: 75%;"></select>
 		<?php } ?>
 	</fieldset>
 	<fieldset id="wcopc_template_fields" style="margin: 1em 0;">

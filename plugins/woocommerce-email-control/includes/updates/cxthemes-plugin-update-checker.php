@@ -3,7 +3,7 @@
 // Include the 3rd party - Plugin Update Checker
 require 'plugin-update-checker/plugin-update-checker.php';
 
-if ( ! class_exists( 'CX_Email_Control_Plugin_Update_Checker' ) ) :
+if ( class_exists( 'CX_Email_Control_Plugin_Update_Checker' ) ) return;
 
 class CX_Email_Control_Plugin_Update_Checker {
 	
@@ -46,7 +46,7 @@ class CX_Email_Control_Plugin_Update_Checker {
 		/**
 		 * Main: do the initial plugin update check.
 		 */
-		$this->plugin_update_checker = new PluginUpdateChecker(
+		$this->plugin_update_checker = PucFactory::buildUpdateChecker(
 			$this->metadataUrl,
 			$pluginFile,
 			$slug
@@ -134,7 +134,7 @@ class CX_Email_Control_Plugin_Update_Checker {
 					$temp_url = remove_query_arg( 'license_key', $temp_url );
 					$temp_url = add_query_arg( array( 'license_key' => $submitted_code ), $temp_url );
 					
-					$this->plugin_update_checker = new PluginUpdateChecker(
+					$this->plugin_update_checker = PucFactory::buildUpdateChecker(
 						$temp_url, // New Local Update Checker
 						$this->pluginFile,
 						$this->slug
@@ -279,7 +279,3 @@ class CX_Email_Control_Plugin_Update_Checker {
 	}
 	
 }
-
-endif;
-
-?>

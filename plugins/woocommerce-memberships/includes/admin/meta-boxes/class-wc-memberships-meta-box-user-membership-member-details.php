@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
  * @category  Admin
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -33,17 +33,20 @@ defined( 'ABSPATH' ) or exit;
 class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Memberships_Meta_Box {
 
 
-	/** @var string meta box id **/
-	protected $id = 'wc-memberships-user-membership-member-details';
+	/**
+	 * Constructor
+	 *
+	 * @since 1.7.0
+	 */
+	public function __construct() {
 
-	/** @var string meta box context **/
-	protected $context = 'side';
+		$this->id       = 'wc-memberships-user-membership-member-details';
+		$this->context  = 'side';
+		$this->priority = 'high';
+		$this->screens  = array( 'wc_user_membership' );
 
-	/** @var string meta box priority **/
-	protected $priority = 'high';
-
-	/** @var array list of supported screen IDs **/
-	protected $screens = array( 'wc_user_membership' );
+		parent::__construct();
+	}
 
 
 	/**
@@ -60,38 +63,21 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Membersh
 	/**
 	 * Display the member details meta box
 	 *
-	 * @param WP_Post $post
+	 * @param \WP_Post $post
 	 * @since 1.0.0
 	 */
 	public function output( WP_Post $post ) {
-		global $pagenow;
 
-		// Prepare variables
-		$user_id = 'post.php' == $pagenow
-						? $post->post_author
-						: ( isset( $_GET['user'] ) ? $_GET['user'] : null );
+		// prepare variables
+		$this->post            = $post;
+		$this->user_membership = $user_membership = wc_memberships_get_user_membership( $post->ID );
+		$this->order           = $order           = $user_membership->get_order();
+		$this->product         = $product         = $user_membership->get_product();
+		$this->user            = $user            = $this->get_membership_user( $user_membership );
 
-		// Bail out if no user ID
-		if ( ! $user_id ) {
+		// bail out if no user
+		if ( ! $user ) {
 			return;
-		}
-
-		// Get user details
-		$user = get_userdata( $user_id );
-
-		// Get user memberships
-		$user_memberships = wc_memberships_get_user_memberships( $user_id );
-
-		// Determine the member since date. Earliest membership wins!
-		$member_since = null;
-
-		if ( ! empty( $user_memberships ) ) {
-			foreach ( $user_memberships as $user_membership ) {
-
-				if ( ! $member_since || $member_since > $user_membership->get_local_start_date( 'timestamp' ) ) {
-					$member_since = $user_membership->get_local_start_date( 'timestamp' );
-				}
-			}
 		}
 
 		/**
@@ -101,47 +87,57 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Membersh
 		 * @param int $user_id The member (user) ID
 		 * @param int $user_membership_id The post id of the user membership post
 		 */
-		do_action( 'wc_memberships_before_user_membership_member_details', $user->ID, $post->ID );
+		do_action( 'wc_memberships_before_user_membership_member_details', $user->ID, $user_membership->get_id() );
 
-		echo get_avatar( $user->ID, 256 ); ?>
+		echo get_avatar( $user->ID, 256 );
 
-		<h2 class="member-name"><?php echo esc_html( $user->display_name ); ?></h2> <span>(<a href="<?php echo esc_url( get_edit_user_link( $user->ID ) ); ?>"><?php esc_html_e( 'Edit User', 'woocommerce-memberships' ); ?></a>)</span>
+		?>
+		<h2 class="member-name"><?php echo esc_html( $user->display_name ); ?> <a class="edit-member" href="<?php echo esc_url( get_edit_user_link( $user->ID ) ); ?>">(<?php echo strtolower( esc_html__( 'Edit User', 'woocommerce-memberships' ) ); ?>)</a></h2>
 
 		<p>
 			<a href="mailto:<?php echo esc_attr( $user->user_email ); ?>" class="member-email"><?php echo esc_html( $user->user_email ); ?></a>
-			<br />
-			<?php if ( $member_since ) : ?>
-				<span class="member-since">
-					<?php printf( /* translators: %s - date */
-						esc_html__( 'Member since %s', 'woocommerce-memberships' ), date_i18n( wc_date_format(), $member_since ) ); ?>
-				</span>
+			<br><br>
+			<?php if ( $member_since = wc_memberships()->get_user_memberships_instance()->get_user_member_since_local_date( $user->ID, 'timestamp' ) ) : ?>
+
+				<span class="member-since"><?php
+
+					/* translators: Placeholder: %s - date */
+					printf( __( 'Member since %s', 'woocommerce-memberships' ),
+						date_i18n( wc_date_format(), $member_since )
+					); ?></span>
+
 			<?php endif; ?>
 		</p>
 
 		<address>
 			<?php
-				$address = apply_filters( 'woocommerce_my_account_my_address_formatted_address', array(
-					'first_name'  => get_user_meta( $user->ID, 'billing_first_name', true ),
-					'last_name'   => get_user_meta( $user->ID, 'billing_last_name', true ),
-					'company'     => get_user_meta( $user->ID, 'billing_company', true ),
-					'address_1'   => get_user_meta( $user->ID, 'billing_address_1', true ),
-					'address_2'   => get_user_meta( $user->ID, 'billing_address_2', true ),
-					'city'        => get_user_meta( $user->ID, 'billing_city', true ),
-					'state'       => get_user_meta( $user->ID, 'billing_state', true ),
-					'postcode'    => get_user_meta( $user->ID, 'billing_postcode', true ),
-					'country'     => get_user_meta( $user->ID, 'billing_country', true )
-				), $user->ID, 'billing' );
 
-				$formatted_address = WC()->countries->get_formatted_address( $address );
+			// prepare the address
+			$address_parts = array(
+				'first_name'  => get_user_meta( $user->ID, 'billing_first_name', true ),
+				'last_name'   => get_user_meta( $user->ID, 'billing_last_name', true ),
+				'company'     => get_user_meta( $user->ID, 'billing_company', true ),
+				'address_1'   => get_user_meta( $user->ID, 'billing_address_1', true ),
+				'address_2'   => get_user_meta( $user->ID, 'billing_address_2', true ),
+				'city'        => get_user_meta( $user->ID, 'billing_city', true ),
+				'state'       => get_user_meta( $user->ID, 'billing_state', true ),
+				'postcode'    => get_user_meta( $user->ID, 'billing_postcode', true ),
+				'country'     => get_user_meta( $user->ID, 'billing_country', true )
+			);
 
-				if ( ! $formatted_address ) {
-					esc_html_e( 'User has not set up their billing address yet.', 'woocommerce-memberships' );
-				} else {
-					echo $formatted_address;
-				}
+			// format the address with WooCommerce
+			$address           = apply_filters( 'woocommerce_my_account_my_address_formatted_address', $address_parts, $user->ID, 'billing' );
+			$formatted_address = WC()->countries->get_formatted_address( $address );
+
+			if ( ! $formatted_address ) {
+				esc_html_e( 'User has not set up their billing address yet.', 'woocommerce-memberships' );
+			} else {
+				echo $formatted_address;
+			}
+
 			?>
 		</address>
-
+		<br>
 		<?php
 
 		/**
@@ -151,7 +147,7 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Membersh
 		 * @param int $user_id The member (user) ID
 		 * @param int $user_membership_id The post id of the user membership post
 		 */
-		do_action( 'wc_memberships_after_user_membership_member_details', $user->ID, $post->ID );
+		do_action( 'wc_memberships_after_user_membership_member_details', $user->ID, $user_membership->get_user_id() );
 	}
 
 

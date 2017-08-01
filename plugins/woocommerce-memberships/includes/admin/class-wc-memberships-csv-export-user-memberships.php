@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Admin
  * @author    SkyVerge
  * @category  Admin
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -33,7 +33,7 @@ defined( 'ABSPATH' ) or exit;
 class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_Export {
 
 
-	/** @var array User Memberhips to export, used in bulk actions */
+	/** @var array User Memberships ids to export, used in bulk actions */
 	public $export_ids = array();
 
 	/** @var bool Whether to export User Memberships additional meta data */
@@ -126,8 +126,8 @@ class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_E
 	/**
 	 * Set User Membership IDs to export
 	 *
-	 * @see WC_Memberships_Admin_Import_Export_Handler::process_bulk_export()
-	 * @see WC_Memberships_CSV_Export_User_Memberships::get_user_memberships_ids()
+	 * @see \WC_Memberships_Admin_Import_Export_Handler::process_bulk_export()
+	 * @see \WC_Memberships_CSV_Export_User_Memberships::get_user_memberships_ids()
 	 *
 	 * @since 1.6.0
 	 * @param int[] $user_membership_ids Array of \WC_Memberships_User_Membership IDs
@@ -156,18 +156,12 @@ class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_E
 			'membership_plan'       => 'membership_plan',
 			'membership_plan_slug'  => 'membership_plan_slug',
 			'membership_status'     => 'membership_status',
+			'has_access'            => 'has_access',
 			'product_id'            => 'product_id',
 			'order_id'              => 'order_id',
 			'member_since'          => 'member_since',
 			'membership_expiration' => 'membership_expiration',
 		);
-
-		if ( wc_memberships()->get_integrations_instance()->is_subscriptions_active() ) {
-
-			$headers = SV_WC_Helper::array_insert_after( $headers, 'product_id', array(
-				'subscription_id' => 'subscription_id',
-			) );
-		}
 
 		/**
 		 * Filter the User Memberships CSV export file row headers
@@ -237,13 +231,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_E
 	 */
 	protected function get_fields() {
 
-		/**
-		 * Filter CSV Export User Memberships options
-		 *
-		 * @since 1.6.0
-		 * @para array $options Associative array
-		 */
-		return apply_filters( 'wc_memberships_csv_export_user_memberships_options', array(
+		$options = array(
 
 			// section start
 			array(
@@ -360,7 +348,15 @@ class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_E
 			// section end
 			array( 'type' => 'sectionend' ),
 
-		) );
+		);
+
+		/**
+		 * Filter CSV Export User Memberships options
+		 *
+		 * @since 1.6.0
+		 * @para array $options Associative array
+		 */
+		return apply_filters( 'wc_memberships_csv_export_user_memberships_options', $options );
 	}
 
 
@@ -619,7 +615,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_E
 
 		foreach ( $user_membership_ids as $user_membership_id ) {
 
-			$user_membership = new WC_Memberships_User_Membership( $user_membership_id );
+			$user_membership = wc_memberships_get_user_membership( $user_membership_id );
 
 			if ( $user_membership->get_id() > 0 ) {
 
@@ -729,16 +725,12 @@ class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_E
 						$value = $user_membership->get_status();
 					break;
 
-					case 'product_id' :
-						$value = $user_membership->get_product_id();
+					case 'has_access' :
+						$value = $user_membership->is_active() ? strtolower( __( 'Yes', 'woocommerce-memberships' ) ) : strtolower( __( 'No', 'woocommerce-memberships' ) );
 					break;
 
-					case 'subscription_id' :
-
-						$subscriptions = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-
-						$value = null !== $subscriptions ? $subscriptions->get_user_membership_subscription_id( $user_membership_id ) : '';
-
+					case 'product_id' :
+						$value = $user_membership->get_product_id();
 					break;
 
 					case 'order_id' :
@@ -756,7 +748,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends WC_Memberships_Import_E
 					case 'user_membership_meta' :
 
 						$meta  = get_post_meta( $user_membership_id );
-						$value = is_array( $meta ) ? wc_memberships_json_encode( $meta ) : '';
+						$value = is_array( $meta ) ? wp_json_encode( $meta ) : '';
 
 					break;
 

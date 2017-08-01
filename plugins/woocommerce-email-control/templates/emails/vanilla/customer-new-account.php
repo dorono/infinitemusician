@@ -4,13 +4,11 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit;
 }
-
 ?>
 
 <?php do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
-
 
 <div class="top_heading">
 	<?php echo get_option( 'ec_vanilla_customer_new_account_heading' ); ?>
@@ -29,6 +27,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php } ?>
 		
 <?php endif; ?>
-
 
 <?php do_action( 'woocommerce_email_footer', $email ); ?>

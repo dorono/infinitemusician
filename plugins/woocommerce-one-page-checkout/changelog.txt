@@ -1,5 +1,24 @@
 == Changelog ==
 
+2017.06.06 - version 1.5.0
+* New: Add improved support for Name Your Price extension - support Product Table, Pricing Table, and Single Product templates. PR#272
+* WooCommerce 3.0: Fix display of product attributes for variation products. PR#274
+* Fix: do not nest additional .opc_order_review divs for each Ajax load. PR#277
+* Fix: Handle Grouped OPC products correctly rather than always triggering a "Sorry, this product cannot be purchased" error. PR#278
+* Fix: Make sure "Ship to a different address" checkbox is available when it should be, which also fixes Apple Pay compatibility. PR#276
+
+2017.04.18 - version 1.4.1
+* WooCommerce 3.0: Fix autofocus/page scroll by removing the new 'autofocus' attribute on the first name checkout form when WooCommerce 3.0+ is active. PR#267
+* WooCommerce 3.0: Fix image display on single product product selection template.
+* WooCommerce 3.0: Fix use of deprecated 'wc_add_to_cart_message'.
+
+2017.04.03 - version 1.4.0
+* WooCommerce 3.0 Compatibility
+
+2017.02.01 - version 1.3.2
+* Fix: Incorrect redirection with WordPress 4.7 and older versions of PHP, like 5.3.29. (PR#261)
+* Fix: Handle undefined variables when a One Page Checkout page is left over for a period of time beyond the lifetime of the nonces used on the page. (PR#257)
+
 2016.10.03 - version 1.3.1
 * Tweak: when the OPC notices are not within view, scroll to 150 pixels above that element to make sure coupon form is displayed. (PR#255)
 

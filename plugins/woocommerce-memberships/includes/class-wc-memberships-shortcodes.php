@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -64,6 +64,8 @@ class WC_Memberships_Shortcodes {
 	/**
 	 * Restrict content shortcode
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 * @param array $atts Shortcode attributes
 	 * @param string|null $content
@@ -96,24 +98,25 @@ class WC_Memberships_Shortcodes {
 	/**
 	 * Nonmember content shortcode
 	 *
+	 * @internal
+	 *
 	 * @since 1.1.0
 	 * @param array $atts Shortcode attributes
 	 * @param string|null $content
-	 * @return void|string Shortcode result
+	 * @return string Shortcode result
 	 */
 	public static function nonmember( $atts, $content = null ) {
 
 		// Hide non-member messages for super users
 		if ( current_user_can( 'wc_memberships_access_all_restricted_content' ) ) {
-			return;
+			return '';
 		}
 
 		$plans         = wc_memberships_get_membership_plans();
 		$active_member = array();
 
 		foreach ( $plans as $plan ) {
-			$active = wc_memberships_is_user_active_member( get_current_user_id(), $plan );
-			array_push( $active_member, $active );
+			$active_member[] = wc_memberships_is_user_active_member( get_current_user_id(), $plan );
 		}
 
 		ob_start();
@@ -128,6 +131,8 @@ class WC_Memberships_Shortcodes {
 
 	/**
 	 * Restricted content messages
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param array $atts Shortcode attributes
@@ -192,5 +197,6 @@ class WC_Memberships_Shortcodes {
 
 		return $output;
 	}
+
 
 }

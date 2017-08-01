@@ -17,6 +17,11 @@ $body_text_color		= get_option( 'ec_vanilla_all_text_color' ); // "#3d3d3d";
 $body_text_size 		= 14; //px
 $body_letter_spacing	= 0.1; //em
 
+// Not used - outlook doesn't like rgba, and bugs out.
+$nav_rgba = wc_rgb_from_hex( $body_text_color );
+$nav_rgba['A'] = '.8'; // add the alpha opacity.
+$nav_rgba = 'rgba( ' . implode( ', ', $nav_rgba ) . ' )';
+
 $heading_color 			= get_option( 'ec_vanilla_all_heading_color' );
 
 $heading_1_size			= get_option( 'ec_vanilla_all_heading_1_size' ); //px
@@ -82,7 +87,7 @@ a { color: <?php echo $body_text_color ?>; font-style: <?php echo $body_a_style 
 
 .main-body { font-family: Arial, sans-serif; text-align: center; overflow: hidden; width: <?php echo $email_width ?>px; }
 
-.divider-line { background: <?php echo wc_hex_darker( $back_bg_color, 8 ); ?>; font-size: 0; height: 1px; }
+.divider-line { background: <?php echo wc_hex_darker( $back_bg_color, 8 ); ?>; font-size: 0; height: 1px; line-height: 1px; }
 
 .template_header { font-family: Arial, sans-serif; font-family:Arial; font-weight:bold; vertical-align:middle; padding: 20px 0; padding: 3% 0; }
 .template_header a { font-weight: normal; text-decoration: none; font-size: 13px; margin: 0 0 0 12px; }
@@ -158,7 +163,7 @@ a { color: <?php echo $body_text_color ?>; font-style: <?php echo $body_a_style 
 .top_nav tr td.nav-text-block-with-image { padding-left: 0px; }
 .top_nav tr td.nav-image-block { padding: 8px 6px; }
 .top_nav tr td.nav-spacer-block { padding: 8px 6px; }
-.top_nav a { font-weight: bold; color: <?php echo wc_hex_darker( $body_text_color, 20 ); ?>; text-decoration: none; }
+.top_nav a { font-weight: bold; color: <?php echo $body_text_color; ?>; text-decoration: none; }
 
 /* FOOTER */
 .footer-text-block { font-family: Arial,sans-serif; font-size: 12px; text-align: center; }

@@ -26,11 +26,12 @@ if ( ! class_exists( 'Homestore_Integrations' ) ) :
 		 * @since 1.0
 		 */
 		public function __construct() {
-			add_action( 'after_switch_theme',  array( $this, 'edit_theme_mods' ) );
-			add_action( 'customize_register',  array( $this, 'edit_controls' ), 99 );
-			add_action( 'customize_register',  array( $this, 'set_extension_default_settings' ), 99 );
-			add_action( 'init',                array( $this, 'default_theme_mod_values' ) );
-			add_action( 'wp',                  array( $this, 'storefront_woocommerce_customiser' ) );
+			add_action( 'after_switch_theme',        array( $this, 'edit_theme_mods' ) );
+			add_action( 'customize_register',        array( $this, 'edit_controls' ), 99 );
+			add_action( 'customize_register',        array( $this, 'set_extension_default_settings' ), 99 );
+			add_action( 'init',                      array( $this, 'default_theme_mod_values' ) );
+			add_action( 'wp',                        array( $this, 'storefront_woocommerce_customiser' ) );
+			add_filter( 'sp_designer_selectors_map', array( $this, 'new_powerpack_selectors' ) );
 
 			/**
 			 * Storefront WooCommerce Customiser
@@ -38,6 +39,19 @@ if ( ! class_exists( 'Homestore_Integrations' ) ) :
 			if ( class_exists( 'Storefront_WooCommerce_Customiser' ) ) {
 				add_filter( 'swc_setting_defaults', array( $this, 'homestore_swc_setting_defaults' ), 99 );
 			}
+		}
+
+		/**
+		 * Adds a new selector to Powerpack
+		 * @return array Powerpack css selectors
+		 */
+		function new_powerpack_selectors( $map ) {
+			$map[ 'homepage-product-section-title' ] = array(
+				'selector' => '.site-main .storefront-product-section h2.section-title',
+				'name'     => __( 'Homepage product section title', 'homestore' ),
+			);
+
+			return $map;
 		}
 
 		/**

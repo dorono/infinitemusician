@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Frontend/Checkout
  * @author    SkyVerge
  * @category  Frontend
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -68,8 +68,10 @@ class WC_Memberships_Checkout {
 	/**
 	 * If shopping cart contains subscriptions, make sure a user can register on the checkout page
 	 *
-	 * @param \WC_Checkout $checkout instance
+	 * TODO since WC 3.0 many of the properties in this method are soft deprecated, they may need an update to checkout methods in the near future {FN 2017-03-10}
+	 *
 	 * @since 1.0.0
+	 * @param null|\WC_Checkout $checkout instance
 	 */
 	public function maybe_enable_registration( $checkout = null ) {
 
@@ -99,8 +101,10 @@ class WC_Memberships_Checkout {
 	/**
 	 * Restore the original checkout registration settings after checkout has loaded
 	 *
-	 * @param \WC_Checkout $checkout instance
+	 * TODO since WC 3.0 many of the properties in this method are soft deprecated, they may need an update to checkout methods in the near future {FN 2017-03-10}
+	 *
 	 * @since 1.0.0
+	 * @param null|\WC_Checkout $checkout instance
 	 */
 	public function restore_registration_settings( $checkout = null ) {
 
@@ -149,7 +153,10 @@ class WC_Memberships_Checkout {
 	 */
 	public function remove_guest_checkout_js_param( $params ) {
 
-		if ( $this->force_registration() && isset( $params['option_guest_checkout'] ) && 'yes' == $params['option_guest_checkout'] ) {
+		if (    isset( $params['option_guest_checkout'] )
+		     && 'yes' === $params['option_guest_checkout']
+		     && $this->force_registration() ) {
+
 			$params['option_guest_checkout'] = 'no';
 		}
 
@@ -185,63 +192,51 @@ class WC_Memberships_Checkout {
 			return false;
 		}
 
-		// Get membership plans
+		// get membership plans
 		$membership_plans = wc_memberships()->get_plans_instance()->get_membership_plans();
 
-		// Bail out if there are no membership plans
+		// bail out if there are no membership plans
 		if ( empty( $membership_plans ) ) {
 			return false;
 		}
 
 		$force = false;
 
-		// Loop over all available membership plans
+		// loop over all available membership plans
 		foreach ( $membership_plans as $plan ) {
 
-			// Skip if no products grant access to this plan
+			// skip if no products grant access to this plan
 			if ( ! $plan->has_products() ) {
 				continue;
 			}
 
-			// Array to store products that grant access to this plan
+			// array to store products that grant access to this plan
 			$access_granting_product_ids = array();
 
-			// Loop over items to see if any of them grant access to any memberships
+			// loop over items to see if any of them grant access to any memberships
 			foreach ( WC()->cart->get_cart() as $key => $item ) {
 
-				// Product grants access to this membership
+				// product grants access to this membership
 				if ( $plan->has_product( $item['product_id'] ) ) {
 					$access_granting_product_ids[] = $item['product_id'];
 				}
 
-				// Variation access
+				// variation access
 				if ( isset( $item['variation_id'] ) && $item['variation_id'] && $plan->has_product( $item['variation_id'] ) ) {
 					$access_granting_product_ids[] = $item['variation_id'];
 				}
 
 			}
 
-			// No products grant access, skip further processing
+			// no products grant access, skip further processing
 			if ( empty( $access_granting_product_ids ) ) {
 				continue;
 			}
 
-			/**
-			 * Filter the product ID that grants access to the membership plan via purchase
-			 *
-			 * Multiple products from a single order can grant access to a membership plan.
-			 * Default behavior is to use the first product that grants access, but this can
-			 * be overriden using this filter.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param int $product_id
-			 * @param array $access_granting_product_ids Array of product IDs that can grant access to this plan
-			 * @param WC_Memberships_Membership_Plan $plan Membership plan access will be granted to
-			 */
+			/* this filter is documented in /includes/class-wc-memberships-user-memberships.php */
 			$product_id = apply_filters( 'wc_memberships_access_granting_purchased_product_id', $access_granting_product_ids[0], $access_granting_product_ids, $plan );
 
-			// Sanity check: make sure the selected product ID in fact does grant access
+			// sanity check: make sure the selected product ID in fact does grant access
 			if ( ! $plan->has_product( $product_id ) ) {
 				continue;
 			}

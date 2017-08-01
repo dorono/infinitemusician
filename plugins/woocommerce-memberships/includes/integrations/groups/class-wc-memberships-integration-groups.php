@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -143,7 +143,7 @@ class WC_Memberships_Integration_Groups {
 
 		if ( ! count( $this->get_groups() ) ) {
 
-			_e( 'There are no groups to import.', 'woocommerce-memberships' );
+			esc_html_e( 'There are no groups to import.', 'woocommerce-memberships' );
 			return;
 		}
 
@@ -170,28 +170,32 @@ class WC_Memberships_Integration_Groups {
 						<ul style="list-style:none;">
 							<li>
 								<label>
-									<input type="radio"
-									       name="import_groups[<?php echo esc_attr( $group->group_id ); ?>][action]"
-									       id="import_groups_action_<?php echo esc_attr( $group->group_id ); ?>_0"
-									       value="skip"
-									       class="js-import-action">
+									<input
+										type="radio"
+									    name="import_groups[<?php echo esc_attr( $group->group_id ); ?>][action]"
+									    id="import_groups_action_<?php echo esc_attr( $group->group_id ); ?>_0"
+									    value="skip"
+									    class="js-import-action">
 									<?php esc_html_e( 'Skip', 'woocommerce-memberships' ); ?>
 								</label>
 							</li>
 
 							<li>
 								<label>
-									<input type="radio"
-									       name="import_groups[<?php echo esc_attr( $group->group_id ); ?>][action]"
-									       id="import_groups_action_<?php echo esc_attr( $group->group_id ); ?>_1"
-									       value="import"
-									       class="js-import-action">
+									<input
+										type="radio"
+									    name="import_groups[<?php echo esc_attr( $group->group_id ); ?>][action]"
+									    id="import_groups_action_<?php echo esc_attr( $group->group_id ); ?>_1"
+									    value="import"
+									    class="js-import-action"
+									/>
 									<?php esc_html_e( 'Import all members to:', 'woocommerce-memberships' ); ?>
 								</label>
 
-								<select name="import_groups[<?php echo esc_attr( $group->group_id ); ?>][plan]"
-								        id="import_groups_plan_<?php echo esc_attr( $group->group_id ); ?>"
-								        class="">
+								<select
+									name="import_groups[<?php echo esc_attr( $group->group_id ); ?>][plan]"
+									id="import_groups_plan_<?php echo esc_attr( $group->group_id ); ?>"
+									class="">
 									<?php foreach ( $membership_plans as $plan ) : ?>
 										<option value="<?php echo esc_attr( $plan->get_id() ); ?>">
 											<?php echo esc_html( $plan->get_name() ); ?>
@@ -205,14 +209,23 @@ class WC_Memberships_Integration_Groups {
 
 				<?php endforeach; ?>
 
-				<input type="hidden" name="action" value="wc_memberships_import_groups">
+				<input
+					type="hidden"
+					name="action"
+					value="wc_memberships_import_groups"
+				/>
+
 				<p class="submit">
-					<input type="submit"
-					       name="submit"
-					       id="submit"
-					       class="button"
-					       value="<?php esc_attr_e( 'Confirm Import', 'woocommerce-memberships' ); ?>"
-					       disabled="">
+
+					<input
+						type="submit"
+						name="submit"
+						id="submit"
+						class="button"
+						value="<?php esc_attr_e( 'Confirm Import', 'woocommerce-memberships' ); ?>"
+						disabled=""
+					/>
+
 				</p>
 
 			</div>

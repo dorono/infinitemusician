@@ -14,7 +14,7 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Templates
  * @author    SkyVerge
@@ -29,7 +29,9 @@ defined( 'ABSPATH' ) or exit;
  *
  * @type string $email_heading Email heading
  * @type string $membership_note Membership note
- * 
+ * @type \WC_Memberships_User_Membership $user_membership User Membership
+ *
+ * @version 1.0.0
  * @since 1.0.0
  */
 

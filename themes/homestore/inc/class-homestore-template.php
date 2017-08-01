@@ -28,7 +28,7 @@ class Homestore_Template {
 		add_action( 'storefront_page',  array( $this, 'homepage_navigation' ), 5 );
 		add_action( 'storefront_page',  array( $this, 'homepage_content_wrapper' ), 6 );
 		add_action( 'storefront_page',  array( $this, 'homepage_content_wrapper_close' ), 30 );
-
+		
 		add_action( 'storefront_before_footer',  array( $this, 'footer_bar_wrapper' ), 10 );
 		add_action( 'storefront_before_footer',  array( $this, 'footer_bar_wrapper_close' ), 11 );
 

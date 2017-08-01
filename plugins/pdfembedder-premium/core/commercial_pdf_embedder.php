@@ -14,11 +14,13 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
 
 	public function pdfemb_wp_enqueue_scripts() {
 		if (!$this->useminified()) {
-			wp_register_script( 'pdfemb_versionspecific_pdf_js', $this->my_plugin_url().'js/pdfemb-premium.js', array('jquery'), $this->PLUGIN_VERSION);
 			wp_register_script( 'pdfemb_grabtopan_js', $this->my_plugin_url().'js/grabtopan-premium.js', array('jquery'), $this->PLUGIN_VERSION);
 			wp_register_script( 'pdfemb_fullscreenpopup_js', $this->my_plugin_url().'js/jquery.fullscreen-popup-premium.js', array('jquery'), $this->PLUGIN_VERSION);
-			wp_register_script( 'pdfemb_embed_pdf_js', $this->my_plugin_url().'js/pdfemb-embed-pdf.js', 
-								array('pdfemb_versionspecific_pdf_js', 'pdfemb_grabtopan_js', 'pdfemb_fullscreenpopup_js', 'jquery'), $this->PLUGIN_VERSION );
+			wp_register_script( 'pdfemb_pv_core_js', $this->my_plugin_url().'js/pdfemb-pv-core.js',
+								array('pdfemb_grabtopan_js', 'pdfemb_fullscreenpopup_js', 'jquery'), $this->PLUGIN_VERSION );
+			wp_register_script( 'pdfemb_versionspecific_pdf_js', $this->my_plugin_url().'js/pdfemb-premium.js', array('jquery', 'pdfemb_pv_core_js'), $this->PLUGIN_VERSION);
+			wp_register_script( 'pdfemb_embed_pdf_js', $this->my_plugin_url().'js/pdfemb-embed-pdf.js',
+				array('pdfemb_pv_core_js', 'pdfemb_versionspecific_pdf_js'), $this->PLUGIN_VERSION );
 		}
 		else {
 			wp_register_script( 'pdfemb_embed_pdf_js', $this->my_plugin_url().'js/all-pdfemb-premium.min.js', array('jquery'), $this->PLUGIN_VERSION );
@@ -26,7 +28,7 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
 
 		wp_localize_script( 'pdfemb_embed_pdf_js', 'pdfemb_trans', $this->get_translation_array() );
 
-		wp_register_script( 'pdfemb_compat_js', $this->my_plugin_url().'js/pdfjs/compatibility'.($this->useminified() ? '.min' : '').'.js', array(), $this->PLUGIN_VERSION);
+		wp_register_script( 'pdfemb_compat_js', $this->my_plugin_url().'js/pdfjs/compatibility.js', array(), $this->PLUGIN_VERSION);
 		wp_register_script( 'pdfemb_pdf_js', $this->my_plugin_url().'js/pdfjs/pdf'.($this->useminified() ? '.min' : '').'.js', array('pdfemb_compat_js'), $this->PLUGIN_VERSION);
 	}
 
@@ -74,13 +76,30 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     protected function pdfemb_mainsection_extra() {
         $options = $this->get_option_pdfemb();
         ?>
-	    <br class="clear" />
-	    <br class="clear" />
+        <br class="clear" />
+        <br class="clear" />
 
-	    <label for="pdfemb_pageturners" class="textinput"><?php esc_html_e('Page Turners', 'pdf-embedder'); ?></label>
-	    <span>
-        <input type="checkbox" name='<?php echo $this->get_options_name(); ?>[pdfemb_pageturners]' id='pdfemb_pageturners' class='checkbox' <?php echo $options['pdfemb_pageturners'] == 'on' ? 'checked' : ''; ?> />
-        <label for="pdfemb_pageturners" class="checkbox plain"><?php esc_html_e('Page turner arrows when hovering over edges of PDF', 'pdf-embedder'); ?></label>
+        <label for="pdfemb_scrollbar" class="textinput"><?php esc_html_e('Display Scrollbars', 'pdf-embedder'); ?></label>
+        <span>
+
+            <select name='<?php echo $this->get_options_name(); ?>[pdfemb_scrollbar]' id='pdfemb_scrollbar' class='select'>
+                <option value="none" <?php echo $options['pdfemb_scrollbar'] == 'none' ? 'selected' : ''; ?>><?php esc_html_e('None', 'pdf-embedder'); ?></option>
+                <option value="vertical" <?php echo $options['pdfemb_scrollbar'] == 'vertical' ? 'selected' : ''; ?>><?php esc_html_e('Vertical', 'pdf-embedder'); ?></option>
+                <option value="horizontal" <?php echo $options['pdfemb_scrollbar'] == 'horizontal' ? 'selected' : ''; ?>><?php esc_html_e('Horizontal', 'pdf-embedder'); ?></option>
+                <option value="both" <?php echo $options['pdfemb_scrollbar'] == 'both' ? 'selected' : ''; ?>><?php esc_html_e('Both', 'pdf-embedder'); ?></option>
+            </select>
+
+            <br class="clear"/>
+
+        <p class="desc big"><i><?php _e('User can still use mouse if scrollbars not visible', 'pdf-embedder'); ?></i></p>
+
+        </span>
+
+
+        <label for="pdfemb_continousscroll" class="textinput"><?php esc_html_e('Continous Page Scrolling', 'pdf-embedder'); ?></label>
+        <span>
+        <input type="checkbox" name='<?php echo $this->get_options_name(); ?>[pdfemb_continousscroll]' id='pdfemb_continousscroll' class='checkbox' <?php echo $options['pdfemb_continousscroll'] ? 'checked' : ''; ?> />
+        <label for="pdfemb_continousscroll" class="checkbox plain"><?php esc_html_e('Allow user to scroll up/down between all pages in the PDF (if unchecked, user must click next/prev buttons to change page)', 'pdf-embedder'); ?></label>
         </span>
 
         <br class="clear" />
@@ -244,17 +263,18 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
             $license_key = $options['pdfemb_license_key'];
         }
 
-        if( !class_exists( 'EDD_SL_Plugin_Updater11' ) ) {
+        if( !class_exists( 'EDD_SL_Plugin_Updater13' ) ) {
             // load our custom updater
             include( dirname( __FILE__ ) . '/EDD_SL_Plugin_Updater.php' );
         }
 
         // setup the updater
-        $edd_updater = new EDD_SL_Plugin_Updater11( $this->WPPDF_STORE_URL, $this->my_plugin_basename(),
+        $edd_updater = new EDD_SL_Plugin_Updater13( $this->WPPDF_STORE_URL, $this->my_plugin_basename(),
             array(
                 'version' 	=> $this->PLUGIN_VERSION,
                 'license' 	=> $license_key,
                 'item_name' => $this->WPPDF_ITEM_NAME,
+                'item_id' => $this->WPPDF_ITEM_ID,
                 'author' 	=> 'Dan Lester',
                 'beta'      => $options['pdfemb_allowbeta']
             ),
@@ -284,53 +304,8 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
             add_action('wp_ajax_pdfemb_count_download', array($this, 'ajax_pdfemb_count_download'));
         }
 
-        // Advertise the new beta upgrades option
-        $no_thanks = get_site_option($this->get_options_name().'_beta_no_thanks', false);
-        if (!$no_thanks && !$options['pdfemb_allowbeta'] && is_super_admin()) {
-            // is_super_admin() should return true for a regular admin if not in network mode
-            if (isset($_REQUEST['pdfemb_beta_action']) && in_array($_REQUEST['pdfemb_beta_action'], array('no_thanks', 'yes_please'))) {
-                $this->pdfemb_said_beta_action($_REQUEST['pdfemb_beta_action']);
-            }
-
-            if ($this->is_multisite_and_network_activated()) {
-                add_action('network_admin_notices', Array($this, 'pdfemb_beta_offer_message'));
-            }
-            else {
-                add_action('admin_notices', Array($this, 'pdfemb_beta_offer_message'));
-            }
-        }
-
         parent::pdfemb_admin_init();
     }
-
-    public function pdfemb_beta_offer_message() {
-		$purchase_url = add_query_arg( 'pdfemb_beta_action', 'yes_please', $this->get_settings_url()."#license" );
-		$nothanks_url = add_query_arg( 'pdfemb_beta_action', 'no_thanks' );
-		echo '<div class="updated"><p>';
-		echo  __('Cutting edge? You can now choose to receive early beta releases of PDF Embedder updates! Just opt-in to beta releases on the License tab.', 'pdf-embedder');
-		echo ' &nbsp; <a href="'.esc_url($purchase_url).'" class="button-secondary">' . __( 'Yes Please!', 'pdf-embedder' ) . '</a>';
-		echo '&nbsp;<a href="' . esc_url($nothanks_url) . '" class="button-secondary">' . __( 'No Thanks', 'pdf-embedder' ) . '</a>';
-		echo '</p></div>';
-	}
-
-    public function pdfemb_said_beta_action( $response ) {
-	    // No longer need to display the message
-		update_site_option($this->get_options_name().'_beta_no_thanks', true);
-		if ($response == 'yes_please') {
-		    $options = $this->get_option_pdfemb();
-		    if (isset($options['pdfemb_allowbeta']) && !$options['pdfemb_allowbeta']) {
-		        $options['pdfemb_allowbeta'] = true;
-                if ($this->is_multisite_and_network_activated()) {
-                    update_site_option( $this->get_options_name(), $options );
-                }
-                else {
-                    update_option( $this->get_options_name(), $options );
-                }
-		    }
-		}
-		wp_redirect( remove_query_arg( 'pdfemb_beta_action' ) );
-		exit;
-	}
 
     protected function get_instructions_url() {
         return 'http://wp-pdf.com/premium-instructions/?utm_source=PDF%20Settings%20Main&utm_medium=premium&utm_campaign=Premium';
@@ -339,10 +314,16 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     public function pdfemb_options_validate($input) {
         $newinput = parent::pdfemb_options_validate($input);
 
-	    $newinput['pdfemb_pageturners'] = isset($input['pdfemb_pageturners']) && ($input['pdfemb_pageturners'] === true || $input['pdfemb_pageturners'] == 'on') ? 'on' : 'off';
+	    if (isset($input['pdfemb_scrollbar']) && in_array($input['pdfemb_scrollbar'], array('vertical', 'horizontal', 'both', 'none'))) {
+		    $newinput['pdfemb_scrollbar'] = $input['pdfemb_scrollbar'];
+	    }
+	    else {
+		    $newinput['pdfemb_scrollbar'] = 'none';
+	    }
+	    $newinput['pdfemb_continousscroll'] = isset($input['pdfemb_continousscroll']) && $input['pdfemb_continousscroll'];
         $newinput['pdfemb_download'] = isset($input['pdfemb_download']) && ($input['pdfemb_download'] === true || $input['pdfemb_download'] == 'on') ? 'on' : 'off';
         $newinput['pdfemb_tracking'] = isset($input['pdfemb_tracking']) && ($input['pdfemb_tracking'] === true || $input['pdfemb_tracking'] == 'on') ? 'on' : 'off';
-	    $newinput['pdfemb_newwindow'] = isset($input['pdfemb_newwindow']) && ($input['pdfemb_newwindow'] === true || $input['pdfemb_newwindow'] == 'on') ? 'on' : 'off';
+  	    $newinput['pdfemb_newwindow'] = isset($input['pdfemb_newwindow']) && ($input['pdfemb_newwindow'] === true || $input['pdfemb_newwindow'] == 'on') ? 'on' : 'off';
 	    $newinput['pdfemb_scrolltotop'] = isset($input['pdfemb_scrolltotop']) && ($input['pdfemb_scrolltotop'] === true || $input['pdfemb_scrolltotop'] == 'on') ? 'on' : 'off';
 	    $newinput['pdfemb_resetviewport'] = isset($input['pdfemb_resetviewport']) && ($input['pdfemb_resetviewport'] === true || $input['pdfemb_resetviewport'] == 'on');
 
@@ -422,8 +403,9 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     protected function get_default_options() {
         return array_merge( parent::get_default_options(),
             Array(
-            	'pdfemb_pageturners' => true,
-                'pdfemb_mobilewidth' => '500',
+                'pdfemb_continousscroll' => true,
+	            'pdfemb_scrollbar' => 'none',
+            	'pdfemb_mobilewidth' => '500',
                 'pdfemb_license_key' => '',
                 'pdfemb_tracking' => 'on',
 	            'pdfemb_newwindow' => 'on',
@@ -434,8 +416,10 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
     }
 
     protected function get_translation_array() {
+	    $options = $this->get_option_pdfemb();
         return array_merge(parent::get_translation_array(),
-            Array('poweredby' => false,
+            Array('continousscroll' => $options['pdfemb_continousscroll'],
+                  'poweredby' => false,
                   'ajaxurl' => admin_url( 'admin-ajax.php' )));
     }
 
@@ -481,32 +465,42 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
         if (isset($post) && 'attachment' == $post->post_type && is_singular() && isset($post->post_mime_type) && $post->post_mime_type == 'application/pdf') {
 			$pdfurl = wp_get_attachment_url($post->ID);
 	        if (!empty($pdfurl)) {
-		        $content = $this->pdfemb_shortcode_display_pdf(array('url' => $pdfurl));
+	            $content = $this->output_the_content($pdfurl);
 	        }
         }
 		return $content;
 	}
 
+	protected function output_the_content($pdfurl) {
+	    return $this->pdfemb_shortcode_display_pdf(array('url' => $pdfurl));
+	}
+
 	// SHORTCODES
+
+    private function shortcode_attr_data_on_off($keyname, $default, $atts, $options) {
+	    $v = isset($atts[$keyname]) ? $atts[$keyname] : (isset($options['pdfemb_'.$keyname]) && $options['pdfemb_'.$keyname] == 'on' ? 'on' : 'off');
+	    if (!in_array($v, array('on', 'off'))) {
+		    $v = $default;
+	    }
+	    return ' data-'.$keyname.'="'.$v.'"';
+    }
 
 	protected function extra_shortcode_attrs($atts, $content=null) {
         $options = $this->get_option_pdfemb();
 
         $extraparams = '';
 
-		$pageturners = isset($atts['pageturners']) ? $atts['pageturners'] : (isset($options['pdfemb_pageturners']) && $options['pdfemb_pageturners'] == 'on' ? 'on' : 'off');
-		if (!in_array($pageturners, array('on', 'off'))) {
-			$pageturners = 'off';
+		$scrollbar = isset($atts['scrollbar']) && in_array($atts['scrollbar'], array('vertical', 'horizontal', 'both', 'none')) ? $atts['scrollbar'] : $options['pdfemb_scrollbar'];
+		if (!in_array($scrollbar, array('vertical', 'horizontal', 'both', 'none'))) {
+			$scrollbar = 'none';
 		}
-		$extraparams .= ' data-pageturners="'.$pageturners.'"';
 
-		$download = isset($atts['download']) ? $atts['download'] : (isset($options['pdfemb_download']) && $options['pdfemb_download'] == 'on' ? 'on' : 'off');
-        if (!in_array($download, array('on', 'off'))) {
-            $download = 'off';
-        }
+		$extraparams .= ' data-scrollbar="'.$scrollbar.'"';
+
+		$extraparams .= $this->shortcode_attr_data_on_off('download', 'off', $atts, $options);
 
         if (isset($atts['page']) && preg_match('/^[0-9]+$/', $atts['page']) && $atts['page'] > 0) {
-            $extraparams = ' data-pagenum="'.esc_attr($atts['page']).'"';
+            $extraparams .= ' data-pagenum="'.esc_attr($atts['page']).'"';
         }
 
         $mobilewidth = '500';
@@ -523,20 +517,13 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
             $extraparams .= ' data-tracking="on"';
         }
 
-		$newwindow = isset($atts['newwindow']) ? $atts['newwindow'] : (isset($options['pdfemb_newwindow']) && $options['pdfemb_newwindow'] == 'on' ? 'on' : 'off');
-		if (!in_array($newwindow, array('on', 'off'))) {
-			$newwindow = 'on';
-		}
-		$extraparams .= ' data-newwindow="'.$newwindow.'"';
+		$extraparams .= $this->shortcode_attr_data_on_off('newwindow', 'on', $atts, $options);
+
 
 		$pagetextbox = isset($atts['pagetextbox']) && $atts['pagetextbox'] == 'on' ? 'on' : 'off';
 		$extraparams .= ' data-pagetextbox="'.$pagetextbox.'"';
 
-        $scrolltotop = isset($atts['scrolltotop']) ? $atts['scrolltotop'] : (isset($options['pdfemb_scrolltotop']) && $options['pdfemb_scrolltotop'] == 'on' ? 'on' : 'off');
-        if (!in_array($scrolltotop, array('on', 'off'))) {
-            $scrolltotop = 'off';
-        }
-        $extraparams .= ' data-scrolltotop="'.$scrolltotop.'"';
+		$extraparams .= $this->shortcode_attr_data_on_off('scrolltotop', 'off', $atts, $options);
 
 		$zoom = isset($atts['zoom']) ? $atts['zoom'] : '100';
 		if (!is_numeric($zoom) || $zoom < 20 || $zoom > 500) {
@@ -550,7 +537,7 @@ class pdfemb_commerical_pdf_embedder extends core_pdf_embedder {
 		}
 		$extraparams .= ' data-startfpzoom="'.$fpzoom.'"';
 
-		return 'data-mobile-width="'.esc_attr($mobilewidth).'" data-download="'.esc_attr($download).'"'.$extraparams;
+		return 'data-mobile-width="'.esc_attr($mobilewidth).'" '.$extraparams;
 	}
 
     protected function count_views_or_downloads($url, $type='views') {

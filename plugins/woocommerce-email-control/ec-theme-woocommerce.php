@@ -28,7 +28,7 @@ class WC_Email_Theme_WooCommerce {
 	*/
 	public function __construct() {
 		
-		/* Register Email Theme */
+		// Register Email Theme.
 		add_action( 'register_email_theme',	array( $this, 'register_email_theme' ) );
 	}
 	

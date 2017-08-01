@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -45,7 +45,6 @@ class WC_Memberships_Membership_Plan_Rule {
 	 *
 	 * @since 1.0.0
 	 * @param array $data Rule data
-	 * @return \WC_Memberships_Membership_Plan_Rule
 	 */
 	public function __construct( array $data ) {
 
@@ -145,6 +144,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	public function get_access_schedule_amount() {
 
 		$parts = explode( ' ', $this->get_access_schedule() );
+
 		return isset( $parts[1] ) ? (int) $parts[0] : '';
 	}
 
@@ -161,6 +161,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	public function get_access_schedule_period() {
 
 		$parts = explode( ' ', $this->get_access_schedule() );
+
 		return isset( $parts[1] ) ? $parts[1] : $parts[0];
 	}
 
@@ -198,7 +199,7 @@ class WC_Memberships_Membership_Plan_Rule {
 		 */
 		$access_time = apply_filters( 'wc_memberships_rule_access_start_time', $access_time, $from_time, $this );
 
-		// access always starts at midnight
+		// access always starts at the beginning of the day (midnight)
 		return strtotime( 'midnight', $access_time );
 	}
 
@@ -225,13 +226,11 @@ class WC_Memberships_Membership_Plan_Rule {
 	 * Check if the content type exists
 	 *
 	 * @since 1.1.0
-	 * @return bool True, if exists, false otherwise
+	 * @return bool
 	 */
 	public function content_type_exists() {
-
-		return 'post_type' == $this->get_content_type()
-				  ? post_type_exists( $this->get_content_type_name() )
-				  : taxonomy_exists( $this->get_content_type_name() );
+		// Content is either a taxonomy or a post type.
+		return 'post_type' === $this->get_content_type() ? post_type_exists( $this->get_content_type_name() ) : taxonomy_exists( $this->get_content_type_name() );
 	}
 
 
@@ -248,8 +247,6 @@ class WC_Memberships_Membership_Plan_Rule {
 		$has_key = 'has_' . $key;
 		$get_key = 'get_' . $key;
 
-		$applies = false;
-
 		switch ( $key ) {
 
 			// Special handling for object IDs
@@ -257,8 +254,8 @@ class WC_Memberships_Membership_Plan_Rule {
 			case 'object_ids':
 
 				$rule_value = $this->get_object_ids();
-				$rule_value = is_bool( $rule_value ) || is_null( $rule_value ) ? array() : (array) $rule_value;
-				$applies    = ! empty( $rule_value ) && in_array( $value, $rule_value );
+				$rule_value = is_bool( $rule_value ) || null === $rule_value ? array() : (array) $rule_value;
+				$applies    = ! empty( $rule_value ) && in_array( $value, $rule_value, false );
 
 			break;
 
@@ -279,7 +276,10 @@ class WC_Memberships_Membership_Plan_Rule {
 	 * @return bool True, if applies to multiple object IDs, false otherwise
 	 */
 	public function applies_to_multiple_objects() {
-		return is_array( $this->get_object_ids() ) && count( $this->get_object_ids() ) > 1;
+
+		$object_ids = $this->get_object_ids();
+
+		return is_array( $object_ids ) && count( $object_ids ) > 1;
 	}
 
 
@@ -292,9 +292,11 @@ class WC_Memberships_Membership_Plan_Rule {
 	 */
 	public function applies_to_single_object( $object_id = null ) {
 
-		return is_array( $this->get_object_ids() )
-				&& count( $this->get_object_ids() ) === 1
-				&& ( $object_id ? $this->applies_to( 'object_id', $object_id ) : true );
+		$object_ids = $this->get_object_ids();
+
+		return is_array( $object_ids )
+		       && count( $object_ids ) === 1
+		       && ( $object_id ? $this->applies_to( 'object_id', $object_id ) : true );
 	}
 
 
@@ -305,7 +307,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	 * @return bool True, if active, false otherwise
 	 */
 	public function is_active() {
-		return $this->get_rule_value( 'active' ) == 'yes';
+		return $this->get_rule_value( 'active' ) === 'yes';
 	}
 
 
@@ -329,6 +331,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	public function has_objects() {
 
 		$object_ids = $this->get_object_ids();
+
 		return is_array( $object_ids ) && ! empty( $object_ids );
 	}
 
@@ -340,7 +343,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	 * @return bool True, if immediate access, false otherwise
 	 */
 	public function grants_immediate_access() {
-		return $this->get_access_schedule() == 'immediate';
+		return $this->get_access_schedule() === 'immediate';
 	}
 
 
@@ -355,22 +358,41 @@ class WC_Memberships_Membership_Plan_Rule {
 
 		$label = null;
 
-		if ( in_array( $object_id, $this->get_object_ids() ) ) {
+		if ( in_array( $object_id, $this->get_object_ids(), false ) ) {
 
 			switch ( $this->get_content_type() ) {
 
 				// Get post title
 				case 'post_type':
 
-					if ( 'product' == $this->get_content_type_name() ) {
+					if ( 'product' === $this->get_content_type_name() ) {
 
 						$product = wc_get_product( $object_id );
 
-						if ( $product && in_array( $product->post->post_type, array( 'product', 'product_variation' ) ) ) {
-							$label = strip_tags( $product->get_formatted_name() );
+						if ( $product ) {
+
+							if ( SV_WC_Plugin_Compatibility::is_wc_version_lt_3_0() ) {
+
+								if ( isset( $product->post ) && in_array( $product->post->post_type, array( 'product', 'product_variation' ), true ) ) {
+									$label = strip_tags( $product->get_formatted_name() );
+								}
+
+							} else {
+
+								if ( $product->is_type( 'variation' ) ) {
+									$post_data = get_post( $product->get_parent_id() );
+								} else {
+									$post_data = get_post( $product->get_id() );
+								}
+
+								if ( isset( $post_data->post_type ) && in_array( $post_data->post_type, array( 'product', 'product_variation' ), true ) ) {
+									$label = strip_tags( $product->get_formatted_name() );
+								}
+							}
 						}
 
-					}	else {
+					} else {
+
 						$label = get_the_title( $object_id );
 					}
 
@@ -381,7 +403,7 @@ class WC_Memberships_Membership_Plan_Rule {
 
 					$term = get_term( $object_id, $this->get_content_type_name() );
 
-					if ( $term ) {
+					if ( ! is_wp_error( $term ) && $term ) {
 						$label = $term->name;
 					}
 
@@ -426,11 +448,7 @@ class WC_Memberships_Membership_Plan_Rule {
 	public function current_context_allows_editing() {
 		global $post;
 
-		if ( ! $post ) {
-			return false;
-		}
-
-		return $this->get_membership_plan_id() == $post->ID || $this->applies_to_single_object( $post->ID );
+		return $post ? $this->get_membership_plan_id() == $post->ID || $this->applies_to_single_object( $post->ID ) : false;
 	}
 
 
@@ -442,18 +460,14 @@ class WC_Memberships_Membership_Plan_Rule {
 	 */
 	public function get_object_search_action_name() {
 
-		if ( 'taxonomy' == $this->get_content_type() ) {
-
+		if ( 'taxonomy' === $this->get_content_type() ) {
 			$action = 'wc_memberships_json_search_terms';
-
 		} else {
-
-			if ( 'product' == $this->get_content_type_name() ) {
+			if ( 'product' === $this->get_content_type_name() ) {
 				$action = 'woocommerce_json_search_products_and_variations';
 			} else {
 				$action = 'wc_memberships_json_search_posts';
 			}
-
 		}
 
 		return $action;
@@ -461,32 +475,30 @@ class WC_Memberships_Membership_Plan_Rule {
 
 
 	/**
-	 * Get rule priority
+	 * Get rule priority.
 	 *
-	 * Priority will be determined by the type of content the rule applies to.
-	 * 10 = post type
-	 * 20 = taxonomy
-	 * 30 = term
-	 * 40 = post
-	 * A higher number means a higher priority
+	 * The priority will be determined by the type of content the rule applies to.
+	 *
+	 * * 10 = post type
+	 * * 20 = taxonomy
+	 * * 30 = term
+	 * * 40 = post
+	 *
+	 * A higher number means a higher priority.
 	 *
 	 * @since 1.1.0
 	 * @return int
 	 */
 	public function get_priority() {
 
-		$priority = 0;
+		$priority     = 0;
+		$object_ids   = $this->get_object_ids();
+		$content_type = $this->get_content_type();
 
-		$object_ids = $this->get_object_ids();
-
-		if ( 'post_type' == $this->get_content_type() && ! empty( $object_ids ) ) {
-			$priority = 40;
-		} else if ( 'taxonomy' == $this->get_content_type() && ! empty( $object_ids ) ) {
-			$priority = 30;
-		} else if ( 'taxonomy' == $this->get_content_type() && empty( $object_ids ) ) {
-			$priority = 20;
-		} else if ( 'post_type' == $this->get_content_type() && empty( $object_ids ) ) {
-			$priority = 10;
+		if ( 'post_type' === $content_type && ! empty( $object_ids ) ) {
+			$priority = ! empty( $object_ids ) ? 40 : 10;
+		} elseif ( 'taxonomy' === $content_type ) {
+			$priority = ! empty( $object_ids ) ? 30 : 20;
 		}
 
 		/**
@@ -494,7 +506,7 @@ class WC_Memberships_Membership_Plan_Rule {
 		 *
 		 * @since 1.1.0
 		 * @param int $priority
-		 * @param WC_Memberships_Membership_Plan_Rule $rule
+		 * @param \WC_Memberships_Membership_Plan_Rule $rule
 		 */
 		return apply_filters( 'wc_memberships_rule_priority', $priority, $this );
 	}

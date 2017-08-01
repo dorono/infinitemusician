@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Admin
  * @author    SkyVerge
  * @category  Admin
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -46,46 +46,48 @@ class WC_Memberships_Admin_User_Memberships {
 	 */
 	public function __construct() {
 
-		// List Table screen hooks
-		add_filter( 'manage_edit-wc_user_membership_columns', array( $this, 'customize_columns' ) );
+		// admin notices for User Memberships
+		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+
+		// List Table screen hooks - edit screen columns
+		add_filter( 'manage_edit-wc_user_membership_columns',          array( $this, 'customize_columns' ) );
 		add_filter( 'manage_edit-wc_user_membership_sortable_columns', array( $this, 'customize_sortable_columns' ) );
-
-		add_filter( 'post_row_actions', array( $this, 'customize_row_actions' ), 10, 2 );
-
-		add_action( 'manage_wc_user_membership_posts_custom_column', array( $this, 'custom_column_content' ), 10, 2 );
-
-		add_filter( 'request', array( $this, 'request_query' ) );
-		add_filter( 'posts_clauses', array( $this, 'posts_clauses' ), 10, 2 );
-
-		add_filter( 'the_title', array( $this, 'user_membership_title' ), 10, 2 );
-		add_filter( 'display_post_states', array( $this, 'remove_post_states' ) );
-
-		add_action( 'restrict_manage_posts', array( $this, 'restrict_user_memberships' ) );
-
-		add_filter( 'bulk_actions-edit-wc_user_membership', array( $this, 'customize_bulk_actions' ) );
-		add_filter( 'months_dropdown_results', '__return_empty_array' );
-
-		add_action( 'bulk_edit_custom_box', array( $this, 'bulk_edit' ) );
+		add_action( 'manage_wc_user_membership_posts_custom_column',   array( $this, 'custom_column_content' ), 10, 2 );
+		add_filter( 'display_post_states',                             array( $this, 'remove_post_states' ) );
+		add_filter( 'the_title',                                       array( $this, 'user_membership_title' ), 10, 2 );
 
 		// Add/Edit screen hooks
 		add_action( 'post_submitbox_misc_actions', array( $this, 'normalize_edit_screen' ) );
 
-		// Custom admin actions
+		// filter post clauses and sorting handler
+		add_filter( 'request',       array( $this, 'request_query' ) );
+		add_filter( 'posts_clauses', array( $this, 'posts_clauses' ), 10, 2 );
+
+		// render dropdowns for user membership filters
+		add_action( 'restrict_manage_posts', array( $this, 'restrict_user_memberships' ) );
+
+		// post actions
+		add_filter( 'post_row_actions', array( $this, 'customize_row_actions' ), 10, 2 );
+		// custom admin actions
 		add_action( 'admin_action_pause',  array( $this, 'pause_membership' ) );
 		add_action( 'admin_action_resume', array( $this, 'resume_membership' ) );
 		add_action( 'admin_action_cancel', array( $this, 'cancel_membership' ) );
+		// bulk actions
+		add_filter( 'bulk_actions-edit-wc_user_membership', array( $this, 'remove_bulk_actions' ) );
+		add_action( 'admin_footer-edit.php',                array( $this, 'add_bulk_actions' ) );
+		add_action( 'bulk_edit_custom_box',                 array( $this, 'bulk_edit' ) );
+		add_filter( 'months_dropdown_results',              '__return_empty_array' );
 
-		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
-
-		// User Membership Validation
-		add_action( 'wp_insert_post_empty_content', array ( $this, 'validate_user_membership' ), 1, 2 );
-		add_action( 'load-post-new.php', array( $this, 'maybe_prevent_adding_user_membership' ), 1 );
-
+		// User Membership validation
+		add_action( 'wp_insert_post_empty_content', array( $this, 'validate_user_membership' ), 1, 2 );
+		add_action( 'load-post-new.php',            array( $this, 'maybe_prevent_adding_user_membership' ), 1 );
 	}
 
 
 	/**
 	 * Customize user memberships columns
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param array $columns
@@ -93,15 +95,15 @@ class WC_Memberships_Admin_User_Memberships {
 	 */
 	public function customize_columns( $columns ) {
 
-		unset( $columns['title'] );
-		unset( $columns['date'] );
+		// remove title and date columns
+		unset( $columns['title'],  $columns['date'] );
 
-		$columns['title']        = __( 'Name', 'woocommerce-memberships' ); // use title column as the member name column
-		$columns['email']        = __( 'Email', 'woocommerce-memberships' );
-		$columns['plan']         = __( 'Plan', 'woocommerce-memberships' );
-		$columns['status']       = __( 'Status', 'woocommerce-memberships' );
-		$columns['member_since'] = __( 'Member since', 'woocommerce-memberships' );
-		$columns['expires']      = __( 'Expires', 'woocommerce-memberships' );
+		$columns['title']        = __( 'Name', 'woocommerce-memberships' );         // member name column
+		$columns['email']        = __( 'Email', 'woocommerce-memberships' );        // member email
+		$columns['plan']         = __( 'Plan', 'woocommerce-memberships' );         // associated membership plan
+		$columns['status']       = __( 'Status', 'woocommerce-memberships' );       // user membership status
+		$columns['member_since'] = __( 'Member since', 'woocommerce-memberships' ); // membership created
+		$columns['expires']      = __( 'Expires', 'woocommerce-memberships' );      // expiration date-time
 
 		return $columns;
 	}
@@ -109,6 +111,8 @@ class WC_Memberships_Admin_User_Memberships {
 
 	/**
 	 * Customize user memberships sortable columns
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param array $columns
@@ -129,16 +133,17 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Customize user memberships row actions
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 * @param array $actions
-	 * @param WP_Post $post
+	 * @param \WP_Post $post
 	 * @return array
 	 */
 	public function customize_row_actions( $actions, WP_Post $post ) {
 
-		// Remove quick edit action
-		unset( $actions['inline hide-if-no-js'] );
-		unset( $actions['trash'] );
+		// remove quick edit action and move to trash
+		unset( $actions['inline hide-if-no-js'], $actions['trash'] );
 
 		$post_link       = remove_query_arg( 'action', get_edit_post_link( $post->ID, '' ) );
 		$user_membership = wc_memberships_get_user_membership( $post );
@@ -165,21 +170,51 @@ class WC_Memberships_Admin_User_Memberships {
 
 
 	/**
-	 * Customize user memberships bulk actions
+	 * Disable move to trash bulk action
 	 *
-	 * @since 1.0.0
+	 * @internal
+	 *
+	 * @since 1.7.0
 	 * @param array $actions
 	 * @return array
 	 */
-	public function customize_bulk_actions( $actions ) {
+	public function remove_bulk_actions( $actions ) {
 
 		unset( $actions['trash'] );
+
 		return $actions;
 	}
 
 
 	/**
+	 * Customize user memberships bulk actions
+	 *
+	 * @internal
+	 *
+	 * @since 1.7.0
+	 */
+	public function add_bulk_actions() {
+		global $post_type;
+
+		if ( $post_type === 'wc_user_membership' && current_user_can( 'manage_woocommerce_user_memberships' ) ) :
+
+			?>
+			<script type="text/javascript">
+				jQuery( document ).ready( function() {
+					jQuery( '<option>' ).val( 'delete' ).text( '<?php esc_html_e( 'Delete', 'woocommerce-memberships' ); ?>').appendTo( "select[name='action']" );
+					jQuery( '<option>' ).val( 'delete' ).text( '<?php esc_html_e( 'Delete', 'woocommerce-memberships' ); ?>').appendTo( "select[name='action2']" );
+				} );
+			</script>
+			<?php
+
+		endif;
+	}
+
+
+	/**
 	 * Customize bulk edit form
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param string $column
@@ -231,6 +266,8 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Output custom column content
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 * @param string $column
 	 * @param int $post_id
@@ -244,41 +281,56 @@ class WC_Memberships_Admin_User_Memberships {
 
 		switch ( $column ) {
 
-			case 'name':
-				echo $user->display_name;
-			break;
-
 			case 'email':
 				echo $user->user_email;
 			break;
 
 			case 'plan':
-				echo '<a href="' . esc_url( get_edit_post_link( $user_membership->get_plan_id() ) ) . '">' . $user_membership->get_plan()->get_name() . '</a>';
+
+				// It shouldn't normally ever happen that the plan can't be found,
+				// but prevents fatal errors on borked installations where the
+				// associated plan disappeared.
+				if ( $plan = $user_membership->get_plan() ) {
+					echo '<a href="' . esc_url( get_edit_post_link( $user_membership->get_plan_id() ) ) . '">' . $plan->get_name() . '</a>';
+				} else {
+					echo '-';
+				}
+
 			break;
 
 			case 'status':
 
 				$statuses = wc_memberships_get_user_membership_statuses();
-				echo esc_html( $statuses[ 'wcm-' . $user_membership->get_status() ]['label'] );
+				$status   = 'wcm-' . $user_membership->get_status();
+
+				echo esc_html( $statuses[ $status ]['label'] );
 
 			break;
 
 			case 'member_since':
 
 				$since_time = $user_membership->get_local_start_date( 'timestamp' );
-				echo esc_html( date_i18n( $date_format, $since_time ) );
-				echo '&nbsp;';
-				echo esc_html( date_i18n( $time_format, $since_time ) );
+
+				$date = esc_html( date_i18n( $date_format, (int) $since_time ) );
+				$time = esc_html( date_i18n( $time_format, (int) $since_time ) );
+
+				printf( '%1$s %2$s', $date, $time );
 
 			break;
 
 			case 'expires':
 
-				if ( $end_date = $user_membership->get_local_end_date( 'timestamp' ) ) {
-					echo esc_html( date_i18n( $date_format, $end_date ) );
+				$end_time = $user_membership->get_local_end_date( 'timestamp' );
+
+				if ( ! empty( $end_time ) && is_numeric( $end_time ) ) {
+					$date = esc_html( date_i18n( $date_format, (int) $end_time ) );
+					$time = esc_html( date_i18n( $time_format, (int) $end_time ) );
 				} else {
-					esc_html_e( 'Never', 'woocommerce-memberships' );
+					$date = esc_html__( 'Never', 'woocommerce-memberships' );
+					$time = '';
 				}
+
+				printf( '%1$s %2$s', $date, $time );
 
 			break;
 		}
@@ -288,12 +340,15 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Hide default publishing box, etc
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function normalize_edit_screen() {
+
 		?>
 		<style type="text/css">
-			#post-body-content, #titlediv, #major-publishing-actions, #minor-publishing-actions, #visibility, #submitdiv { display:none }
+			#post-body-content, #titlediv, #major-publishing-actions, #minor-publishing-actions, #visibility, #submitdiv { display:none; }
 		</style>
 		<?php
 	}
@@ -301,6 +356,8 @@ class WC_Memberships_Admin_User_Memberships {
 
 	/**
 	 * Filters and sorting handler
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param array $vars
@@ -311,17 +368,17 @@ class WC_Memberships_Admin_User_Memberships {
 
 		if ( 'wc_user_membership' === $typenow ) {
 
-			// Status
+			// status
 			if ( ! isset( $vars['post_status'] ) ) {
 				$vars['post_status'] = array_keys( wc_memberships_get_user_membership_statuses() );
 			}
 
-			// Filter by plan ID (post parent)
+			// filter by plan ID (post parent)
 			if ( isset( $_GET['post_parent'] ) ) {
 				$vars['post_parent'] = $_GET['post_parent'];
 			}
 
-			// Filter by expiry date
+			// filter by expiry date
 			if ( isset( $_GET['expires'] ) ) {
 
 				$min_date = $max_date = null;
@@ -361,20 +418,19 @@ class WC_Memberships_Admin_User_Memberships {
 						'type'    => 'DATETIME',
 					) ) );
 				}
-
 			}
 
-			// Sorting order
+			// sorting order
 			if ( isset( $vars['orderby'] ) ) {
 
 				switch ( $vars['orderby'] ) {
 
-					// Order by plan (abusing title column)
+					// order by plan (abusing title column)
 					case 'title':
 						$vars['orderby'] = 'post_parent';
 					break;
 
-					// Order by start date (member since)
+					// order by start date (member since)
 					case 'start_date':
 
 						$vars['meta_key'] = '_start_date';
@@ -382,7 +438,7 @@ class WC_Memberships_Admin_User_Memberships {
 
 					break;
 
-					// Order by end date (expires)
+					// order by end date (expires)
 					case 'expiry_date':
 
 						$vars['meta_key'] = '_end_date';
@@ -401,41 +457,53 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Alter posts query clauses
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 * @param array $pieces
 	 * @param WP_Query $wp_query
 	 * @return string
 	 */
 	public function posts_clauses( $pieces, WP_Query $wp_query ) {
-
 		global $wpdb;
 
-		// Bail out if not the correct post type
-		if ( 'wc_user_membership' != $wp_query->query['post_type'] ) {
+		// bail out if not the correct post type
+		if ( 'wc_user_membership' !== $wp_query->query['post_type'] ) {
 			return $pieces;
 		}
 
-		// Whether to add a join clause for users table or not
+		// whether to add a join clause for users table or not
 		$join_users = false;
 
-		// Search
+		// search
 		if ( isset( $wp_query->query['s'] ) ) {
 
-			$join_users = true;
-			$keyword = '%' . $wp_query->query['s'] . '%';
+			// remove prefixing underscores as they'd end up escaped strings
+			// and would produce empty search results
+			$keyword  = trim( ltrim( $wp_query->query['s'], '_' ) );
 
-			// Do a LIKE search in user fields
-			$where_title        = $wpdb->prepare( "($wpdb->posts.post_title LIKE %s)", $keyword );
-			$where_user_login   = $wpdb->prepare( " OR ($wpdb->users.user_login LIKE %s)", $keyword );
-			$where_user_email   = $wpdb->prepare( " OR ($wpdb->users.user_email LIKE %s)", $keyword );
-			$where_display_name = $wpdb->prepare( " OR ($wpdb->users.display_name LIKE %s)", $keyword );
+			if ( ! empty( $keyword ) ) {
 
-			$where = $where_title . $where_user_login . $where_user_email . $where_display_name;
+				$join_users = true;
+				$keyword    = '%' . $keyword . '%';
 
-			$pieces['where'] = str_replace( $where_title, $where, $pieces['where'] );
+				// Do a LIKE search in user fields:
+				$where_post_type    = "$wpdb->posts.post_type = 'wc_user_membership'";
+				$where_post_status  = "$wpdb->posts.post_status = 'wcm-active' OR $wpdb->posts.post_status = 'wcm-free_trial' OR $wpdb->posts.post_status = 'wcm-delayed' OR $wpdb->posts.post_status = 'wcm-complimentary' OR $wpdb->posts.post_status = 'wcm-pending' OR $wpdb->posts.post_status = 'wcm-paused' OR $wpdb->posts.post_status = 'wcm-expired' OR $wpdb->posts.post_status = 'wcm-cancelled'";
+				$where_title        = $wpdb->prepare( "$wpdb->posts.post_title LIKE %s", $keyword );
+				$where_user_login   = $wpdb->prepare( "$wpdb->users.user_login LIKE %s", $keyword );
+				$where_user_email   = $wpdb->prepare( "$wpdb->users.user_email LIKE %s", $keyword );
+				$where_display_name = $wpdb->prepare( "$wpdb->users.display_name LIKE %s", $keyword );
+				$where_user_id      = $wpdb->prepare( "$wpdb->users.id LIKE %s", $keyword );
+
+				$where = " AND $where_post_type AND ($where_post_status) AND ( ($where_title) OR ($where_user_login) OR ($where_user_email) OR ($where_display_name) OR ($where_user_id) )";
+
+				// replace the where clauses
+				$pieces['where'] = $where;
+			}
 		}
 
-		// Order by
+		// order by
 		if ( isset( $wp_query->query['orderby'] ) ) {
 
 			switch ( $wp_query->query['orderby'] ) {
@@ -457,7 +525,7 @@ class WC_Memberships_Admin_User_Memberships {
 			}
 		}
 
-		// Join users table, if needed
+		// join users table, if needed
 		if ( $join_users ) {
 			$pieces['join'] .= " LEFT JOIN $wpdb->users ON $wpdb->posts.post_author = $wpdb->users.ID ";
 		}
@@ -469,6 +537,8 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Use membership plan name as user membership title
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 * @param string $title Original title
 	 * @param int $post_id Post ID
@@ -477,11 +547,13 @@ class WC_Memberships_Admin_User_Memberships {
 	public function user_membership_title( $title, $post_id ) {
 		global $pagenow;
 
-		if ( 'wc_user_membership' == get_post_type( $post_id ) ) {
+		if ( 'wc_user_membership' === get_post_type( $post_id ) ) {
+
 			$user_membership = wc_memberships_get_user_membership( $post_id );
 
 			if ( $user_membership ) {
-				$user = get_userdata( $user_membership->get_user_id() );
+
+				$user  = get_userdata( $user_membership->get_user_id() );
 				$title = 'edit.php' === $pagenow || ! $user_membership->get_plan() ? $user->display_name : $user_membership->get_plan()->get_name();
 			}
 		}
@@ -493,25 +565,28 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Remove post states (such as "Password protected") from list table
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 * @param string $states
 	 * @return string
 	 */
 	public function remove_post_states( $states ) {
-		return "";
+		return '';
 	}
 
 
 	/**
 	 * Render dropdowns for user membership filters
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function restrict_user_memberships() {
-
 		global $typenow;
 
-		if ( 'wc_user_membership' != $typenow ) {
+		if ( 'wc_user_membership' !== $typenow ) {
 			return;
 		}
 
@@ -533,11 +608,12 @@ class WC_Memberships_Admin_User_Memberships {
 			'this_week'  => __( 'This week', 'woocommerce-memberships' ),
 			'this_month' => __( 'This month', 'woocommerce-memberships' ),
 		) );
+
 		$selected_expiry_term = isset( $_GET['expires'] ) ? $_GET['expires'] : null;
 
 		?>
 		<select name="post_parent">
-			<option value=""><?php _e( 'All plans', 'woocommerce-memberships' ); ?></option>
+			<option value=""><?php esc_html_e( 'All plans', 'woocommerce-memberships' ); ?></option>
 			<?php
 				if ( ! empty( $membership_plans ) ) {
 					foreach ( $membership_plans as $membership_plan ) {
@@ -548,33 +624,34 @@ class WC_Memberships_Admin_User_Memberships {
 		</select>
 
 		<select name="post_status">
-			<option value=""><?php _e( 'All statuses', 'woocommerce-memberships' ); ?></option>
+			<option value=""><?php esc_html_e( 'All statuses', 'woocommerce-memberships' ); ?></option>
 			<?php
 				if ( ! empty( $statuses ) ) {
 					foreach ( $statuses as $status => $labels ) {
-						echo "\t<option value='" . esc_attr( $status ) . "'" . selected( $status, $selected_status, false ) . '>' . esc_html( $labels['label'] ) . '</option>' . PHP_EOL;
+						echo "\t<option value='" . esc_attr( $status ) . "' " . selected( $status, $selected_status, false ) . '>' . esc_html( $labels['label'] ) . '</option>' . PHP_EOL;
 					}
 				}
 			?>
 		</select>
 
 		<select name="expires">
-			<option value=""><?php _e( 'Expires', 'woocommerce-memberships' ); ?></option>
+			<option value=""><?php esc_html_e( 'Expires', 'woocommerce-memberships' ); ?></option>
 			<?php
 				if ( ! empty( $expires ) ) {
 					foreach ( $expires as $expiry_term => $label ) {
-						echo "\t<option value='" . esc_attr( $expiry_term ) . "'" . selected( $expiry_term, $selected_expiry_term, false ) . '>' . esc_html( $label ) . '</option>' . PHP_EOL;
+						echo "\t<option value='" . esc_attr( $expiry_term ) . "' " . selected( $expiry_term, $selected_expiry_term, false ) . '>' . esc_html( $label ) . '</option>' . PHP_EOL;
 					}
 				}
 			?>
 		</select>
 		<?php
-
 	}
 
 
 	/**
 	 * Pause a membership
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 */
@@ -584,7 +661,7 @@ class WC_Memberships_Admin_User_Memberships {
 			return;
 		}
 
-		// Get the post
+		// get the post
 		$id = isset( $_REQUEST['post'] ) ? absint( $_REQUEST['post'] ) : '';
 
 		check_admin_referer( 'wc-memberships-pause-membership-' . $id );
@@ -600,6 +677,8 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Resume a membership
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function resume_membership() {
@@ -608,12 +687,13 @@ class WC_Memberships_Admin_User_Memberships {
 			return;
 		}
 
-		// Get the post
+		// get the post
 		$id = isset( $_REQUEST['post'] ) ? absint( $_REQUEST['post'] ) : '';
 
 		check_admin_referer( 'wc-memberships-resume-membership-' . $id );
 
 		$user_membership = wc_memberships_get_user_membership( $id );
+
 		$user_membership->activate_membership();
 
 		wp_redirect( add_query_arg( array('resumed' => 1, 'ids' => $_REQUEST['post'] ), $this->get_sendback_url() ) );
@@ -624,6 +704,8 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Cancel a membership
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function cancel_membership() {
@@ -632,7 +714,7 @@ class WC_Memberships_Admin_User_Memberships {
 			return;
 		}
 
-		// Get the post
+		// get the post
 		$id = isset( $_REQUEST['post'] ) ? absint( $_REQUEST['post'] ) : '';
 
 		check_admin_referer( 'wc-memberships-cancel-membership-' . $id );
@@ -649,6 +731,7 @@ class WC_Memberships_Admin_User_Memberships {
 	 * Get the sendback URL
 	 *
 	 * Mimics the core sendback url in wp-admin/post.php
+	 *
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -675,9 +758,9 @@ class WC_Memberships_Admin_User_Memberships {
 
 		$sendback = wp_get_referer();
 
-		if ( ! $sendback
-		     || strpos( $sendback, 'post.php' ) !== false
-		     || strpos( $sendback, 'post-new.php' ) !== false ) {
+		if (    ! $sendback
+		     ||   strpos( $sendback, 'post.php' )     !== false
+		     ||   strpos( $sendback, 'post-new.php' ) !== false ) {
 
 			$sendback = admin_url( 'edit.php' );
 			$sendback .= ( ! empty( $post_type ) ) ? '?post_type=' . $post_type : '';
@@ -704,13 +787,14 @@ class WC_Memberships_Admin_User_Memberships {
 	/**
 	 * Display custom admin notices
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function admin_notices() {
+		global $pagenow;
 
-		global $post_type, $pagenow;
-
-		if ( 'edit.php' == $pagenow ) {
+		if ( 'edit.php' === $pagenow ) {
 
 			$message = '';
 
@@ -729,13 +813,14 @@ class WC_Memberships_Admin_User_Memberships {
 			if ( $message ) {
 				echo "<div class='updated'><p>{$message}</p></div>";
 			}
-
 		}
 	}
 
 
 	/**
 	 * Validate user membership data before saving
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param bool $maybe_empty Is the post empty?
@@ -744,30 +829,33 @@ class WC_Memberships_Admin_User_Memberships {
 	 */
 	public function validate_user_membership( $maybe_empty, $postarr ) {
 
-		// Bail out if not user membership
+		// bail out if not user membership
 		if ( $postarr['post_type'] != 'wc_user_membership' ) {
 			return $maybe_empty;
 		}
 
-		// Bail out if doing autosave
+		// bail out if doing autosave
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return $maybe_empty;
 		}
 
-		// Prevent saving memberships with no plan
+		// prevent saving memberships with no plan
 		if ( ! $postarr['post_parent'] && isset( $_POST['post_ID'] ) ) {
 
 			wc_memberships()->get_admin_instance()->get_message_handler()->add_error( __( 'Please select a membership plan.', 'woocommerce-memberships' ) );
-			wp_redirect( wp_get_referer() ); exit;
+
+			wp_redirect( wp_get_referer() );
+			exit;
 		}
 
 		return $maybe_empty;
-
 	}
 
 
 	/**
 	 * Prevent adding a user membership if user is already a member of all plans
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 */
@@ -776,7 +864,7 @@ class WC_Memberships_Admin_User_Memberships {
 
 		if ( 'post-new.php' === $pagenow ) {
 
-			// Get user details
+			// get user details
 			$user_id = ( isset( $_GET['user'] ) ? $_GET['user'] : null );
 			$user    = $user_id ? get_userdata( $user_id ) : null;
 
@@ -786,7 +874,7 @@ class WC_Memberships_Admin_User_Memberships {
 				wp_redirect( wp_get_referer() ); exit;
 			}
 
-			// All the user memberships
+			// all the user memberships
 			$user_memberships = wc_memberships_get_user_memberships( $user->ID );
 			$membership_plans = wc_memberships_get_membership_plans( array(
 				'post_status' => array( 'publish', 'private', 'future', 'draft', 'pending', 'trash' )

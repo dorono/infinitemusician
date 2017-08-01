@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Authorize.Net CIM Gateway to newer
  * versions in the future. If you wish to customize WooCommerce Authorize.Net CIM Gateway for your
- * needs please refer to http://docs.woothemes.com/document/authorize-net-cim/
+ * needs please refer to http://docs.woocommerce.com/document/authorize-net-cim/
  *
  * @package   WC-Gateway-Authorize-Net-CIM/Gateway
  * @author    SkyVerge
- * @copyright Copyright (c) 2013-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2013-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -107,7 +107,7 @@ class WC_Authorize_Net_CIM_Payment_Profile extends SV_WC_Payment_Gateway_Payment
 
 		if ( 'credit_card' === $data['type'] ) {
 
-			$data['card_type'] = SV_WC_Payment_Gateway_Helper::card_type_from_account_number( $order->payment->account_number );
+			$data['card_type'] = isset( $order->payment->card_type ) ? $order->payment->card_type : SV_WC_Payment_Gateway_Helper::card_type_from_account_number( $order->payment->account_number );
 			$data['exp_month'] = $order->payment->exp_month;
 			$data['exp_year']  = $order->payment->exp_year;
 
@@ -208,15 +208,15 @@ class WC_Authorize_Net_CIM_Payment_Profile extends SV_WC_Payment_Gateway_Payment
 	protected function get_billing_from_order( WC_Order $order ) {
 
 		return array(
-			'first_name' => $order->billing_first_name,
-			'last_name'  => $order->billing_last_name,
-			'company'    => $order->billing_company,
-			'address'    => trim( $order->billing_address_1 . ' ' . $order->billing_address_2 ),
-			'city'       => $order->billing_city,
-			'state'      => $order->billing_state,
-			'postcode'   => $order->billing_postcode,
-			'country'    => $order->billing_country,
-			'phone'      => $order->billing_phone,
+			'first_name' => SV_WC_Order_Compatibility::get_prop( $order, 'billing_first_name' ),
+			'last_name'  => SV_WC_Order_Compatibility::get_prop( $order, 'billing_last_name' ),
+			'company'    => SV_WC_Order_Compatibility::get_prop( $order, 'billing_company' ),
+			'address'    => trim( SV_WC_Order_Compatibility::get_prop( $order, 'billing_address_1' ) . ' ' . SV_WC_Order_Compatibility::get_prop( $order, 'billing_address_2' ) ),
+			'city'       => SV_WC_Order_Compatibility::get_prop( $order, 'billing_city' ),
+			'state'      => SV_WC_Order_Compatibility::get_prop( $order, 'billing_state' ),
+			'postcode'   => SV_WC_Order_Compatibility::get_prop( $order, 'billing_postcode' ),
+			'country'    => SV_WC_Order_Compatibility::get_prop( $order, 'billing_country' ),
+			'phone'      => SV_WC_Order_Compatibility::get_prop( $order, 'billing_phone' ),
 		);
 	}
 
@@ -257,7 +257,7 @@ class WC_Authorize_Net_CIM_Payment_Profile extends SV_WC_Payment_Gateway_Payment
 		// set billing postcode
 		if ( empty( $data['billing']['postcode'] ) ) {
 
-			$billing_postcode = ( isset( $data['order'] ) && $data['order'] instanceof WC_Order ) ? $data['order']->billing_postcode : get_user_meta( get_current_user_id(), 'billing_postcode', true );
+			$billing_postcode = ( isset( $data['order'] ) && $data['order'] instanceof WC_Order ) ? SV_WC_Order_Compatibility::get_prop( $data['order'], 'billing_postcode' ) : get_user_meta( get_current_user_id(), 'billing_postcode', true );
 
 		} else {
 
@@ -294,7 +294,7 @@ class WC_Authorize_Net_CIM_Payment_Profile extends SV_WC_Payment_Gateway_Payment
 		$entered_payment = array(
 			'last_four' => $order->payment->last_four,
 			'type'      => 'credit_card' === $order->payment->type ? $order->payment->card_type : $order->payment->account_type,
-			'postcode'  => $order->billing_postcode,
+			'postcode'  => SV_WC_Order_Compatibility::get_prop( $order, 'billing_postcode' ),
 		);
 
 		$entered_payment_hash = md5( json_encode( $entered_payment ) );

@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Frontend
  * @author    SkyVerge
  * @category  Frontend
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -33,20 +33,17 @@ defined( 'ABSPATH' ) or exit;
 class WC_Memberships_Frontend {
 
 
-	/** @var WC_Memberships_Checkout instance */
+	/** @var \WC_Memberships_Checkout instance */
 	protected $checkout;
 
-	/** @var WC_Memberships_Member_Area instance */
-	protected $member_area;
+	/** @var \WC_Memberships_Members_Area instance */
+	protected $members_area;
 
-	/** @var WC_Memberships_Restrictions instance */
+	/** @var \WC_Memberships_Restrictions instance */
 	protected $restrictions;
 
-	/** @var array Query vars to add to WordPress */
-	public $query_vars = array();
-
-	/** @var array cart items with member discounts helper **/
-	private $_cart_items_with_member_discounts = null;
+	/** @var null|array Cart items with member discounts helper **/
+	private $cart_items_with_member_discounts;
 
 
 	/**
@@ -57,7 +54,7 @@ class WC_Memberships_Frontend {
 	public function __construct() {
 
 		// load classes
-		$this->member_area  = wc_memberships()->load_class( '/includes/frontend/class-wc-memberships-member-area.php',  'WC_Memberships_Member_Area' );
+		$this->members_area = wc_memberships()->load_class( '/includes/frontend/class-wc-memberships-members-area.php', 'WC_Memberships_Members_Area' );
 		$this->checkout     = wc_memberships()->load_class( '/includes/frontend/class-wc-memberships-checkout.php',     'WC_Memberships_Checkout' );
 		$this->restrictions = wc_memberships()->load_class( '/includes/frontend/class-wc-memberships-restrictions.php', 'WC_Memberships_Restrictions' );
 
@@ -65,8 +62,8 @@ class WC_Memberships_Frontend {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts_and_styles' ) );
 
 		// handle frontend actions
-		add_action( 'wp_loaded', array( $this, 'cancel_membership' ) );
-		add_action( 'wp_loaded', array( $this, 'renew_membership' ) );
+		add_action( 'template_redirect', array( $this, 'cancel_membership' ) );
+		add_action( 'template_redirect', array( $this, 'renew_membership' ) );
 
 		// add cart & checkout notices
 		add_action( 'wp', array( $this, 'add_cart_member_login_notice' ) );
@@ -76,6 +73,8 @@ class WC_Memberships_Frontend {
 
 		// redirects to restricted content or product upon login
 		add_filter( 'woocommerce_login_redirect', array( $this, 'restricted_content_redirect' ), 40, 1 );
+
+		add_action( 'woocommerce_thankyou', array( $this, 'maybe_render_thank_you_content' ), 9 );
 	}
 
 
@@ -91,13 +90,13 @@ class WC_Memberships_Frontend {
 
 
 	/**
-	 * Get Member Area instance
+	 * Get the Members Area instance.
 	 *
-	 * @since 1.6.0
-	 * @return \WC_Memberships_Member_Area
+	 * @since 1.7.4
+	 * @return \WC_Memberships_Members_Area
 	 */
-	public function get_member_area_instance() {
-		return $this->member_area;
+	public function get_members_area_instance() {
+		return $this->members_area;
 	}
 
 
@@ -115,6 +114,8 @@ class WC_Memberships_Frontend {
 	/**
 	 * Enqueue frontend scripts & styles
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function enqueue_scripts_and_styles() {
@@ -125,35 +126,32 @@ class WC_Memberships_Frontend {
 	/**
 	 * Cancel a membership
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function cancel_membership() {
 
-		if ( ! isset( $_GET['cancel_membership'] ) || ! isset( $_GET['user_membership_id'] ) ) {
+		if ( ! isset( $_REQUEST['cancel_membership'] ) ) {
 			return;
 		}
 
-		$user_membership_id = absint( $_GET['user_membership_id'] );
+		$user_membership_id = (int) $_REQUEST['cancel_membership'];
 		$user_membership    = wc_memberships_get_user_membership( $user_membership_id );
-		$user_can_cancel    = current_user_can( 'wc_memberships_cancel_membership', $user_membership_id );
 
 		if ( ! $user_membership ) {
-			wc_add_notice( __( 'Invalid membership.', 'woocommerce-memberships' ), 'error' );
+
+			$notice_message = __( 'Invalid membership.', 'woocommerce-memberships' );
+			$notice_type    = 'error';
+
 		} else {
 
-			/**
-			 * Filter the valid statuses for cancelling a user membership on frontend
-			 *
-			 * @since 1.0.0
-			 * @param array $statuses Array of statuses valid for cancellation
-			 */
-			$user_membership_can_cancel = in_array( $user_membership->get_status(), apply_filters( 'wc_memberships_valid_membership_statuses_for_cancel', array( 'active' ) ), true );
-
-			if ( ! $user_membership->is_cancelled() && $user_can_cancel && $user_membership_can_cancel && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'wc_memberships-cancel_membership' ) ) {
+			if (     current_user_can( 'wc_memberships_cancel_membership', $user_membership_id )
+			      && $user_membership->can_be_cancelled()
+			      && isset( $_REQUEST['_wpnonce'] )
+			      && wp_verify_nonce( $_REQUEST['_wpnonce'], 'wc_memberships-cancel_membership_' . $user_membership_id ) ) {
 
 				$user_membership->cancel_membership( __( 'Membership cancelled by customer.', 'woocommerce-memberships' ) );
-
-				// Message
 
 				/**
 				 * Filter the user cancelled membership message on frontend
@@ -161,8 +159,8 @@ class WC_Memberships_Frontend {
 				 * @since 1.0.0
 				 * @param string $notice
 				 */
-				$notice = apply_filters( 'wc_memberships_user_membership_cancelled_notice', __( 'Your membership was cancelled.', 'woocommerce-memberships' ) );
-				wc_add_notice( $notice, 'notice' );
+				$notice_message =  apply_filters( 'wc_memberships_user_membership_cancelled_notice', __( 'Your membership was cancelled.', 'woocommerce-memberships' ) );
+				$notice_type    = 'notice';
 
 				/**
 				 * Fires right after a membership has been cancelled by a customer
@@ -174,94 +172,153 @@ class WC_Memberships_Frontend {
 
 			} else {
 
-				wc_add_notice( __( 'Cannot cancel this membership.', 'woocommerce-memberships' ), 'error' );
+				$notice_message = __( 'Cannot cancel this membership.', 'woocommerce-memberships' );
+				$notice_type    = 'error';
 			}
+		}
+
+		if ( isset( $notice_message, $notice_type ) ) {
+			wc_add_notice( $notice_message, $notice_type );
 		}
 
 		wp_safe_redirect( wc_get_page_permalink( 'myaccount' ) );
 		exit;
+	}
+
+
+	/**
+	 * Log in a member
+	 *
+	 * @since 1.7.0
+	 * @param \WC_Memberships_User_Membership $user_membership Membership the member to log in belongs to
+	 */
+	private function log_member_in( $user_membership ) {
+
+		$log_in_user_id    = $user_membership->get_user_id();
+		$user_is_not_admin = ! user_can( $log_in_user_id, 'edit_others_posts' ) && ! user_can( $log_in_user_id, 'edit_users' );
+
+		// maybe log in the membership owner
+		if ( is_user_logged_in() ) {
+
+			// another user is logged in
+			if ( (int) $log_in_user_id !== (int) get_current_user_id() ) {
+
+				// log out existing user
+				wp_logout();
+
+				// do not log in a user with high privileges
+				if ( $user_is_not_admin ) {
+
+					wp_set_current_user( $log_in_user_id );
+					wp_set_auth_cookie( $log_in_user_id );
+				}
+			}
+
+		} elseif ( $user_is_not_admin ) {
+
+			// log the member in automatically if has low privileges
+			wp_set_current_user( $log_in_user_id );
+			wp_set_auth_cookie( $log_in_user_id );
+		}
 	}
 
 
 	/**
 	 * Renew a membership
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
 	public function renew_membership() {
 
-		if ( ! isset( $_GET['renew_membership'] ) || ! isset( $_GET['user_membership_id'] ) ) {
+		if ( ! isset( $_REQUEST['renew_membership'] ) ) {
 			return;
 		}
 
-		$user_membership_id = absint( $_GET['user_membership_id'] );
+		$redirect_url       = wc_get_page_permalink( 'myaccount' );
+		$user_membership_id = (int) $_REQUEST['renew_membership'];
 		$user_membership    = wc_memberships_get_user_membership( $user_membership_id );
-		$membership_plan    = $user_membership->get_plan();
-		$user_can_renew     = current_user_can( 'wc_memberships_renew_membership', $user_membership_id );
-		$product            = null;
 
 		if ( ! $user_membership ) {
 
-			wc_add_notice( __( 'Invalid membership.', 'woocommerce-memberships' ), 'error' );
+			$notice_message = __( 'Invalid membership.', 'woocommerce-memberships' );
+			$notice_type    = 'error';
 
-		} else {
+		} elseif ( $user_membership->can_be_renewed() ) {
 
-			/**
-			 * Filter the valid statuses for renewing a user membership on frontend
-			 *
-			 * @since 1.0.0
-			 * @param array $statuses Array of statuses valid for renewal
-			 */
-			$user_membership_can_renew = in_array( $user_membership->get_status(), apply_filters( 'wc_memberships_valid_membership_statuses_for_renewal', array( 'expired', 'cancelled' ) ), true );
+			// makes sure the member is logged in
+			$this->log_member_in( $user_membership );
 
-			// try to purchase the same product as before
-			$original_product = $user_membership->get_product();
+			// get the renewal product to be added to cart
+			$product_for_renewal = $user_membership->get_product_for_renewal();
 
-			if ( $original_product && $original_product->is_purchasable() ) {
+			/* this filter is documented in /includes/class-wc-memberships-membership-plan.php */
+			$renew = (bool) apply_filters( 'wc_memberships_renew_membership', (bool) $product_for_renewal, $user_membership->get_plan(), array(
+				'user_id'    => $user_membership->get_user_id(),
+				'product_id' => $product_for_renewal->get_id(),
+				'order_id'   => $user_membership->get_order_id(),
+			) );
 
-				$product = $original_product;
+			if ( true === $renew && current_user_can( 'wc_memberships_renew_membership', $user_membership_id ) ) {
+
+				/**
+				 * Filter whether to add to cart the renewal product and redirect to checkout,
+				 * or redirect to the product page without adding it to cart.
+				 *
+				 * @since 1.7.4
+				 * @param bool $add_to_cart Whether to add to cart the product and redirect to checkout (true, default) or redirect to product page instead (false).
+				 * @param \WC_Product $product_for_renewal The product that would renew access if purchased again.
+				 * @param int $user_membership_id The membership being renewed upon purchase.
+				 */
+				if ( true === (bool) apply_filters( 'wc_memberships_add_to_cart_renewal_product', true, $product_for_renewal, $user_membership_id ) ) {
+
+					// empty the cart and add the one product to renew this membership
+					wc_empty_cart();
+
+					// set up variation data (if needed) before adding to the cart
+					$product_id           = $product_for_renewal->is_type( 'variation' ) ? SV_WC_Product_Compatibility::get_prop( $product_for_renewal, 'parent_id' ) : $product_for_renewal->get_id();
+					$variation_id         = $product_for_renewal->is_type( 'variation' ) ? $product_for_renewal->get_id() : 0;
+					$variation_attributes = $product_for_renewal->is_type( 'variation' ) ? wc_get_product_variation_attributes( $variation_id ) : array();
+
+
+					// add the product to the cart
+					WC()->cart->add_to_cart( $product_id, 1, $variation_id, $variation_attributes );
+
+					// then redirect to checkout instead of my account page
+					$redirect_url = wc_get_checkout_url();
+
+				} else {
+
+					$redirect_url = get_permalink( $product_for_renewal->is_type( 'variation' ) ? SV_WC_Product_Compatibility::get_prop( $product_for_renewal, 'parent_id' ) : $product_for_renewal->get_id() );
+				}
+
+				/* translators: Placeholder: %s - a product to purchase to renew a membership */
+				$notice_message  = sprintf( __( 'Renew your membership by purchasing %s.', 'woocommerce-memberships' ) . ' ', $product_for_renewal->get_title() );
+				$notice_message .= is_user_logged_in() ? ' ' : __( 'You must be logged to renew your membership.', 'woocommerce-memberships' );
+				$notice_type = 'success';
 
 			} else {
 
-				// if the original product as before is not available,
-				// try to get the first purchasable product
-
-				foreach ( $membership_plan->get_product_ids() as $product_id ) {
-
-					$another_product = wc_get_product( $product_id );
-
-					// we've found a product that can be purchased to renew access!
-					if ( $another_product && $another_product->is_purchasable() ) {
-
-						$product = $another_product;
-						break;
-					}
-				}
-			}
-
-			// if all conditions are met, the membership can be renewed
-			if ( $product && $user_can_renew && $user_membership_can_renew && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], 'wc_memberships-renew_membership' ) ) {
-
-				wc_empty_cart();
-				WC()->cart->add_to_cart( $product->id, 1 );
-
-				/* translators: Placeholder: %s - a product to purchase to renew a membership */
-				wc_add_notice( sprintf( __( 'Renew your membership by purchasing %s.', 'woocommerce-memberships' ), $product->get_title() ), 'success' );
-
-				wp_safe_redirect( wc_get_checkout_url() );
-				exit;
+				$notice_message = __( 'Cannot renew this membership. Please contact us if you need assistance.', 'woocommerce-memberships' );
+				$notice_type    = 'error';
 			}
 		}
 
-		wc_add_notice( __( 'Cannot renew this membership. Please contact us if you need assistance.', 'woocommerce-memberships' ), 'error' );
+		if ( isset( $notice_message, $notice_type ) ) {
 
-		wp_safe_redirect( wc_get_page_permalink( 'myaccount' ) );
-		exit;
+			wc_add_notice( $notice_message, $notice_type );
+
+			wp_safe_redirect( $redirect_url );
+			exit;
+		}
 	}
 
 
 	/**
 	 * Add a notice for members that they can get a discount when logged in
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 */
@@ -269,19 +326,32 @@ class WC_Memberships_Frontend {
 
 		$display_in = get_option( 'wc_memberships_display_member_login_notice' );
 
-		if ( ! is_user_logged_in()
-		     && is_cart()
-		     && in_array( $display_in, array( 'cart', 'both' ), true )
-		     && ( $this->cart_has_items_with_member_discounts() && ! is_ajax() ) ) {
+		if (    ! is_user_logged_in()
+		     &&   is_cart()
+		     &&   in_array( $display_in, array( 'cart', 'both' ), true )
+		     &&   ( $this->cart_has_items_with_member_discounts() && ! is_ajax() ) ) {
 
-			$message = $this->get_member_login_message();
-			wc_add_notice( sprintf( $message, '<a href="' . esc_url( $this->get_restricted_content_redirect_url() ) . '">', '</a>' ), 'notice' );
+			wc_add_notice( sprintf( $this->get_member_login_message(), '<a href="' . esc_url( $this->get_restricted_content_redirect_url() ) . '">', '</a>' ), 'notice' );
 		}
 	}
 
 
 	/**
+	 * Renders a thank you message on the Order Received page when a membership is purchased.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param int $order_id the order ID
+	 */
+	public function maybe_render_thank_you_content( $order_id ) {
+		echo wp_kses_post( wc_memberships_get_order_thank_you_links( $order_id ) );
+	}
+
+
+	/**
 	 * Maybe render checkout member login notice
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @param string $template_name template being loaded by WC
@@ -293,10 +363,10 @@ class WC_Memberships_Frontend {
 
 			$display_in = get_option( 'wc_memberships_display_member_login_notice' );
 
-			if ( in_array( $display_in, array( 'checkout', 'both' ), true ) && $this->cart_has_items_with_member_discounts() ) {
+			if (    in_array( $display_in, array( 'checkout', 'both' ), true )
+			     && $this->cart_has_items_with_member_discounts() ) {
 
-				$message = $this->get_member_login_message();
-				wc_print_notice( sprintf( $message, '', '' ), 'notice' );
+				wc_print_notice( sprintf( $this->get_member_login_message(), '', '' ), 'notice' );
 			}
 		}
 	}
@@ -304,6 +374,8 @@ class WC_Memberships_Frontend {
 
 	/**
 	 * Get member login message
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -351,21 +423,23 @@ class WC_Memberships_Frontend {
 	 */
 	private function get_cart_items_with_member_discounts() {
 
-		if ( ! isset( $this->_cart_items_with_member_discounts ) ) {
+		if ( ! isset( $this->cart_items_with_member_discounts ) ) {
 
-			$this->_cart_items_with_member_discounts = array();
+			$this->cart_items_with_member_discounts = array();
 
 			foreach ( WC()->cart->get_cart() as $item_key => $item ) {
 
 				$product_id = isset( $item['variation_id'] ) && $item['variation_id'] ? $item['variation_id'] : $item['product_id'];
 
-				if ( wc_memberships()->get_rules_instance()->product_has_member_discount( $product_id ) ) {
-					$this->_cart_items_with_member_discounts[] = $product_id;
+				if (      wc_memberships()->get_rules_instance()->product_has_member_discount( $product_id )
+				     && ! wc_memberships()->get_member_discounts_instance()->is_product_excluded_from_member_discounts( $product_id ) ) {
+
+					$this->cart_items_with_member_discounts[] = $product_id;
 				}
 			}
 		}
 
-		return $this->_cart_items_with_member_discounts;
+		return $this->cart_items_with_member_discounts;
 	}
 
 
@@ -378,6 +452,7 @@ class WC_Memberships_Frontend {
 	private function cart_has_items_with_member_discounts() {
 
 		$cart_items = $this->get_cart_items_with_member_discounts();
+
 		return ! empty( $cart_items );
 	}
 
@@ -394,8 +469,8 @@ class WC_Memberships_Frontend {
 
 		// Default to the 'current' post
 		if ( ! $post_id ) {
-
 			global $post;
+
 			$post_id = $post->ID;
 		}
 
@@ -433,6 +508,7 @@ class WC_Memberships_Frontend {
 					$product = wc_get_product( $product_id );
 
 					if ( $product instanceof WC_Product && $product->is_purchasable() && $product->is_visible() ) {
+
 						$products[] = $product_id;
 					}
 				}
@@ -453,7 +529,29 @@ class WC_Memberships_Frontend {
 		 */
 		$products = apply_filters( 'wc_memberships_products_that_grant_access', $products, $post_id, $rule_type );
 
-		return ! empty( $products ) ? $products : null;
+		return ! empty( $products ) ? array_map( 'intval', (array) $products ) : null;
+	}
+
+
+	/**
+	 * Get valid restriction message types
+	 *
+	 * @since 1.7.0
+	 * @return array
+	 */
+	public function get_valid_restriction_message_types() {
+
+		/**
+		 * Filter valid restriction message types
+		 *
+		 * @since 1.0.0
+		 * @param array
+		 */
+		return (array) apply_filters( 'wc_memberships_valid_restriction_message_types', array(
+			'content_restricted',
+			'product_viewing_restricted',
+			'product_purchasing_restricted'
+		) );
 	}
 
 
@@ -467,11 +565,16 @@ class WC_Memberships_Frontend {
 	 * @param string $type Restriction type
 	 * @param int $post_id Post ID that is being restricted
 	 * @param array $products List of product IDs that grant access. Optional
-	 * @return string Restriction message
+	 * @return bool|string Restriction message
 	 */
 	private function get_restriction_message( $type, $post_id, $products = null ) {
 
 		if ( ! $type ) {
+			return false;
+		}
+
+		// don't show discount notices for products that are excluded from discounts
+		if ( 'product_discount' === $type && wc_memberships()->get_member_discounts_instance()->is_product_excluded_from_member_discounts( $post_id ) ) {
 			return false;
 		}
 
@@ -482,9 +585,13 @@ class WC_Memberships_Frontend {
 			// Check that the message type is valid for custom messages.
 			// For example, purchasing_discount messages cannot be customized per-product
 			// so we must leave them out
-			if ( in_array( $type, wc_memberships_get_valid_restriction_message_types(), true ) && 'yes' === get_post_meta( $post_id, "_wc_memberships_use_custom_{$type}_message", true ) ) {
-				$message = get_post_meta( $post_id, "_wc_memberships_{$type}_message", true );
+			if (    'yes' === wc_memberships_get_content_meta( $post_id, "_wc_memberships_use_custom_{$type}_message", true )
+			     && in_array( $type, $this->get_valid_restriction_message_types(), true ) ) {
+
+				$message = wc_memberships_get_content_meta( $post_id, "_wc_memberships_{$type}_message", true );
+
 			} else {
+
 				$message = get_option( "wc_memberships_{$type}_message" );
 			}
 
@@ -492,14 +599,15 @@ class WC_Memberships_Frontend {
 
 		} else {
 
-			if ( 'yes' === get_post_meta( $post_id, "_wc_memberships_use_custom_{$type}_message", true ) ) {
-				$message = get_post_meta( $post_id, "_wc_memberships_{$type}_message", true );
+			if ( 'yes' === wc_memberships_get_content_meta( $post_id, "_wc_memberships_use_custom_{$type}_message", true ) ) {
+				$message = wc_memberships_get_content_meta( $post_id, "_wc_memberships_{$type}_message", true );
 			} else {
 				$message = get_option( "wc_memberships_{$type}_message_no_products" );
 			}
 		}
 
 		if ( SV_WC_Helper::str_exists( $message, '{login_url}' ) ) {
+
 			$message = str_replace( '{login_url}', $this->get_restricted_content_redirect_url( $post_id ), $message );
 		}
 
@@ -590,7 +698,7 @@ class WC_Memberships_Frontend {
 			return array();
 		}
 
-		return array_filter( array_map( array( $this, 'format_product'), $products ) );
+		return array_filter( array_map( array( $this, 'format_product' ), array_unique( $products ) ) );
 	}
 
 
@@ -613,7 +721,7 @@ class WC_Memberships_Frontend {
 		$title   = $product->get_title();
 
 		// Special handling for variations
-		if ( $product->is_type( 'variation' ) ) {
+		if ( $product->is_type( array( 'variation', 'subscription_variation' ) ) ) {
 
 			$attributes = $product->get_variation_attributes();
 
@@ -774,24 +882,6 @@ class WC_Memberships_Frontend {
 
 		}
 
-		// Apply the deprecated filter
-		if ( has_filter( 'get_content_delayed_message' ) ) {
-
-			/**
-			 * Filter the delayed content message
-			 *
-			 * @since 1.0.0
-			 * @deprecated 1.3.1
-			 * @param string $message Delayed content message
-			 * @param int $post_id Post ID that the message applies to
-			 * @param string $access_time Access time timestamp
-			 */
-			$message = apply_filters( 'get_content_delayed_message', $message, $post_id, $access_time );
-
-			// Notify developers that this filter is deprecated
-			_deprecated_function( 'The get_content_delayed_message filter', '1.3.1', 'wc_memberships_get_content_delayed_message' );
-		}
-
 		/**
 		 * Filter the delayed content message
 		 *
@@ -920,7 +1010,7 @@ class WC_Memberships_Frontend {
 
 		if ( ! $post_id ) {
 			global $post;
-			
+
 			$post_id = $post->ID;
 		}
 
@@ -954,24 +1044,30 @@ class WC_Memberships_Frontend {
 		$class = 'wc_memberships()->get_frontend_instance()';
 
 		$deprecated_since_1_6_0 = '1.6.0';
+		$deprecated_since_1_7_4 = '1.7.4';
 
 		switch( $method ) {
 
 			/** @deprecated since 1.6.0 */
 			case 'filter_breadcrumbs' :
-				_deprecated_function( "{$class}->{$method}()", $deprecated_since_1_6_0, "{$class}->get_member_area_instance()->{$method}()" );
-				return $this->get_member_area_instance()->filter_breadcrumbs( $args );
+				_deprecated_function( "{$class}->{$method}()", $deprecated_since_1_6_0, "{$class}->get_members_area_instance()->{$method}()" );
+				return $this->get_members_area_instance()->filter_breadcrumbs( $args );
 
 			/** @deprecated since 1.6.0 */
 			case 'my_account_memberships' :
-				_deprecated_function( "{$class}->{$method}()", $deprecated_since_1_6_0, "{$class}->get_member_area_instance()->{$method}()" );
-				$this->get_member_area_instance()->my_account_memberships();
+				_deprecated_function( "{$class}->{$method}()", $deprecated_since_1_6_0, "{$class}->get_members_area_instance()->{$method}()" );
+				$this->get_members_area_instance()->my_account_memberships();
 				return null;
 
 			/** @deprecated since 1.6.0 */
 			case 'render_members_area_content' :
-				_deprecated_function( "{$class}->{$method}()", $deprecated_since_1_6_0, "{$class}->get_member_area_instance()->{$method}()" );
-				return $this->get_member_area_instance()->render_member_area_content( $args );
+				_deprecated_function( "{$class}->{$method}()", $deprecated_since_1_6_0, "{$class}->get_members_area_instance()->{$method}()" );
+				return $this->get_members_area_instance()->render_member_area_content( $args );
+
+			/** @deprecated since 1.7.4 */
+			case 'get_member_area_instance' :
+				_deprecated_function( "{$class}->{$method}()", $deprecated_since_1_7_4, "{$class}->get_members_area_instance()" );
+				return $this->get_members_area_instance();
 
 			default :
 				// you're probably doing it wrong

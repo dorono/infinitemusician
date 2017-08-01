@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: cxThemes
 Tags: woocommerce, email, customize, customise, edit, colors, text, preview, template, communication, send, test
-Stable tag: 3.07
+Stable tag: 3.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,6 +33,23 @@ Please see the included PDF for full instructions on how to use this plugin.
  
  
 == Changelog ==
+
+= 3.11 =
+* Move the registering of the template functions out of the email-header.php. This should prevent the error `ec_special_title()` function doesn't exist.
+* Move `woocommerce_email_before_order_table` and `woocommerce_email_after_order_table` to look better in all our templates.
+
+= 3.10 =
+* Updated our plugin-update-checker script.
+
+= 3.09 =
+* Remove the `height="80"` attribute from the product thumbnail images in the emails. We found that in cases where the thumbnail images were not proportionately cropped the images would appear squashed. FYI the product images in the emails use the WordPress 'thumbnail' image crop, which you can set in WordPress > Settings > Media.
+* Update the way we get and display the Date after the release of WC 3.0
+
+= 3.08 =
+* Updated all email template files (WC3.0 compatibility).
+* Use WC Order object methods instead of accessing properties directly (WC3.0 compatibility).
+* Add helper functions for WC backwards compat.
+* Email Customizer now requires WooCommerce version 2.5 or above.
 
 = 3.07 =
 * Fixed issue when using WPML String Translation where each new email sent would add new unique strings to the database causing unwanted bloat.

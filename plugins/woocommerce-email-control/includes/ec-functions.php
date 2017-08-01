@@ -25,7 +25,7 @@
  * }
  * @return	object|WP_Error		The registered post type object, or an error object.
  */
-if ( !function_exists('ec_register_email_theme') ) {
+if ( ! function_exists( 'ec_register_email_theme' ) ) {
 	function ec_register_email_theme( $theme_id, $args ) {
 		
 		global $ec_email_themes;
@@ -117,4 +117,21 @@ function ec_check_theme_version( $theme_id ) {
 	return version_compare( get_option( 'woocommerce_version' ), $woocommerce_required_version, '>' );
 }
 
-?>
+/**
+ * Order helper function for methods that were only introduced in WC 3.0.
+ */
+function ec_order_get_id( $order ) {
+	return method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id ;
+}
+function ec_order_get_date_created( $order ) {
+	return method_exists( $order, 'get_date_created' ) ? $order->get_date_created() : $order->date;
+}
+function ec_order_get_billing_first_name( $order ) {
+	return method_exists( $order, 'get_billing_first_name' ) ? $order->get_billing_first_name() : $order->billing_first_name;
+}
+function ec_order_get_billing_last_name( $order ) {
+	return method_exists( $order, 'get_billing_last_name' ) ? $order->get_billing_last_name() : $order->billing_last_name;
+}
+function ec_order_get_billing_email( $order ) {
+	return method_exists( $order, 'get_billing_email' ) ? $order->get_billing_email() : $order->billing_email;
+}

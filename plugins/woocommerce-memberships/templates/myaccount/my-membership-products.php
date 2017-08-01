@@ -14,7 +14,7 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Templates
  * @author    SkyVerge
@@ -31,7 +31,7 @@ defined( 'ABSPATH' ) or exit;
  * @type \WP_Query $restricted_products Query results of products post objects for all products restricted to the membership
  * @type int $user_id The current user ID
  *
- * @version 1.5.0
+ * @version 1.8.0
  * @since 1.4.0
  */
 ?>
@@ -78,19 +78,27 @@ defined( 'ABSPATH' ) or exit;
 		<?php foreach ( $restricted_products->posts as $member_product ) : ?>
 
 			<?php
+
 			$product = wc_get_product( $member_product );
 
 			if ( ! $product ) {
 				continue;
 			}
 
-			// Customer capabilities
-			$can_view_product     = wc_memberships_user_can( $user_id, 'view' , array( 'product' => $product->id ) );
-			$can_purchase_product = wc_memberships_user_can( $user_id, 'purchase', array( 'product' => $product->id ) );
-			$view_start_time      = wc_memberships_get_user_access_start_time( $user_id, 'view', array( 'product' => $product->id ) );
-			$purchase_start_time  = wc_memberships_get_user_access_start_time( $user_id, 'purchase', array( 'product' => $product->id ) );
-			?>
+			if ( $product->is_type( 'variation' ) ) {
+				$parent     = SV_WC_Product_Compatibility::get_parent( $product );
+				$product_id = $parent->get_id();
+			} else {
+				$product_id = $product->get_id();
+			}
 
+			// Customer capabilities
+			$can_view_product     = wc_memberships_user_can( $user_id, 'view' , array( 'product' => $product_id ) );
+			$can_purchase_product = wc_memberships_user_can( $user_id, 'purchase', array( 'product' => $product_id ) );
+			$view_start_time      = wc_memberships_adjust_date_by_timezone( wc_memberships_get_user_access_start_time( $user_id, 'view', array( 'product' => $product_id ) ), 'timestamp', wc_timezone_string() );
+			$purchase_start_time  = wc_memberships_get_user_access_start_time( $user_id, 'purchase', array( 'product' => $product_id ) );
+
+			?>
 			<tr class="membership-product">
 				<?php foreach ( $my_membership_products_columns as $column_id => $column_name ) : ?>
 
@@ -98,7 +106,7 @@ defined( 'ABSPATH' ) or exit;
 
 						<td class="membership-product-image" style="min-width: 84px;" data-title="<?php echo esc_attr( $column_name ); ?>">
 							<?php if ( $can_view_product ) : ?>
-								<a href="<?php echo esc_url( get_permalink( $product->id ) ); ?>"><?php echo $product->get_image(); ?></a>
+								<a href="<?php echo esc_url( get_permalink( $product_id ) ); ?>"><?php echo $product->get_image(); ?></a>
 							<?php else : ?>
 								<?php echo wc_placeholder_img( 'shop_thumbnail' ); ?>
 							<?php endif; ?>
@@ -108,7 +116,7 @@ defined( 'ABSPATH' ) or exit;
 
 						<td class="membership-product-title" data-title="<?php echo esc_attr( $column_name ); ?>">
 							<?php if ( $can_view_product ) : ?>
-								<a href="<?php echo esc_url( get_permalink( $product->id ) ); ?>"><?php echo esc_html( $product->get_title() ); ?></a>
+								<a href="<?php echo esc_url( get_permalink( $product_id ) ); ?>"><?php echo esc_html( $product->get_title() ); ?></a>
 							<?php else : ?>
 								<?php echo esc_html( $product->get_title() ); ?>
 							<?php endif; ?>
@@ -120,7 +128,7 @@ defined( 'ABSPATH' ) or exit;
 							<?php if ( $can_view_product ) : ?>
 								<?php esc_html_e( 'Now', 'woocommerce-memberships' ); ?>
 							<?php else : ?>
-								<time datetime="<?php echo date( 'Y-m-d', $view_start_time ); ?>" title="<?php echo esc_attr( $view_start_time ); ?>"><?php echo date_i18n( get_option( 'date_format' ), $view_start_time ); ?></time>
+								<time datetime="<?php echo date( 'Y-m-d H:i:s', $view_start_time ); ?>" title="<?php echo esc_attr( $view_start_time ); ?>"><?php echo date_i18n( wc_date_format(), $view_start_time ); ?></time>
 							<?php endif; ?>
 						</td>
 

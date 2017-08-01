@@ -155,6 +155,10 @@ if ( ! class_exists( 'Homestore_Customizer' ) ) :
 				background-color: ' . $header_background_color . ';
 			}';
 
+			$styles[] = '.storefront-product-section .section-title:after, .single-product div.product .related.products > h2:first-child:after {
+				border-color: transparent ' . $background_color . $background_color . $background_color . ';
+			}';
+
 			$styles[] = '#page #site-navigation {
 				border-bottom-color: ' . $header_background_color .  ';
 			}';

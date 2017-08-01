@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: WooCommerce Authorize.Net CIM Gateway
- * Plugin URI: http://www.woothemes.com/products/authorize-net-cim/
+ * Plugin URI: http://www.woocommerce.com/products/authorize-net-cim/
  * Description: Adds the Authorize.Net CIM Payment Gateway to your WooCommerce site, allowing customers to securely save their credit card or bank account to their account for use with single purchases, pre-orders, subscriptions, and more!
- * Author: WooThemes / SkyVerge
- * Author URI: http://www.woothemes.com/
- * Version: 2.3.2
+ * Author: SkyVerge
+ * Author URI: http://www.woocommerce.com/
+ * Version: 2.6.3
  * Text Domain: woocommerce-gateway-authorize-net-cim
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2013-2016 SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2013-2017, SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,7 +17,7 @@
  * @package     WC-Authorize-Net-CIM
  * @author      SkyVerge
  * @category    Payment-Gateways
- * @copyright   Copyright (c) 2013-2016, SkyVerge, Inc.
+ * @copyright   Copyright (c) 2013-2017, SkyVerge, Inc.
  * @license     http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -41,11 +41,11 @@ if ( ! class_exists( 'SV_WC_Framework_Bootstrap' ) ) {
 	require_once( plugin_dir_path( __FILE__ ) . 'lib/skyverge/woocommerce/class-sv-wc-framework-bootstrap.php' );
 }
 
-SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.4.1', __( 'WooCommerce Authorize.Net CIM Gateway', 'woocommerce-gateway-authorize-net-cim' ), __FILE__, 'init_woocommerce_gateway_authorize_net_cim', array(
+SV_WC_Framework_Bootstrap::instance()->register_plugin( '4.6.4', __( 'WooCommerce Authorize.Net CIM Gateway', 'woocommerce-gateway-authorize-net-cim' ), __FILE__, 'init_woocommerce_gateway_authorize_net_cim', array(
 	'is_payment_gateway'   => true,
-	'minimum_wc_version'   => '2.4.13',
+	'minimum_wc_version'   => '2.5.5',
 	'minimum_wp_version'   => '4.1',
-	'backwards_compatible' => '4.4.0',
+	'backwards_compatible' => '4.4',
 ) );
 
 function init_woocommerce_gateway_authorize_net_cim() {
@@ -122,7 +122,7 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 
 
 	/** string version number */
-	const VERSION = '2.3.2';
+	const VERSION = '2.6.3';
 
 	/** @var WC_Authorize_Net_CIM single instance of this plugin */
 	protected static $instance;
@@ -158,7 +158,8 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 			self::PLUGIN_ID,
 			self::VERSION,
 			array(
-				'gateways' => array(
+				'text_domain' => 'woocommerce-gateway-authorize-net-cim',
+				'gateways'    => array(
 					self::CREDIT_CARD_GATEWAY_ID => self::CREDIT_CARD_GATEWAY_CLASS_NAME,
 					self::ECHECK_GATEWAY_ID      => self::ECHECK_GATEWAY_CLASS_NAME,
 				),
@@ -169,11 +170,19 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 					self::FEATURE_MY_PAYMENT_METHODS,
 					self::FEATURE_CUSTOMER_ID,
 				),
+				'display_php_notice' => true, // @since 2.6.3
 			)
 		);
 
 		// Load gateway files after woocommerce is loaded
 		add_action( 'sv_wc_framework_plugins_loaded', array( $this, 'includes' ), 11 );
+
+		// display the admin Shipping Address ID user field
+		add_action( 'wc_payment_gateway_' . $this->get_id() . '_user_profile', array( $this, 'display_shipping_address_id_field' ), 15 );
+
+		// save the admin Shipping Address ID user field
+		add_action( 'personal_options_update',  array( $this, 'save_shipping_address_id_field' ) );
+		add_action( 'edit_user_profile_update', array( $this, 'save_shipping_address_id_field' ) );
 	}
 
 
@@ -208,18 +217,6 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 			//  require the billing fields
 			add_filter( 'woocommerce_get_country_locale', array( $this, 'require_billing_fields' ), 100 );
 		}
-	}
-
-
-	/**
-	 * Handle localization, WPML compatible
-	 *
-	 * @since 1.0
-	 * @see SV_WC_Plugin::load_translation()
-	 */
-	public function load_translation() {
-
-		load_plugin_textdomain( 'woocommerce-gateway-authorize-net-cim', false, dirname( plugin_basename( $this->get_file() ) ) . '/i18n/languages' );
 	}
 
 
@@ -262,10 +259,63 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 
 			if ( isset( $locales[ $country_code ]['state']['required'] ) ) {
 				$locales[ $country_code ]['state']['required'] = true;
+				$locales[ $country_code ]['state']['label']    = $this->get_state_label( $country_code );
 			}
 		}
 
 		return $locales;
+	}
+
+
+	/**
+	 * Gets a label for states that don't have one set by WooCommerce.
+	 *
+	 * @since 2.6.1
+	 *
+	 * @param string $country_code the 2-letter country code for the billing country
+	 * @return string the label for the "billing state" field at checkout
+	 */
+	protected function get_state_label( $country_code ) {
+
+		switch( $country_code ) {
+
+			case 'AF':
+			case 'AT':
+			case 'BI':
+			case 'KR':
+			case 'PL':
+			case 'PT':
+			case 'LK':
+			case 'SE':
+			case 'VN':
+				$label = __( 'Province', 'woocommerce-gateway-authorize-net-cim' );
+			break;
+
+			case 'AX':
+			case 'YT':
+				$label = __( 'Island', 'woocommerce-gateway-authorize-net-cim' );
+			break;
+
+			case 'DE':
+				$label = __( 'State', 'woocommerce-gateway-authorize-net-cim' );
+			break;
+
+			case 'EE':
+			case 'NO':
+				$label = __( 'County', 'woocommerce-gateway-authorize-net-cim' );
+			break;
+
+			case 'FI':
+			case 'IL':
+			case 'LB':
+				$label = __( 'District', 'woocommerce-gateway-authorize-net-cim' );
+			break;
+
+			default:
+				$label = __( 'Region', 'woocommerce-gateway-authorize-net-cim' );
+		}
+
+		return $label;
 	}
 
 
@@ -314,15 +364,15 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 			);
 		}
 
+		$gateway = $this->get_gateway( self::CREDIT_CARD_GATEWAY_ID );
+
+		// bail if gateway is not available, as proper credentials are needed first
+		if ( ! $gateway->is_available() ) {
+			return;
+		}
+
 		// check if CIM feature is enabled on customer's authorize.net account
 		if ( ! get_option( 'wc_authorize_net_cim_feature_enabled' ) ) {
-
-			$gateway = $this->get_gateway( self::CREDIT_CARD_GATEWAY_ID );
-
-			// bail if gateway is not available, as proper credentials are needed first
-			if ( ! $gateway->is_available() ) {
-				return;
-			}
 
 			if ( $gateway->is_cim_feature_enabled() ) {
 				update_option( 'wc_authorize_net_cim_feature_enabled', true );
@@ -333,6 +383,100 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 						sprintf( __( 'The CIM Add-On is not enabled on your Authorize.Net account. Please %scontact Authorize.Net%s to enable CIM. You will be unable to process transactions until CIM is enabled. ', 'woocommerce-gateway-authorize-net-cim' ), '<a href="http://support.authorize.net" target="_blank">', '</a>' ),
 						'cim-add-on-notice' );
 				}
+			}
+		}
+
+		if ( $gateway->is_accept_js_enabled() && isset( $_GET['page'] ) && 'wc-settings' === $_GET['page'] ) {
+
+			$message = '';
+
+			if ( ! $gateway->get_client_key() ) {
+				$message = sprintf( __( "%s: A valid Client Key is required to use Accept.js at checkout.", 'woocommerce-gateway-authorize-net-cim' ), '<strong>' . $this->get_plugin_name() . '</strong>' );
+			} elseif ( ! wc_checkout_is_https() ) {
+				$message = sprintf( __( "%s: SSL is required to use Accept.js at checkout.", 'woocommerce-gateway-authorize-net-cim' ), '<strong>' . $this->get_plugin_name() . '</strong>' );
+			}
+
+			if ( $message ) {
+				$this->get_admin_notice_handler()->add_admin_notice( $message, 'accept-js-status', array(
+					'dismissible'  => false,
+					'notice_class' => 'error',
+				) );
+			}
+		}
+	}
+
+
+	/**
+	 * Displays the admin Shipping Address ID user field.
+	 *
+	 * @since 2.6.3
+	 *
+	 * @param \WP_User $user user object
+	 */
+	public function display_shipping_address_id_field( $user ) {
+
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+
+		$unique_meta_key = '';
+
+		foreach ( $this->get_gateways() as $gateway ) {
+
+			$meta_key = sprintf( 'wc_%s_shipping_address_id', $this->get_id() );
+
+			if ( ! $gateway->is_production_environment() ) {
+				$meta_key .= '_' . $gateway->get_environment();
+			}
+
+			// If a field with this meta key has already been set, skip this gateway
+			if ( $meta_key === $unique_meta_key ) {
+				continue;
+			}
+
+			$label = __( 'Shipping Address ID', 'woocommerce-gateway-authorize-net-cim' );
+			$value = get_user_meta( $user->ID, $meta_key, true );
+
+			?>
+
+			<tr>
+				<th><label for="<?php esc_attr_e( $meta_key ); ?>"><?php echo esc_html( $label ); ?></label></th>
+				<td>
+					<input class="regular-text" name="<?php esc_attr_e( $meta_key ); ?>" value="<?php esc_attr_e( $value ); ?>" type="text" /><br/>
+					<span class="description"><?php esc_html_e( 'The shipping profile ID for the user. Only edit this if necessary.', 'woocommerce-gateway-authorize-net-cim' ); ?></span>
+				</td>
+			</tr>
+
+			<?php
+
+			$unique_meta_key = $meta_key;
+		}
+	}
+
+
+	/**
+	 * Saves the admin Shipping Address ID user field.
+	 *
+	 * @since 2.6.3
+	 *
+	 * @param int $user_id user profile ID
+	 */
+	public function save_shipping_address_id_field( $user_id ) {
+
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+
+		foreach ( $this->get_gateways() as $gateway ) {
+
+			$field_name = sprintf( 'wc_%s_shipping_address_id', $this->get_id() );
+
+			if ( ! $gateway->is_production_environment() ) {
+				$field_name .= '_' . $gateway->get_environment();
+			}
+
+			if ( isset( $_POST[ $field_name ] ) ) {
+				update_user_meta( $user_id, $field_name, wc_clean( $_POST[ $field_name ] ) );
 			}
 		}
 	}
@@ -364,7 +508,7 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 	 * @return string documentation URL
 	 */
 	public function get_documentation_url() {
-		return 'http://docs.woothemes.com/document/authorize-net-cim/';
+		return 'http://docs.woocommerce.com/document/authorize-net-cim/';
 	}
 
 
@@ -376,7 +520,8 @@ class WC_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Plugin {
 	 * @return string
 	 */
 	public function get_support_url() {
-		return 'http://support.woothemes.com/';
+
+		return 'https://woocommerce.com/my-account/tickets/';
 	}
 
 

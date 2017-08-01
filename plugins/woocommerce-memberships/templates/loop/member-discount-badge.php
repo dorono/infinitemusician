@@ -14,7 +14,7 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Templates
  * @author    SkyVerge
@@ -30,8 +30,8 @@ defined( 'ABSPATH' ) or exit;
  * @type \WP_Post $post Post object
  * @type \WC_Product $product Product object
  *
- * @since 1.0.0
  * @version 1.6.4
+ * @since 1.0.0
  */
 global $product;
 

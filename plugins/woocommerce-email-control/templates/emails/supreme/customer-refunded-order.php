@@ -11,48 +11,38 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @hooked WC_Emails::email_header() Output the email header
  */
 do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
-
-<table cellpadding="0" cellspacing="0" border="0" width="100%">
-	<tr>
-		<td valign="top" class="top_content_container">
 		
-			<?php if ( $partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
+<?php if ( $partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
 
-				<div class="top_heading">
-					<?php echo get_option( 'ec_supreme_customer_refunded_order_heading_partial' ); ?>
-				</div>
-				<div class="top_paragraph">
-					<?php echo get_option( 'ec_supreme_customer_refunded_order_main_text_partial' ); ?>
-				</div>
-				
-				<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
-					<p class="state-guide">
-						▲ <?php _e( "Partial Refund", 'email-control' ) ?>
-					<p>
-				<?php } ?>
-				
-			<?php } ?>
-			
-			<?php if ( ! $partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
-				
-				<div class="top_heading">
-					<?php echo get_option( 'ec_supreme_customer_refunded_order_heading_full' ); ?>
-				</div>
-				<p class="top_paragraph">
-					<?php echo get_option( 'ec_supreme_customer_refunded_order_main_text_full' ); ?>
-				</p>
-				
-				<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
-					<p class="state-guide">
-						▲ <?php _e( "Refund", 'email-control' ) ?>
-					<p>
-				<?php } ?>
+	<div class="top_heading">
+		<?php echo get_option( 'ec_supreme_customer_refunded_order_heading_partial' ); ?>
+	</div>
+	
+	<?php echo get_option( 'ec_supreme_customer_refunded_order_main_text_partial' ); ?>
+	
+	<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
+		<p class="state-guide">
+			▲ <?php _e( "Partial Refund", 'email-control' ) ?>
+		<p>
+	<?php } ?>
+	
+<?php } ?>
 
-			<?php } ?>
+<?php if ( ! $partial_refund || isset( $_REQUEST['ec_render_email'] ) ) { ?>
+	
+	<div class="top_heading">
+		<?php echo get_option( 'ec_supreme_customer_refunded_order_heading_full' ); ?>
+	</div>
+	
+	<?php echo get_option( 'ec_supreme_customer_refunded_order_main_text_full' ); ?>
+	
+	<?php if ( isset( $_REQUEST['ec_render_email'] ) ) { ?>
+		<p class="state-guide">
+			▲ <?php _e( "Refund", 'email-control' ) ?>
+		<p>
+	<?php } ?>
 
-		</td>
-	</tr>
-</table>
+<?php } ?>
 
 <?php
 

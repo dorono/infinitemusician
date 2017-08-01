@@ -3,7 +3,7 @@
 class core_pdf_embedder {
 	
 	protected function useminified() {
-		return true;
+		return !defined( 'SCRIPT_DEBUG' ) || !SCRIPT_DEBUG;
 	}
 	
 	protected function __construct() {

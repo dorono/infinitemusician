@@ -7,16 +7,6 @@
 .quick-view-button span {
   display: none; }
 
-.quick-view-button:before {
-  display: inline-block;
-  font: normal normal normal 1em / 1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  content: "\f06e";
-  margin-left: 0.6180469716em; }
-
 div.quick-view div.quick-view-image a.button {
   border: 0;
   background: none;

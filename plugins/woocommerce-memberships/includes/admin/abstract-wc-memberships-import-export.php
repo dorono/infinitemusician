@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Admin
  * @author    SkyVerge
  * @category  Admin
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -83,6 +83,8 @@ abstract class WC_Memberships_Import_Export {
 	/**
 	 * Conditionally output HTML if the section is displayed
 	 *
+	 * @internal
+	 *
 	 * @since 1.6.0
 	 * @param string $current_section
 	 */
@@ -97,6 +99,8 @@ abstract class WC_Memberships_Import_Export {
 
 	/**
 	 * Output HTML
+	 *
+	 * @internal
 	 *
 	 * @since 1.6.0
 	 */
@@ -117,6 +121,8 @@ abstract class WC_Memberships_Import_Export {
 
 	/**
 	 * Output a file input field
+	 *
+	 * @internal
 	 *
 	 * @since 1.6.0
 	 * @param array $field Field settings
@@ -157,6 +163,8 @@ abstract class WC_Memberships_Import_Export {
 
 	/**
 	 * Output a date range input field
+	 *
+	 * @internal
 	 *
 	 * @since 1.6.0
 	 * @param array $field Field settings
@@ -269,21 +277,9 @@ abstract class WC_Memberships_Import_Export {
 	 */
 	protected function is_date( $date ) {
 
-		if ( empty( $date ) ) {
-			return false;
-		}
+		$format = is_numeric( $date ) ? 'timestamp' : 'mysql';
 
-		// if it's a timestamp, must be greater than 0
-		if ( is_numeric( $date ) ) {
-			return (int) $date > 0;
-		}
-
-		// if it's not a timestamp, must be a string
-		if ( is_string( $date ) ) {
-			return (int) strtotime( $date ) > 0;
-		}
-
-		return false;
+		return false !== wc_memberships_parse_date( $date, $format );
 	}
 
 
@@ -302,6 +298,8 @@ abstract class WC_Memberships_Import_Export {
 	/**
 	 * Ensure a date is returned in mysql format
 	 *
+	 * @see wc_memberships_adjust_date_by_timezone()
+	 *
 	 * @since 1.6.0
 	 * @param string|int $date Date as timestamp or string format
 	 * @param string $timezone Timezone to use to convert the date from, defaults to site timezone
@@ -314,16 +312,56 @@ abstract class WC_Memberships_Import_Export {
 			$timezone = wc_timezone_string();
 		}
 
-		// no need to adjust date, it's already in UTC
-		if ( 'UTC' === $timezone ) {
-
-			$utc_date = is_numeric( $date ) ? date( 'Y-m-d H:i:s', $date ) : date( 'Y-m-d H:i:s', strtotime( $date ) );
-			$utc_date = new DateTime( $utc_date, new DateTimeZone( $timezone ) );
-
-			return date( 'Y-m-d H:i:s', $utc_date->format( 'U' ) );
+		// get the date
+		if ( is_numeric( $date ) ) {
+			$src_date = date( 'Y-m-d H:i:s', (int) $date );
+		} else {
+			$src_date = date( 'Y-m-d H:i:s', strtotime( $date ) );
 		}
 
-		return wc_memberships_adjust_date_by_timezone( $date, 'mysql', $timezone );
+		if ( ! empty( $src_date ) ) {
+
+			// no need to adjust date, it's already in UTC
+			if ( 'UTC' === $timezone ) {
+
+				try {
+
+					$datetime = new DateTime( $src_date, new DateTimeZone( $timezone ) );
+					$utc_date = date( 'Y-m-d H:i:s', $datetime->format( 'U' ) );
+
+				} catch ( Exception $e ) {
+
+					// in case of DateTime errors, just return the date as is but issue an error
+					trigger_error( sprintf( 'Failed to parse date "%1$s": %2$s', $date, $e->getMessage() ), E_USER_WARNING );
+
+					$utc_date = $src_date;
+				}
+
+			} else {
+
+				try {
+
+					$from_date = new DateTime( $src_date, new DateTimeZone( $timezone ) );
+					$to_date   = new DateTimeZone( 'UTC' );
+					$offset    = $to_date->getOffset( $from_date );
+
+					// getTimestamp method not used here for PHP 5.2 compatibility
+					$timestamp = (int) $from_date->format( 'U' );
+
+				} catch ( Exception $e ) {
+
+					// in case of DateTime errors, just return the date as is but issue an error
+					trigger_error( sprintf( 'Failed to parse date "%1$s" to get timezone offset: %2$s.', $date, $e->getMessage() ), E_USER_WARNING );
+
+					$timestamp = is_numeric( $date ) ? (int) $date : strtotime( $date );
+					$offset    = 0;
+				}
+
+				$utc_date = date( 'Y-m-d H:i:s', $timestamp + $offset );
+			}
+		}
+
+		return ! empty( $utc_date ) ? $utc_date : '';
 	}
 
 

@@ -14,12 +14,12 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Admin
  * @author    SkyVerge
  * @category  Admin
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -74,7 +74,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 		 */
 		$this->enclosure = apply_filters( 'wc_memberships_csv_import_enclosure', '"', $this );
 
-		$docs_button = '<p><a class="button" href="https://docs.woothemes.com/document/woocommerce-memberships-import-and-export/">' . esc_html__( 'See Documentation', 'woocommerce-memberships' ). '</a>';
+		$docs_button = '<p><a class="button" href="https://docs.woocommerce.com/document/woocommerce-memberships-import-and-export/">' . esc_html__( 'See Documentation', 'woocommerce-memberships' ). '</a>';
 
 		wc_memberships()->get_admin_notice_handler()->add_admin_notice(
 			'<p>' . __( '<strong>Members CSV Import</strong> - Importing members will create or update automatically User Memberships in bulk. Importing members <strong>does not</strong> create any associated billing, subscription or order records.', 'woocommerce-memberships' ) . '</p>' . $docs_button,
@@ -111,20 +111,14 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 	 */
 	protected function get_fields() {
 
-		$documentation_url = 'https://docs.woothemes.com/document/woocommerce-memberships-import-and-export/';
+		$documentation_url = 'https://docs.woocommerce.com/document/woocommerce-memberships-import-and-export/';
 		$max_upload_size   = size_format( wc_let_to_num( ini_get( 'post_max_size' ) ) );
 
 		if ( ! $site_timezone = wc_timezone_string() ) {
 			$site_timezone = 'UTC';
 		}
 
-		/**
-		 * Filter the CSV Import User Memberships options
-		 *
-		 * @since 1.6.0
-		 * @param array $options Associative array
-		 */
-		return apply_filters( 'wc_memberships_csv_import_user_memberships_options', array(
+		$options = array(
 
 			// section start
 			array(
@@ -225,7 +219,15 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 			// end of section
 			array( 'type' => 'sectionend' ),
 
-		) );
+		);
+
+		/**
+		 * Filter the CSV Import User Memberships options
+		 *
+		 * @since 1.6.0
+		 * @param array $options Associative array
+		 */
+		return apply_filters( 'wc_memberships_csv_import_user_memberships_options', $options );
 	}
 
 
@@ -400,6 +402,8 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 					continue;
 				}
 
+				$import_data = array();
+
 				// prepare variables
 				$import_data['membership_plan_id']    = $membership_plan_id;
 				$import_data['membership_plan_slug']  = $membership_plan_slug;
@@ -410,13 +414,25 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 				$import_data['user_id']               = isset( $columns['user_id'] )               && ! empty( $row[ $columns['user_id'] ] )               ? $row[ $columns['user_id'] ]               : null;
 				$import_data['user_name']             = isset( $columns['user_name'] )             && ! empty( $row[ $columns['user_name'] ] )             ? $row[ $columns['user_name'] ]             : null;
 				$import_data['product_id']            = isset( $columns['product_id'] )            && ! empty( $row[ $columns['product_id'] ] )            ? $row[ $columns['product_id'] ]            : null;
-				$impost_data['order_id']              = isset( $columns['order_id'] )              && ! empty( $row[ $columns['order_id'] ] )              ? $row[ $columns['order_id'] ]              : null;
+				$import_data['order_id']              = isset( $columns['order_id'] )              && ! empty( $row[ $columns['order_id'] ] )              ? $row[ $columns['order_id'] ]              : null;
 				$import_data['member_email']          = isset( $columns['member_email'] )          && ! empty( $row[ $columns['member_email'] ] )          ? $row[ $columns['member_email'] ]          : null;
 				$import_data['member_first_name']     = isset( $columns['member_first_name'] )     && ! empty( $row[ $columns['member_first_name'] ] )     ? $row[ $columns['member_first_name'] ]     : null;
 				$import_data['member_last_name']      = isset( $columns['member_last_name'] )      && ! empty( $row[ $columns['member_last_name'] ] )      ? $row[ $columns['member_last_name'] ]      : null;
 				$import_data['membership_status']     = isset( $columns['membership_status'] )     && ! empty( $row[ $columns['membership_status'] ] )     ? $row[ $columns['membership_status'] ]     : null;
 				$import_data['member_since']          = isset( $columns['member_since'] )          && ! empty( $row[ $columns['member_since'] ] )          ? $row[ $columns['member_since'] ]          : null;
 				$import_data['membership_expiration'] = isset( $columns['membership_expiration'] ) && isset( $row[ $columns['membership_expiration'] ] )   ? $row[ $columns['membership_expiration'] ] : null;
+
+				/**
+				 * Filter CSV User Membership import data
+				 * before processing an import
+				 *
+				 * @since 1.6.0
+				 * @param array $import_data The imported data as associative array
+				 * @param string $action Either 'create' or 'merge' (update) a User Membership
+				 * @param array $columns CSV columns raw data
+				 * @param array $row CSV row raw data
+				 */
+				$import_data = (array) apply_filters( 'wc_memberships_csv_import_user_memberships_data', $import_data, true === $this->create_new_memberships ? 'create' : 'merge', $columns, $row );
 
 				// create or update a User Membership and bump counters
 				if ( ! $existing_user_membership && true === $this->create_new_memberships ) {
@@ -449,69 +465,43 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 			return null;
 		}
 
-		/**
-		 * Filter CSV User Membership import data
-		 * before processing an import
-		 *
-		 * @since 1.6.0
-		 * @param array $import_data The imported data as associative array
-		 * @param string $action Either 'create' or 'merge' (update) a User Membership
-		 */
-		$data = apply_filters( 'wc_memberships_csv_import_user_memberships_data', $import_data, $action );
+		// make sure an user id exists
+		$user_id = $this->import_user_id( $action, $import_data );
 
-		$user_id = $this->import_user_id( $action, $data );
-
-		// bail out if a user couldn't be determined
 		if ( 0 === $user_id ) {
+			// bail out if a user couldn't be determined
 			return false;
+		} else {
+			// update the import data with the retrieved id
+			$import_data['user_id'] = $user_id;
 		}
 
 		$user_membership = null;
 
-		if ( 'merge' === $action
-		     && isset( $data['user_membership'] )
-		     && $data['user_membership'] instanceof WC_Memberships_User_Membership ) {
+		if (    'merge' === $action
+		     && isset( $import_data['user_membership'] )
+		     && $import_data['user_membership'] instanceof WC_Memberships_User_Membership ) {
 
 			// update an existing User Membership
-			$user_membership = $this->update_user_membership( $user_id, $data );
+			$user_membership = $this->update_user_membership( $user_id, $import_data );
 
-		} elseif ( 'create' === $action
-		           && isset( $data['membership_plan'] )
-		           && $data['membership_plan'] instanceof WC_Memberships_Membership_Plan ) {
+		} elseif (    'create' === $action
+		           && isset( $import_data['membership_plan'] )
+		           && $import_data['membership_plan'] instanceof WC_Memberships_Membership_Plan ) {
 
 			// sanity check: bail out if user is already member
-			if ( wc_memberships_is_user_member( $user_id, $data['membership_plan'] ) ) {
+			if ( wc_memberships_is_user_member( $user_id, $import_data['membership_plan'] ) ) {
 				return false;
 			}
 
-			$order_id = 0;
-
-			if ( ! empty( $data['order_id'] ) && is_numeric( $data['order_id'] ) ) {
-
-				$order    = wc_get_order( (int) $data['order_id'] );
-				$order_id = $order instanceof WC_Order ? $order->id : $order_id;
-			}
-
-			$product_id = 0;
-
-			if ( ! empty( $data['product_id'] ) && is_numeric( $data['product_id'] ) ) {
-
-				$product    = wc_get_product( (int) $data['product_id'] );
-				$product_id = $product instanceof WC_Product ? (int) $data['product_id'] : $product_id;
-			}
-
-			// create or update the User Membership
+			// create the User Membership
 			$user_membership = wc_memberships_create_user_membership( array(
 				'user_membership_id' => 0,
-				'plan_id'            => $data['membership_plan']->get_id(),
+				'plan_id'            => $import_data['membership_plan']->get_id(),
 				'user_id'            => $user_id,
-				'product_id'         => $product_id,
-				'order_id'           => $order_id,
+				'product_id'         => ! empty( $import_data['product_id'] ) ? (int) $import_data['product_id'] : 0,
+				'order_id'           => ! empty( $import_data['order_id'] )   ? (int) $import_data['order_id']   : 0,
 			), 'create' );
-
-		} else {
-
-			return false;
 		}
 
 		if ( ! $user_membership instanceof WC_Memberships_User_Membership ) {
@@ -521,16 +511,15 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 
 		} elseif ( 'create' === $action ) {
 
-			$user_membership->add_note(
-				/* translators: Placeholder: %s - User display name */
-				sprintf( __( "Membership created from %s's import.", 'woocommerce-memberships' ), wp_get_current_user()->display_name )
-			);
+			/* translators: Placeholder: %s - User display name */
+			$import_note = sprintf( __( "Membership created from %s's import.", 'woocommerce-memberships' ), wp_get_current_user()->display_name );
+
+			// leave a note on the membership to help tracking the import operations
+			$user_membership->add_note( $import_note );
 		}
 
-		// update meta upon create or merge
-		if ( 'create' === $action || true === $this->merge_existing_memberships ) {
-			$this->update_user_membership_meta( $user_membership, $action, $import_data );
-		}
+		// update meta upon create or update action
+		$this->update_user_membership_meta( $user_membership, $action, $import_data );
 
 		/**
 		 * Upon creating or updating a User Membership from import data
@@ -540,7 +529,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 		 * @param string $action Either 'create' or 'merge' (update) a User Membership
 		 * @param array $data Import data
 		 */
-		do_action( 'wc_memberships_csv_import_user_membership', $user_membership, $action, $data );
+		do_action( 'wc_memberships_csv_import_user_membership', $user_membership, $action, $import_data );
 
 		return true;
 	}
@@ -562,7 +551,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 		$user_id = $user instanceof WP_User ? $user->ID : 0;
 
 		// if can't determine a valid user, try to create one
-		if ( 0 === $user_id
+		if (    0 === $user_id
 		     && true === $this->create_new_users
 		     && ( 'create' === $action || ( $this->allow_memberships_transfer && isset( $data['member_email'] ) ) ) ) {
 
@@ -603,8 +592,11 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 		// check for plans conflict
 		if ( null !== $membership_plan && (int) $user_membership->get_plan_id() !== (int) $membership_plan->get_id() ) {
 
-			// bail out if the user is already an active member of the plan we're transferring to
-			if ( wc_memberships_is_user_active_member( $user_id, $membership_plan->get_id() ) ) {
+			// bail out if the user is already a non-expired member
+			// of the plan we're transferring to
+			if (    wc_memberships_is_user_active_member( $user_id, $membership_plan->get_id() )
+			     || wc_memberships_is_user_delayed_member( $user_id, $membership_plan->get_id() ) ) {
+
 				return false;
 			}
 
@@ -645,20 +637,34 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 	 */
 	private function update_user_membership_meta( WC_Memberships_User_Membership $user_membership, $action, array $data ) {
 
+		// maybe update the product that grants access
+		if (    ! empty( $data['product_id'] )
+		     && ( 'create' === $action || $this->merge_existing_memberships || ! $user_membership->get_product_id() > 0 ) ) {
+
+			$user_membership->set_product_id( trim( $data['product_id'] ) );
+		}
+
+		// maybe update the order that granted access
+		if (    ! empty( $data['order_id'] )
+		     && ( 'create' === $action || $this->merge_existing_memberships || ! $user_membership->get_order_id() > 0 ) ) {
+
+			$user_membership->set_order_id( trim( $data['order_id'] ) );
+		}
+
 		// maybe update start date
 		if ( ! empty( $data['member_since'] ) ) {
 
-			if ( $this->is_date( $data['member_since'] ) ) {
-				$user_membership->set_start_date( $this->parse_date_mysql( $data['member_since'], $this->timezone ) );
+			if ( ( 'create' === $action || $this->merge_existing_memberships ) && $this->is_date( $data['member_since'] ) ) {
+				$user_membership->set_start_date( $this->parse_date_mysql( trim( $data['member_since'] ), $this->timezone ) );
 			}
 
 		} elseif ( 'create' === $action && $this->is_date( $this->default_start_date ) ) {
 
-			$user_membership->set_start_date( $this->parse_date_mysql( $this->default_start_date, wc_timezone_string() ) );
+			$user_membership->set_start_date( $this->parse_date_mysql( $this->default_start_date, $this->timezone ) );
 		}
 
 		// maybe update status
-		if ( $this->is_status( trim( $data['membership_status'] ) ) ) {
+		if ( ( 'create' === $action || $this->merge_existing_memberships ) && $this->is_status( trim( $data['membership_status'] ) ) ) {
 
 			$user_membership->update_status( trim( $data['membership_status'] ) );
 
@@ -682,36 +688,32 @@ class WC_Memberships_CSV_Import_User_Memberships extends WC_Memberships_Import_E
 		}
 
 		// maybe update end date (this could affect status)
-		if ( $this->is_date( $data['membership_expiration'] ) ) {
-			$user_membership->set_end_date( $this->parse_date_mysql( $data['membership_expiration'], $this->timezone ) );
-		} elseif ( is_string( $data['membership_expiration'] ) && '' === trim( $data['membership_expiration'] ) ) {
-			$user_membership->set_end_date( '' );
-		}
+		if ( 'create' === $action || $this->merge_existing_memberships ) {
 
-		$expiry_date = $user_membership->get_end_date( 'timestamp' );
-
-		// if expiry date is in the past (with 1 minute buffer), set the membership as expired
-		if ( $expiry_date && (int) $expiry_date + 60 <= current_time( 'timestamp', true ) && ! $user_membership->is_expired() ) {
-			$user_membership->expire_membership();
-		}
-
-		// maybe update the product that grants access
-		if ( ! empty( $data['product_id'] ) && is_numeric( $data['product_id'] ) ) {
-
-			$product = wc_get_product( (int) $data['product_id'] );
-
-			if ( $product instanceof WC_Product ) {
-				update_post_meta( $user_membership->get_id(), '_product_id', (int) $data['product_id'] );
+			if ( $this->is_date( trim( $data['membership_expiration'] ) ) ) {
+				$user_membership->set_end_date( $this->parse_date_mysql( trim( $data['membership_expiration'] ), $this->timezone ) );
+			} elseif ( is_string( $data['membership_expiration'] ) && '' === trim( $data['membership_expiration'] ) ) {
+				$user_membership->set_end_date( '' );
+			} else {
+				// forces to reschedule expiration events for sanity
+				$user_membership->set_end_date( $user_membership->get_end_date() );
 			}
-		}
 
-		// maybe update the order that granted access
-		if ( ! empty( $data['order_id'] ) && is_numeric( $data['order_id'] ) ) {
+			// get the (maybe) new end date
+			$expiry_date = $user_membership->get_end_date( 'timestamp' );
 
-			$order = wc_get_order( (int) $data['order_id'] );
+			// if expiry date is in the past (with 1 minute buffer), set the membership as expired
+			if (    is_numeric( $expiry_date )
+			     && $expiry_date - 60 <= current_time( 'timestamp', true )
+			     && ! $user_membership->is_expired() && ! $user_membership->is_cancelled() ) {
 
-			if ( $order instanceof WC_Order ) {
-				update_post_meta( $user_membership->get_id(), '_order_id', (int) $data['order_id'] );
+				$user_membership->expire_membership();
+
+			// sanity check for memberships created with a start date in the future
+			} elseif (    'delayed' !== $user_membership->get_status()
+			           && $user_membership->get_start_date( 'timestamp' ) > current_time( 'timestamp', true ) ) {
+
+				$user_membership->update_status( 'delayed' );
 			}
 		}
 	}

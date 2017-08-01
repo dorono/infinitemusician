@@ -73,43 +73,45 @@ if ( ! function_exists( 'storefront_comment' ) ) {
 
 if ( ! function_exists( 'storefront_footer_widgets' ) ) {
 	/**
-	 * Display the footer widget regions
+	 * Display the footer widget regions.
 	 *
 	 * @since  1.0.0
-	 * @return  void
+	 * @return void
 	 */
 	function storefront_footer_widgets() {
-		if ( is_active_sidebar( 'footer-4' ) ) {
-			$widget_columns = apply_filters( 'storefront_footer_widget_regions', 4 );
-		} elseif ( is_active_sidebar( 'footer-3' ) ) {
-			$widget_columns = apply_filters( 'storefront_footer_widget_regions', 3 );
-		} elseif ( is_active_sidebar( 'footer-2' ) ) {
-			$widget_columns = apply_filters( 'storefront_footer_widget_regions', 2 );
-		} elseif ( is_active_sidebar( 'footer-1' ) ) {
-			$widget_columns = apply_filters( 'storefront_footer_widget_regions', 1 );
-		} else {
-			$widget_columns = apply_filters( 'storefront_footer_widget_regions', 0 );
-		}
+		$rows    = intval( apply_filters( 'storefront_footer_widget_rows', 1 ) );
+		$regions = intval( apply_filters( 'storefront_footer_widget_columns', 4 ) );
 
-		if ( $widget_columns > 0 ) : ?>
+		for ( $row = 1; $row <= $rows; $row++ ) :
 
-			<div class="footer-widgets col-<?php echo intval( $widget_columns ); ?> fix">
+			// Defines the number of active columns in this footer row.
+			for ( $region = $regions; 0 < $region; $region-- ) {
+				if ( is_active_sidebar( 'footer-' . strval( $region + $regions * ( $row - 1 ) ) ) ) {
+					$columns = $region;
+					break;
+				}
+			}
 
-				<?php
-				$i = 0;
-				while ( $i < $widget_columns ) : $i++;
-					if ( is_active_sidebar( 'footer-' . $i ) ) : ?>
+			if ( isset( $columns ) ) : ?>
+				<div class=<?php echo '"footer-widgets row-' . strval( $row ) . ' col-' . strval( $columns ) . ' fix"'; ?>><?php
 
-						<div class="block footer-widget-<?php echo intval( $i ); ?>">
-							<?php dynamic_sidebar( 'footer-' . intval( $i ) ); ?>
-						</div>
+					for ( $column = 1; $column <= $columns; $column++ ) :
+						$footer_n = $column + $regions * ( $row - 1 );
 
-					<?php endif;
-				endwhile; ?>
+						if ( is_active_sidebar( 'footer-' . strval( $footer_n ) ) ) : ?>
 
-			</div><!-- /.footer-widgets  -->
+							<div class="block footer-widget-<?php echo strval( $column ); ?>">
+								<?php dynamic_sidebar( 'footer-' . strval( $footer_n ) ); ?>
+							</div><?php
 
-		<?php endif;
+						endif;
+					endfor; ?>
+
+				</div><!-- .footer-widgets.row-<?php echo strval( $row ); ?> --><?php
+
+				unset( $columns );
+			endif;
+		endfor;
 	}
 }
 
@@ -289,9 +291,27 @@ if ( ! function_exists( 'storefront_skip_links' ) ) {
 	}
 }
 
+if ( ! function_exists( 'storefront_homepage_header' ) ) {
+	/**
+	 * Display the page header without the featured image
+	 *
+	 * @since 1.0.0
+	 */
+	function storefront_homepage_header() {
+		edit_post_link( __( 'Edit this section', 'storefront' ), '', '', '', 'button storefront-hero__button-edit' );
+		?>
+		<header class="entry-header">
+			<?php
+			the_title( '<h1 class="entry-title">', '</h1>' );
+			?>
+		</header><!-- .entry-header -->
+		<?php
+	}
+}
+
 if ( ! function_exists( 'storefront_page_header' ) ) {
 	/**
-	 * Display the post header with a link to the single post
+	 * Display the page header
 	 *
 	 * @since 1.0.0
 	 */
@@ -309,7 +329,7 @@ if ( ! function_exists( 'storefront_page_header' ) ) {
 
 if ( ! function_exists( 'storefront_page_content' ) ) {
 	/**
-	 * Display the post content with a link to the single post
+	 * Display the post content
 	 *
 	 * @since 1.0.0
 	 */
@@ -539,24 +559,33 @@ if ( ! function_exists( 'storefront_product_categories' ) ) {
 				'title'				=> __( 'Shop by Category', 'storefront' ),
 			) );
 
-			echo '<section class="storefront-product-section storefront-product-categories" aria-label="Product Categories">';
-
-			do_action( 'storefront_homepage_before_product_categories' );
-
-			echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
-
-			do_action( 'storefront_homepage_after_product_categories_title' );
-
-			echo storefront_do_shortcode( 'product_categories', array(
+			$shortcode_content = storefront_do_shortcode( 'product_categories', apply_filters( 'storefront_product_categories_shortcode_args', array(
 				'number'  => intval( $args['limit'] ),
 				'columns' => intval( $args['columns'] ),
 				'orderby' => esc_attr( $args['orderby'] ),
 				'parent'  => esc_attr( $args['child_categories'] ),
-			) );
+			) ) );
 
-			do_action( 'storefront_homepage_after_product_categories' );
+			/**
+			 * Only display the section if the shortcode returns product categories
+			 */
+			if ( false !== strpos( $shortcode_content, 'product-category' ) ) {
 
-			echo '</section>';
+				echo '<section class="storefront-product-section storefront-product-categories" aria-label="' . esc_attr__( 'Product Categories', 'storefront' ) . '">';
+
+				do_action( 'storefront_homepage_before_product_categories' );
+
+				echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
+
+				do_action( 'storefront_homepage_after_product_categories_title' );
+
+				echo wp_kses_post( $shortcode_content );
+
+				do_action( 'storefront_homepage_after_product_categories' );
+
+				echo '</section>';
+
+			}
 		}
 	}
 }
@@ -580,22 +609,31 @@ if ( ! function_exists( 'storefront_recent_products' ) ) {
 				'title'				=> __( 'New In', 'storefront' ),
 			) );
 
-			echo '<section class="storefront-product-section storefront-recent-products" aria-label="Recent Products">';
-
-			do_action( 'storefront_homepage_before_recent_products' );
-
-			echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
-
-			do_action( 'storefront_homepage_after_recent_products_title' );
-
-			echo storefront_do_shortcode( 'recent_products', array(
+			$shortcode_content = storefront_do_shortcode( 'recent_products', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
 			) );
 
-			do_action( 'storefront_homepage_after_recent_products' );
+			/**
+			 * Only display the section if the shortcode returns products
+			 */
+			if ( false !== strpos( $shortcode_content, 'product' ) ) {
 
-			echo '</section>';
+				echo '<section class="storefront-product-section storefront-recent-products" aria-label="' . esc_attr__( 'Recent Products', 'storefront' ) . '">';
+
+				do_action( 'storefront_homepage_before_recent_products' );
+
+				echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
+
+				do_action( 'storefront_homepage_after_recent_products_title' );
+
+				echo wp_kses_post( $shortcode_content );
+
+				do_action( 'storefront_homepage_after_recent_products' );
+
+				echo '</section>';
+
+			}
 		}
 	}
 }
@@ -621,24 +659,33 @@ if ( ! function_exists( 'storefront_featured_products' ) ) {
 				'title'   => __( 'We Recommend', 'storefront' ),
 			) );
 
-			echo '<section class="storefront-product-section storefront-featured-products" aria-label="Featured Products">';
-
-			do_action( 'storefront_homepage_before_featured_products' );
-
-			echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
-
-			do_action( 'storefront_homepage_after_featured_products_title' );
-
-			echo storefront_do_shortcode( 'featured_products', array(
+			$shortcode_content = storefront_do_shortcode( 'featured_products', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
 				'orderby'  => esc_attr( $args['orderby'] ),
 				'order'    => esc_attr( $args['order'] ),
 			) );
 
-			do_action( 'storefront_homepage_after_featured_products' );
+			/**
+			 * Only display the section if the shortcode returns products
+			 */
+			if ( false !== strpos( $shortcode_content, 'product' ) ) {
 
-			echo '</section>';
+				echo '<section class="storefront-product-section storefront-featured-products" aria-label="' . esc_attr__( 'Featured Products', 'storefront' ) . '">';
+
+				do_action( 'storefront_homepage_before_featured_products' );
+
+				echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
+
+				do_action( 'storefront_homepage_after_featured_products_title' );
+
+				echo wp_kses_post( $shortcode_content );
+
+				do_action( 'storefront_homepage_after_featured_products' );
+
+				echo '</section>';
+
+			}
 		}
 	}
 }
@@ -662,22 +709,31 @@ if ( ! function_exists( 'storefront_popular_products' ) ) {
 				'title'   => __( 'Fan Favorites', 'storefront' ),
 			) );
 
-			echo '<section class="storefront-product-section storefront-popular-products" aria-label="Popular Products">';
-
-			do_action( 'storefront_homepage_before_popular_products' );
-
-			echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
-
-			do_action( 'storefront_homepage_after_popular_products_title' );
-
-			echo storefront_do_shortcode( 'top_rated_products', array(
+			$shortcode_content = storefront_do_shortcode( 'top_rated_products', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
 			) );
 
-			do_action( 'storefront_homepage_after_popular_products' );
+			/**
+			 * Only display the section if the shortcode returns products
+			 */
+			if ( false !== strpos( $shortcode_content, 'product' ) ) {
 
-			echo '</section>';
+				echo '<section class="storefront-product-section storefront-popular-products" aria-label="' . esc_attr__( 'Popular Products', 'storefront' ) . '">';
+
+				do_action( 'storefront_homepage_before_popular_products' );
+
+				echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
+
+				do_action( 'storefront_homepage_after_popular_products_title' );
+
+				echo wp_kses_post( $shortcode_content );
+
+				do_action( 'storefront_homepage_after_popular_products' );
+
+				echo '</section>';
+
+			}
 		}
 	}
 }
@@ -701,22 +757,31 @@ if ( ! function_exists( 'storefront_on_sale_products' ) ) {
 				'title'   => __( 'On Sale', 'storefront' ),
 			) );
 
-			echo '<section class="storefront-product-section storefront-on-sale-products" aria-label="On Sale Products">';
-
-			do_action( 'storefront_homepage_before_on_sale_products' );
-
-			echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
-
-			do_action( 'storefront_homepage_after_on_sale_products_title' );
-
-			echo storefront_do_shortcode( 'sale_products', array(
+			$shortcode_content = storefront_do_shortcode( 'sale_products', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
 			) );
 
-			do_action( 'storefront_homepage_after_on_sale_products' );
+			/**
+			 * Only display the section if the shortcode returns products
+			 */
+			if ( false !== strpos( $shortcode_content, 'product' ) ) {
 
-			echo '</section>';
+				echo '<section class="storefront-product-section storefront-on-sale-products" aria-label="' . esc_attr__( 'On Sale Products', 'storefront' ) . '">';
+
+				do_action( 'storefront_homepage_before_on_sale_products' );
+
+				echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
+
+				do_action( 'storefront_homepage_after_on_sale_products_title' );
+
+				echo wp_kses_post( $shortcode_content );
+
+				do_action( 'storefront_homepage_after_on_sale_products' );
+
+				echo '</section>';
+
+			}
 		}
 	}
 }
@@ -732,21 +797,38 @@ if ( ! function_exists( 'storefront_best_selling_products' ) ) {
 	 */
 	function storefront_best_selling_products( $args ) {
 		if ( storefront_is_woocommerce_activated() ) {
+
 			$args = apply_filters( 'storefront_best_selling_products_args', array(
 				'limit'   => 4,
 				'columns' => 4,
 				'title'	  => esc_attr__( 'Best Sellers', 'storefront' ),
 			) );
-			echo '<section class="storefront-product-section storefront-best-selling-products" aria-label="Best Selling Products">';
-			do_action( 'storefront_homepage_before_best_selling_products' );
-			echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
-			do_action( 'storefront_homepage_after_best_selling_products_title' );
-			echo storefront_do_shortcode( 'best_selling_products', array(
+
+			$shortcode_content = storefront_do_shortcode( 'best_selling_products', array(
 				'per_page' => intval( $args['limit'] ),
 				'columns'  => intval( $args['columns'] ),
 			) );
-			do_action( 'storefront_homepage_after_best_selling_products' );
-			echo '</section>';
+
+			/**
+			 * Only display the section if the shortcode returns products
+			 */
+			if ( false !== strpos( $shortcode_content, 'product' ) ) {
+
+				echo '<section class="storefront-product-section storefront-best-selling-products" aria-label="' . esc_attr__( 'Best Selling Products', 'storefront' ) . '">';
+
+				do_action( 'storefront_homepage_before_best_selling_products' );
+
+				echo '<h2 class="section-title">' . wp_kses_post( $args['title'] ) . '</h2>';
+
+				do_action( 'storefront_homepage_after_best_selling_products_title' );
+
+				echo wp_kses_post( $shortcode_content );
+
+				do_action( 'storefront_homepage_after_best_selling_products' );
+
+				echo '</section>';
+
+			}
 		}
 	}
 }
@@ -763,7 +845,7 @@ if ( ! function_exists( 'storefront_homepage_content' ) ) {
 		while ( have_posts() ) {
 			the_post();
 
-			get_template_part( 'content', 'page' );
+			get_template_part( 'content', 'homepage' );
 
 		} // end of the loop.
 	}

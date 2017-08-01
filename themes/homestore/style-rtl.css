@@ -2,10 +2,10 @@
 Theme Name:       Homestore
 Theme URI:        https://www.woocommerce.com/products/homestore/
 Description:      A storefront child theme for webshops selling homeware goods.
-Author:           WooThemes
+Author:           WooCommerce
 Author URI:       https://woocommerce.com
 Template:         storefront
-Version:          2.0.13
+Version:          2.0.20
 License:          GNU General Public License v2 or later
 License URI:      http://www.gnu.org/licenses/gpl-2.0.html
 Tags:             light, dark, two-columns, right-sidebar, left-sidebar, responsive-layout, accessibility-ready
@@ -280,8 +280,7 @@ table {
     border-bottom-color: rgba(255, 255, 255, 0.1);
     border-top-color: rgba(255, 255, 255, 0.1); }
   table thead th {
-    font-weight: 600;
-    display: none; }
+    font-weight: 600; }
   table tbody p {
     margin-bottom: 1.2em; }
   table tbody tr:not(:first-child):not(:last-child) td,
@@ -319,8 +318,6 @@ table {
 
 table.cart {
   font-size: 1.05em; }
-  table.cart thead {
-    display: none; }
   table.cart .qty {
     padding-right: 0.15em;
     padding-left: 0.15em;
@@ -330,9 +327,8 @@ table.cart {
 -------------------------------------------------------------- */
 #masthead {
   margin-bottom: 3.6rem;
-  background-size: cover; }
-  body:not(.sd-header-sticky) #masthead {
-    position: relative; }
+  background-size: cover;
+  position: relative; }
   body.page-template-template-homepage #masthead {
     margin-bottom: 28px; }
   #masthead:after {
@@ -347,6 +343,7 @@ table.cart {
     z-index: -1; }
 
 .site-header {
+  border-bottom: none;
   padding-top: 0; }
   .site-header .hs-primary-navigation {
     clear: both;
@@ -360,7 +357,8 @@ table.cart {
     max-width: calc(100% - 15em - 1.5em);
     margin-left: 0;
     width: 100%; }
-    .site-header .site-branding h1 a {
+    .site-header .site-branding h1 a,
+    .site-header .site-branding .site-title a {
       font-family: "Montserrat Alternates", sans-serif;
       letter-spacing: -0.05em;
       font-size: 2em;
@@ -379,6 +377,14 @@ table.cart {
       font-size: 0.85em;
       font-weight: 500;
       display: block; }
+
+body.sd-header-sticky #masthead,
+body.sp-header-sticky #masthead {
+  position: fixed; }
+
+body.sd-header-sticky .site-content,
+body.sp-header-sticky .site-content {
+  padding-top: 2em; }
 
 /* Header / search
 -------------------------------------------------------------- */
@@ -534,6 +540,14 @@ table.cart {
 
 /* Product lists
 -------------------------------------------------------------- */
+.page-template-template-homepage-php .site-main .columns-5 ul.products li.product.product-category {
+  margin-top: 0; }
+
+.page-template-template-homepage-php .site-main > .type-page {
+  margin-right: 0 !important;
+  width: auto !important;
+  border: 0 !important; }
+
 ul.products li.col-sep {
   position: relative;
   display: block;
@@ -591,7 +605,9 @@ ul.products {
       max-width: 100%;
       width: 100%;
       height: auto; }
-    ul.products li.product.product-category h3 {
+    ul.products li.product.product-category h3,
+    ul.products li.product.product-category h2,
+    ul.products li.product.product-category .woocommerce-loop-category__title {
       position: absolute;
       background: rgba(255, 255, 255, 0.95);
       padding: 1em 1em;
@@ -602,7 +618,9 @@ ul.products {
       bottom: 13px;
       color: #151515;
       right: 0; }
-      ul.products li.product.product-category h3 mark {
+      ul.products li.product.product-category h3 mark,
+      ul.products li.product.product-category h2 mark,
+      ul.products li.product.product-category .woocommerce-loop-category__title mark {
         font-weight: 300; }
     ul.products li.product.product-category > a {
       display: block; }
@@ -1019,7 +1037,7 @@ ul.homestore-section-tabs {
   .single-product #reviews ol.commentlist li.comment {
     margin-bottom: 1.8em; }
     .single-product #reviews ol.commentlist li.comment p.meta {
-      margin: 0.7em 0;
+      margin: 0 0 .7em;
       font-size: 1em;
       color: #747373; }
       .single-product #reviews ol.commentlist li.comment p.meta strong {
@@ -1341,14 +1359,16 @@ p.stars a:after,
 
 /* Pagination
 -------------------------------------------------------------- */
-.woocommerce-pagination ul.page-numbers li .page-numbers {
-  font-weight: 500;
-  background: transparent;
-  border: solid 2px #e2e2e2; }
-  .woocommerce-pagination ul.page-numbers li .page-numbers.next, .woocommerce-pagination ul.page-numbers li .page-numbers.prev {
-    padding-right: 0.78em;
-    padding-left: 0.78em;
-    font-weight: 300; }
+.woocommerce-pagination ul.page-numbers li {
+  margin-right: .236em; }
+  .woocommerce-pagination ul.page-numbers li .page-numbers {
+    font-weight: 500;
+    background: transparent;
+    border: solid 2px #e2e2e2; }
+    .woocommerce-pagination ul.page-numbers li .page-numbers.next, .woocommerce-pagination ul.page-numbers li .page-numbers.prev {
+      padding-right: 0.78em;
+      padding-left: 0.78em;
+      font-weight: 300; }
 
 .navigation.pagination {
   border: none;
@@ -1630,6 +1650,7 @@ ul.products li.product .star-rating {
   padding-top: 32px;
   margin-bottom: 0; }
 
+.page-template-template-homepage:not(.has-post-thumbnail) .site-main,
 .page-template-template-homepage .site-main {
   padding-top: 0; }
 
@@ -1691,7 +1712,8 @@ a.more-link {
 @media screen and (max-width: 767px) {
   body {
     font-size: 1.05em; }
-    body.sd-header-sticky #page {
+    body.sd-header-sticky #page,
+    body.sp-header-sticky #page {
       padding-top: 0 !important; }
   #page .homestore-section-tabs {
     margin-bottom: 32px; }
@@ -1837,9 +1859,11 @@ a.more-link {
       .single-product div.product .woocommerce-tabs ul.wc-tabs li.active a:before {
         border-color: transparent #151515 transparent transparent; }
   #order_review .shop_table {
-    margin-bottom: 0; }
+    padding-top: 0; }
     #order_review .shop_table + .woocommerce-checkout-payment {
       border-top: none; }
+  #ship-to-different-address label {
+    font-weight: 600; }
   .hs-header-bar,
   .hs-primary-navigation {
     margin-right: -9999px;
@@ -1981,15 +2005,18 @@ a.more-link {
     padding: 0.3em;
     font-size: 0.85em;
     font-weight: 600; }
-  .homestore-homepage-menu {
+  .page-template-template-homepage .homestore-homepage-menu {
     float: right;
     width: 30.4347826086%; }
-    .homestore-homepage-menu + .homestore-homepage-content {
+    .page-template-template-homepage .homestore-homepage-menu + .homestore-homepage-content {
       width: 65.2173913044%;
       margin-right: 4.347826087%;
       float: right; }
-      .homestore-homepage-menu + .homestore-homepage-content > .entry-content > .sprh-hero:first-child {
+      .page-template-template-homepage .homestore-homepage-menu + .homestore-homepage-content > .entry-content > .sprh-hero:first-child {
         margin-top: -1.85em; }
+      .page-template-template-homepage .homestore-homepage-menu + .homestore-homepage-content .entry-header,
+      .page-template-template-homepage .homestore-homepage-menu + .homestore-homepage-content .entry-content {
+        text-align: right; }
   ul.homestore-section-tabs {
     width: 30.4347826086%;
     float: right; }

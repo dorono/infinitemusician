@@ -52,8 +52,10 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
                 this.active = true;
                 this.element.addEventListener('mousedown', this._onmousedown, true);
 
-                this.element.addEventListener('DOMMouseScroll', this._onmousewheel);
                 this.element.addEventListener('mousewheel', this._onmousewheel);
+                this.element.addEventListener('wheel', this._onmousewheel);
+                this.element.addEventListener('DOMMouseScroll', this._onmousewheel);
+
 
                 this.element.addEventListener('touchstart', this._ontouchstart);
 
@@ -172,14 +174,22 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
             this.document.addEventListener('touchmove', this._ontouchmove);
             this.document.addEventListener('touchend', this._ontouchend);
 
-            event.preventDefault();
-            event.stopPropagation();
+            if (event.touches.length != 1) {
+                // Prevent default for zooms
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
             this.document.documentElement.classList.add(this.CSS_CLASS_GRABBING);
 
             var focusedElement = document.activeElement;
             if (focusedElement && !focusedElement.contains(event.target)) {
                 focusedElement.blur();
             }
+
+            // Tell viewer that touch has occurred so it can display the 'hover' toolbar if needed
+
+            this.touchtapmaybe = event.touches.length == 1;
         },
 
         _calcTouchDistance: function GrabToPan_calcTouchDistance(event) {
@@ -191,26 +201,51 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
             return dist;
         },
 
+        _calcTouchCenter: function GrabToPan_calcTouchCenter(event) {
+            var x =0, y = 0;
+            if (event.touches && event.touches.length>= 2) {
+                x = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                y = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+            }
+            return Array(x,y);
+        },
+
         /**
          * @private
          */
         _ontouchmove: function GrabToPan__ontouchmove(event) {
+            var preventDefault = true;
             var xDiff = event.touches[0].clientX - this.clientXStart;
             var yDiff = event.touches[0].clientY - this.clientYStart;
 
             if (event.touches.length == 1) {
                 this.element.scrollTop = this.scrollTopStart - yDiff;
                 this.element.scrollLeft = this.scrollLeftStart - xDiff;
+
+                if ((this.element.scrollTop == this.scrollTopStart && yDiff != 0)
+                    || (this.element.scrollLeft == this.scrollLeftStart && xDiff != 0)) {
+                    preventDefault = false;
+                }
+            }
+            else {
+                this.touchtapmaybe = false;
             }
 
             if (!this.overlay.parentNode) {
                 document.body.appendChild(this.overlay);
             }
 
+            if (xDiff != 0 || yDiff != 0) {
+                this.touchtapmaybe = false;
+            }
+
+            // Look at distance between fingers - for zoom
             var newdist = this._calcTouchDistance(event);
 
-            event.preventDefault();
-            event.stopPropagation();
+            if (preventDefault) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
 
             if (isNaN(this.distStart)) {
                 this.distStart = newdist;
@@ -225,12 +260,19 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
                     mag = 0.75;
                 }
 
-                this.scaledForMagnification = true;
-                var evt = document.createEvent("Events")
-                evt.initEvent('pdfembMagnify', true, true); //true for can bubble, true for cancelable
-                evt.magnification = mag;
-                evt.gtpelement = this.element;
-                document.dispatchEvent(evt);
+                if (mag != 1) {
+                    this.scaledForMagnification = true;
+                    var evt = document.createEvent("Events");
+                    evt.initEvent('pdfembMagnify', true, true); //true for can bubble, true for cancelable
+                    evt.magnification = mag;
+                    evt.gtpelement = this.element;
+
+                    var centre = this._calcTouchCenter(event);
+                    evt.centreLeft = centre[0];
+                    evt.centreTop = centre[1];
+
+                    this.element.dispatchEvent(evt);
+                }
 
                 this.distStart = newdist;
             }
@@ -244,22 +286,27 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
             this.element.removeEventListener('scroll', this._endPan, true);
 
             var MOUSE_WHEEL_DELTA_FACTOR = 40;
-            var ticks = (event.type === 'DOMMouseScroll') ? -event.detail :
-            event.wheelDelta / MOUSE_WHEEL_DELTA_FACTOR;
-            //var direction = (ticks < 0) ? 'zoomOut' : 'zoomIn';
+            var ticks = event.deltaY ? -event.deltaY/ MOUSE_WHEEL_DELTA_FACTOR : (
+                 event.wheelDelta ? event.wheelDelta / MOUSE_WHEEL_DELTA_FACTOR : -event.detail
+                );
 
             this.scrollLeftStart = this.element.scrollLeft;
             this.scrollTopStart = this.element.scrollTop;
-//                  var xDiff = event.clientX - this.clientXStart;
             var yDiff = ticks * MOUSE_WHEEL_DELTA_FACTOR;
             this.element.scrollTop = this.scrollTopStart - yDiff;
-            //                this.element.scrollLeft = this.scrollLeftStart - xDiff;
+
             if (!this.overlay.parentNode) {
                 document.body.appendChild(this.overlay);
             }
+
+            if (this.element.scrollTop != this.scrollTopStart || yDiff == 0) {
+                event.preventDefault();
+                return false;
+            }
+
         },
 
-        _ontouchend: function GrabToPan_ontouchEnd() {
+        _ontouchend: function GrabToPan_ontouchEnd(event) {
              this._endPan();
 
              if (this.scaledForMagnification) {
@@ -267,7 +314,15 @@ var pdfembGrabToPan = (function GrabToPanClosure() {
                  evt.initEvent('pdfembMagnify', true, true); //true for can bubble, true for cancelable
                  evt.magnification = -1;
                  evt.gtpelement = this.element;
-                 document.dispatchEvent(evt);
+                 this.element.dispatchEvent(evt);
+             }
+
+             if (this.touchtapmaybe) {
+                 // It was a tap!
+
+                 var evt2 = document.createEvent("Events")
+                 evt2.initEvent('pdfembTouchTapped', true, true); //true for can bubble, true for cancelable
+                 this.element.dispatchEvent(evt2);
              }
         },
 

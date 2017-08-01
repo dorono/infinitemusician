@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Authorize.Net CIM Gateway to newer
  * versions in the future. If you wish to customize WooCommerce Authorize.Net CIM Gateway for your
- * needs please refer to http://docs.woothemes.com/document/authorize-net-cim/
+ * needs please refer to http://docs.woocommerce.com/document/authorize-net-cim/
  *
  * @package   WC-Gateway-Authorize-Net-CIM/API/Request
  * @author    SkyVerge
- * @copyright Copyright (c) 2011-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2011-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -36,8 +36,7 @@ abstract class WC_Authorize_Net_CIM_API_Transaction_Request extends WC_Authorize
 
 
 	/**
-	 * Creates a credit card charge request for the payment method / customer
-	 * associated with $order
+	 * Creates a credit card charge request for the given order.
 	 *
 	 * @since 2.0.0
 	 * @param WC_Order $order the order object
@@ -51,8 +50,7 @@ abstract class WC_Authorize_Net_CIM_API_Transaction_Request extends WC_Authorize
 
 
 	/**
-	 * Creates a credit card auth request for the payment method / customer
-	 * associated with $order
+	 * Creates a credit card auth request for the given order.
 	 *
 	 * @since 2.0.0
 	 * @param WC_Order $order the order object
@@ -66,7 +64,7 @@ abstract class WC_Authorize_Net_CIM_API_Transaction_Request extends WC_Authorize
 
 
 	/**
-	 * Creates a customer check debit request for the given $order
+	 * Creates a customer check debit request for the given order.
 	 *
 	 * @since 2.0.0
 	 * @param WC_Order $order the order object
@@ -80,17 +78,18 @@ abstract class WC_Authorize_Net_CIM_API_Transaction_Request extends WC_Authorize
 
 
 	/**
-	 * Create a credit card/eCheck transaction -- the profile & non-profile
-	 * child classes must implement this method
+	 * Creates a payment transaction.
+	 *
+	 * The profile & non-profile child classes must implement this method.
 	 *
 	 * @since 2.0.0
-	 * @param string $type, transaction type either `auth_only` or `auth_capture`
+	 * @param string $type the transaction type, either `auth_only` or `auth_capture`
 	 */
 	abstract protected function create_transaction( $type );
 
 
 	/**
-	 * Adds line items to the request
+	 * Adds order line items to the request.
 	 *
 	 * @since 2.0.0
 	 * @return array
@@ -121,7 +120,7 @@ abstract class WC_Authorize_Net_CIM_API_Transaction_Request extends WC_Authorize
 
 				$line_items[] = array(
 					'itemId'      => SV_WC_Helper::str_truncate( $fee_id, 31 ),
-					'name'        => SV_WC_Helper::str_truncate( htmlentities( $fee['name'], ENT_QUOTES, 'UTF-8', false ), 31 ),
+					'name'        => ! empty( $fee['name'] ) ? SV_WC_Helper::str_truncate( htmlentities( $fee['name'], ENT_QUOTES, 'UTF-8', false ), 31 ) : __( 'Fee', 'woocommerce-gateway-authorize-net-cim' ),
 					'description' => __( 'Order Fee', 'woocommerce-gateway-authorize-net-cim' ),
 					'quantity'    => 1,
 					'unitPrice'   => SV_WC_Helper::number_format( $this->order->get_item_total( $fee ) ),
@@ -139,7 +138,7 @@ abstract class WC_Authorize_Net_CIM_API_Transaction_Request extends WC_Authorize
 
 
 	/**
-	 * Adds tax information to the request
+	 * Adds tax information to the request.
 	 *
 	 * @since 2.0.0
 	 * @return array
@@ -169,7 +168,7 @@ abstract class WC_Authorize_Net_CIM_API_Transaction_Request extends WC_Authorize
 
 
 	/**
-	 * Adds shipping information to the request
+	 * Adds shipping information to the request.
 	 *
 	 * @since 2.0.0
 	 * @return array

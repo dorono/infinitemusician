@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Authorize.Net CIM Gateway to newer
  * versions in the future. If you wish to customize WooCommerce Authorize.Net CIM Gateway for your
- * needs please refer to http://docs.woothemes.com/document/authorize-net-cim/
+ * needs please refer to http://docs.woocommerce.com/document/authorize-net-cim/
  *
  * @package   WC-Gateway-Authorize-Net-CIM/Gateway
  * @author    SkyVerge
- * @copyright Copyright (c) 2013-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2013-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -198,16 +198,13 @@ class WC_Gateway_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Direct {
 
 		// backwards compat for transaction/PO number filters introduced in v1.x
 		// @deprecated in 2.0.0
-		$order->description = apply_filters( 'wc_authorize_net_cim_transaction_description', $order->description, $order->id, $this );
+		$order->description = apply_filters( 'wc_authorize_net_cim_transaction_description', $order->description, $order_id, $this );
 
 		// remove any weirdness in the description
 		$order->description = SV_WC_Helper::str_to_sane_utf8( $order->description );
 
 		// @deprecated in 2.0.0
-		$po_number = apply_filters( 'wc_authorize_net_cim_transaction_po_number', false, $order_id, $this );
-		if ( $po_number ) {
-			$order->po_number =  $po_number;
-		}
+		$order->payment->po_number = apply_filters( 'wc_authorize_net_cim_transaction_po_number', '', $order_id, $this );
 
 		// add shipping address ID for profile transactions (using existing payment method or adding a new one)
 		if ( $order->get_user_id() && ( ! empty( $order->payment->token ) || $this->get_payment_tokens_handler()->should_tokenize() ) ) {
@@ -239,7 +236,34 @@ class WC_Gateway_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Direct {
 	 * @param string $key meta key
 	 * @return mixed
 	 */
-	public function get_order_meta( $order_id, $key ) {
+	public function get_order_meta( $order, $key ) {
+
+		if ( is_numeric( $order ) ) {
+			$order = wc_get_order( $order );
+		}
+
+		if ( ! $order ) {
+			return false;
+		}
+
+		$order_id = SV_WC_Order_Compatibility::get_prop( $order, 'id' );
+
+		// Add token meta to renewal orders from subscriptions that were created before CIM v2.x
+		if ( 'payment_token' === $key && ! parent::get_order_meta( $order_id, $key ) && $this->get_plugin()->is_subscriptions_active() && SV_WC_Plugin_Compatibility::is_wc_subscriptions_version_gte_2_0() && wcs_order_contains_renewal( $order ) ) {
+
+			$subscriptions = wcs_get_subscriptions_for_renewal_order( $order );
+			$subscription  = array_pop( $subscriptions );
+
+			$parent_order = is_callable( array( $subscription, 'get_parent' ) ) ? $subscription->get_parent() : $subscription->order;
+
+			// if the parent order has a payment token stored, store it for the renewal order too
+			if ( $parent_order instanceof WC_Order && $parent_token = get_post_meta( SV_WC_Order_Compatibility::get_prop( $parent_order, 'id' ), '_wc_authorize_net_cim_payment_profile_id', true ) ) {
+
+				$this->update_order_meta( $order_id, 'payment_token', $parent_token );
+
+				return $parent_token;
+			}
+		}
 
 		// v2.0.0-v2.0.3 fix due to copypasta
 		if ( 'payment_token' === $key && metadata_exists( 'post', $order_id, $this->get_order_meta_prefix() . $key ) && metadata_exists( 'post', $order_id, '_wc_authorize_net_cim_payment_profile_id' ) ) {
@@ -598,7 +622,7 @@ class WC_Gateway_Authorize_Net_CIM extends SV_WC_Payment_Gateway_Direct {
 	public function get_guest_customer_id( WC_Order $order ) {
 
 		// is there a customer id already tied to this order?
-		if ( $customer_id = $this->get_order_meta( $order->id, 'customer_id' ) ) {
+		if ( $customer_id = $this->get_order_meta( $order, 'customer_id' ) ) {
 			return $customer_id;
 		}
 

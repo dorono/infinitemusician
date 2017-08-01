@@ -6,12 +6,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
 ?>
 
 <?php do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plain_text, $email ); ?>
 
-<p>&nbsp;<br/></p>
+<p>&nbsp;</p>
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%">
 	<tr>
@@ -26,13 +25,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<?php if ( ! $sent_to_admin ) : ?>
 								<?php echo $order->get_order_number(); ?>
 							<?php else : ?>
-								<a class="link" href="<?php echo esc_url( admin_url( 'post.php?post=' . $order->id . '&action=edit' ) ); ?>"><?php printf( __( 'Order #%s', 'woocommerce'), $order->get_order_number() ); ?></a>
+								<a class="link" href="<?php echo esc_url( admin_url( 'post.php?post=' . $order->get_id() . '&action=edit' ) ); ?>"><?php printf( __( 'Order #%s', 'woocommerce'), $order->get_order_number() ); ?></a>
 							<?php endif; ?>
 						</p>
 						
 						<p>
 							<span class="highlight"><?php _e( 'Order Date:', 'email-control' ) ?></span> 
-							<?php printf( '<time datetime="%s">%s</time>', date_i18n( 'c', strtotime( $order->order_date ) ), date_i18n( wc_date_format(), strtotime( $order->order_date ) ) ); ?>
+							<?php printf( '<time datetime="%s">%s</time>', $order->get_date_created()->format( 'c' ), wc_format_datetime( $order->get_date_created() ) ); ?>
 						</p>
 						
 					</td>
@@ -50,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</thead>
 				<?php } ?>
 				<tbody>
-					<?php echo $order->email_order_items_table( array(
+					<?php echo wc_get_email_order_items( $order, array(
 						'show_sku'      => $sent_to_admin,
 						'show_image'    => FALSE,
 						'image_size'    => array( 70, 70 ),
@@ -93,11 +92,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</tr>
 				</tfoot>
 			</table>
-
-			<?php do_action( 'woocommerce_email_after_order_table', $order, $sent_to_admin, $plain_text, $email ); ?>
 		
 		</td>
 	</tr>
 </table>
 
-<p>&nbsp;<br/></p>
+<p>&nbsp;</p>
+
+<?php
+ob_start();
+do_action( 'woocommerce_email_after_order_table', $order, $sent_to_admin, $plain_text, $email );
+$check_content = ob_get_clean();
+if ( '' !== $check_content ) { ?>
+	
+	<?php echo $check_content; ?>
+	
+	<p>&nbsp;</p>
+	
+	<table cellpadding="0" cellspacing="0" border="0" width="100%">
+		<tr>
+			<td class="divider-line" align="center" valign="top">&nbsp;
+				<!-- Divider -->
+			</td>
+		</tr>
+	</table>
+	
+	<p>&nbsp;</p>
+	
+<?php } ?>

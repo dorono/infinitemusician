@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <ul id="checkout-products">
 	<?php foreach( $products as $product ) : ?>
-	<li class="product-item <?php if ( $product->in_cart ) echo 'selected'; ?>" >
+	<li class="product-item <?php if ( wcopc_get_products_prop( $product, 'in_cart' ) ) echo 'selected'; ?>" >
 		<?php wc_get_template( 'checkout/add-to-cart/radio.php', array( 'product' => $product ), '', PP_One_Page_Checkout::$template_path );; ?>
 		<?php echo $product->get_title(); ?>
 		<?php if ( $product->is_type( 'variation' ) ) : ?>

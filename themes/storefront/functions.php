@@ -45,6 +45,22 @@ if ( storefront_is_woocommerce_activated() ) {
 
 if ( is_admin() ) {
 	$storefront->admin = require 'inc/admin/class-storefront-admin.php';
+
+	require 'inc/admin/class-storefront-plugin-install.php';
+}
+
+/**
+ * NUX
+ * Only load if wp version is 4.7.3 or above because of this issue;
+ * https://core.trac.wordpress.org/ticket/39610?cversion=1&cnum_hist=2
+ */
+if ( version_compare( get_bloginfo( 'version' ), '4.7.3', '>=' ) && ( is_admin() || is_customize_preview() ) ) {
+	require 'inc/nux/class-storefront-nux-admin.php';
+	require 'inc/nux/class-storefront-nux-guided-tour.php';
+
+	if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '3.0.0', '>=' ) ) {
+		require 'inc/nux/class-storefront-nux-starter-content.php';
+	}
 }
 
 /**

@@ -7,7 +7,7 @@ Author URI: http://prospress.com/
 Text Domain: wcopc
 Domain Path: languages
 Plugin URI: http://www.woothemes.com/products/woocommerce-one-page-checkout/
-Version: 1.3.1
+Version: 1.5.0
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ woothemes_queue_update( plugin_basename( __FILE__ ), 'c9ba8f8352cd71b5508af51612
  *
  * @since 1.0
  */
-if ( ! is_woocommerce_active() || version_compare( get_option( 'woocommerce_db_version' ), '2.1', '<' ) ) {
+if ( ! is_woocommerce_active() || version_compare( get_option( 'woocommerce_db_version' ), '2.5', '<' ) ) {
 	add_action( 'admin_notices', 'PP_One_Page_Checkout::woocommerce_inactive_notice' );
 	return;
 }
@@ -170,6 +170,8 @@ class PP_One_Page_Checkout {
 			self::$active_plugins = array_merge( self::$active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
 		}
 
+		require_once( 'functions.php' );
+
 		require_once( 'classes/class-wcopc-admin-editor.php' );
 
 		require_once( 'classes/abstract-class-wcopc-template.php' );
@@ -179,6 +181,8 @@ class PP_One_Page_Checkout {
 		require_once( 'classes/class-wcopc-compat-bookings.php' );
 
 		require_once( 'classes/class-wcopc-compat-subscriptions.php' );
+
+		require_once( 'classes/class-wcopc-compat-name-your-price.php' );
 
 		self::$plugin_url     = untrailingslashit( plugins_url( '/', __FILE__ ) );
 		self::$plugin_path    = untrailingslashit( plugin_dir_path( __FILE__ ) );
@@ -210,8 +214,12 @@ class PP_One_Page_Checkout {
 		add_action( 'woocommerce_checkout_before_customer_details', array( __CLASS__, 'add_product_selection_fields' ), 11 );
 
 		// Change add to cart messages on OPC pages to say "Add to Order" and do not include the "View Cart ->" button
-		add_filter( 'wc_add_to_cart_message', array( __CLASS__, 'maybe_filter_add_to_cart_message' ), 10, 2 );
 		add_filter( 'woocommerce_add_error', array( __CLASS__, 'maybe_filter_error_message'), 10, 1 );
+		if ( self::is_woocommerce_pre( '3.0' ) ) {
+			add_filter( 'wc_add_to_cart_message', array( __CLASS__, 'maybe_filter_add_to_cart_message' ), 10, 2 );
+		} else {
+			add_filter( 'wc_add_to_cart_message_html', array( __CLASS__, 'maybe_filter_add_to_cart_message' ), 10, 2 );
+		}
 
 		// Update products from the checkout page
 		add_action( 'wp_ajax_pp_add_to_cart', array( __CLASS__, 'ajax_add_to_cart' ) );
@@ -226,6 +234,7 @@ class PP_One_Page_Checkout {
 
 		// Add JavaScript
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'maybe_enqueue_single_product_styles_scripts' ) );
 
 		// Add WooCommerce body class
 		add_filter( 'body_class', array( __CLASS__, 'opc_woocommerce_body_class' ) );
@@ -301,9 +310,12 @@ class PP_One_Page_Checkout {
 		// Hook in just before (and after) 'woocommerce_checkout_payment' to adjust needs_payment() to ensure the payment methods are displayed on page load
 		add_action( 'woocommerce_checkout_order_review', array( __CLASS__, 'maybe_toggle_cart_needs_payment'), 19 );
 		add_action( 'woocommerce_checkout_order_review', array( __CLASS__, 'maybe_toggle_cart_needs_payment'), 21 );
+
 		// Add a variable for opc to check what the default/original guest checkout is before extensions like subscriptions override
 		add_filter( 'woocommerce_params', array( __CLASS__, 'filter_woocommerce_script_paramaters' ), 10, 1 );
 		add_filter( 'wc_checkout_params', array( __CLASS__, 'filter_woocommerce_script_paramaters' ), 10, 1 );
+
+		add_filter( 'woocommerce_default_address_fields', array( __CLASS__, 'filter_default_address_fields' ), 10, 1 );
 
 		do_action( 'wcopc_loaded' );
 	}
@@ -439,13 +451,7 @@ class PP_One_Page_Checkout {
 	public static function opc_single_add_to_cart( $post_id ) {
 		global $product;
 
-		if ( $product->is_type( 'variable' ) ) {
-			$product_type = 'variable';
-		} elseif ( ! empty( $product->product_type ) ) {
-			$product_type = $product->product_type;
-		} else {
-			$product_type = 'simple';
-		}
+		$product_type = wcopc_get_product_type( $product );
 
 		// Change 'Add to cart' to 'Add to order' for known product types
 		// Let custom types handle this themselves
@@ -466,16 +472,7 @@ class PP_One_Page_Checkout {
 	 */
 	public static function opc_single_add_to_cart_core_types( $post_id ) {
 		global $product;
-
-		if ( $product->is_type( 'variable' ) ) {
-			$product_type = 'variable';
-		} elseif ( ! empty( $product->product_type ) ) {
-			$product_type = $product->product_type;
-		} else {
-			$product_type = 'simple';
-		}
-
-		wc_get_template( 'checkout/add-to-cart/' . $product_type . '.php', array( 'product' => $product ), '', PP_One_Page_Checkout::$template_path );
+		wc_get_template( 'checkout/add-to-cart/' . wcopc_get_product_type( $product ) . '.php', array( 'product' => $product ), '', PP_One_Page_Checkout::$template_path );
 	}
 
 	/**
@@ -611,7 +608,7 @@ class PP_One_Page_Checkout {
 
 			foreach ( $product_posts as $product_post ) {
 
-				$product = get_product( $product_post->ID );
+				$product = wc_get_product( $product_post->ID );
 
 				if ( ! is_object( $product ) ) {
 					continue;
@@ -619,9 +616,12 @@ class PP_One_Page_Checkout {
 
 				if ( ( $product->is_type( 'variable' ) || $product->is_type( 'grouped' ) ) && ( self::$template != 'checkout/product-single.php' ) ) {
 
-					foreach ( $product->get_children( true ) as $child_id ) {
+					// WC 3.0 provides a get_visible_children() method instead of using the $is_visible parameter on get_children()
+					$visible_children = is_callable( array( $product, 'get_visible_children' ) ) ? $product->get_visible_children() : $product->get_children( true );
 
-						$child = $product->get_child( $child_id );
+					foreach ( $visible_children as $child_id ) {
+
+						$child = wc_get_product( $child_id );
 
 						if ( $product->is_type( 'variable' ) && self::all_variation_attributes_set( $child ) ) {
 							$products = self::build_products_array( $child, $products );
@@ -661,28 +661,31 @@ class PP_One_Page_Checkout {
 			return $products;
 		}
 
-		$product->add_to_cart_id = ( isset( $product->variation_id ) ) ? $product->variation_id : $product->id;
-		$products_in_cart        = self::get_products_in_cart( self::$shortcode_page_id );
+		$products_in_cart = self::get_products_in_cart( self::$shortcode_page_id );
 
-		if ( array_key_exists( $product->add_to_cart_id, $products_in_cart ) ) {
-			$product->in_cart   = true;
-			$product->cart_item = $products_in_cart[ $product->add_to_cart_id ];
+		if ( array_key_exists( $product->get_id(), $products_in_cart ) ) {
+			wcopc_set_products_prop( $product, 'in_cart', true );
+			wcopc_set_products_prop( $product, 'cart_item', $products_in_cart[ $product->get_id() ] );
 		} else {
-			$product->in_cart   = false;
-			$product->cart_item = array();
+			wcopc_set_products_prop( $product, 'in_cart', false );
+			wcopc_set_products_prop( $product, 'cart_item', array() );
 		}
 
 		// For the single product template we need to check if a product variation exists in the cart
 		if ( $product->has_child() ) {
-			foreach( $product->get_children( true ) as $product_id ) {
+
+			// WC 3.0 provides a get_visible_children() method instead of using the $is_visible parameter on get_children()
+			$visible_children = is_callable( array( $product, 'get_visible_children' ) ) ? $product->get_visible_children() : $product->get_children( true );
+
+			foreach( $visible_children as $product_id ) {
 				if ( array_key_exists( $product_id , $products_in_cart ) ) {
-					$product->in_cart   = true;
-					$product->cart_item = $products_in_cart[ $product_id ];
+					wcopc_set_products_prop( $product, 'in_cart', true );
+					wcopc_set_products_prop( $product, 'cart_item', $products_in_cart[ $product_id ] );
 				}
 			}
 		}
 
-		$products[ $product->add_to_cart_id ] = $product;
+		$products[ $product->get_id() ] = $product;
 
 		return $products;
 	}
@@ -952,7 +955,7 @@ class PP_One_Page_Checkout {
 		$product_id          = apply_filters( 'woocommerce_add_to_cart_product_id', absint( $_REQUEST['add_to_cart'] ) );
 		$was_added_to_cart   = false;
 		$product             = wc_get_product( $product_id );
-		$add_to_cart_handler = apply_filters( 'woocommerce_add_to_cart_handler', $product->product_type, $product );
+		$add_to_cart_handler = apply_filters( 'woocommerce_add_to_cart_handler', $product->get_type(), $product );
 
 		if ( ! $bypass ) {
 
@@ -960,12 +963,13 @@ class PP_One_Page_Checkout {
 			if ( 'variation' === $add_to_cart_handler ) {
 
 				$variation_id       = $product_id;
-				$product_id         = $product->id;
+				$product_id         = is_callable( array( $product, 'get_parent_id' ) ) ? $product->get_parent_id() : $product->get_parent(); // WC 3.0+
 				$quantity           = empty( $_REQUEST['quantity'] ) ? 1 : wc_stock_amount( $_REQUEST['quantity'] );
 				$all_variations_set = true;
 				$variations         = array();
 
-				$attributes = $product->parent->get_attributes();
+				$parent     = wc_get_product( $product_id );
+				$attributes = $parent->get_attributes();
 				$variations = $product->get_variation_attributes();
 				$variation  = $product;
 
@@ -1033,7 +1037,6 @@ class PP_One_Page_Checkout {
 							// Get valid value from variation
 							$valid_value = $variation->variation_data[ $taxonomy ];
 
-
 							// Allow if valid
 							if ( '' == $valid_value || strtolower( $valid_value ) == $value ) {
 
@@ -1066,7 +1069,8 @@ class PP_One_Page_Checkout {
 							}
 
 							// Get valid value from variation
-							$valid_value = $variation->variation_data[ $taxonomy ];
+							$variation_data = wc_get_product_variation_attributes( $variation_id );
+							$valid_value    = $variation_data[ $taxonomy ];
 
 							// Allow if valid
 							if ( '' === $valid_value || $valid_value === $value ) {
@@ -1140,7 +1144,12 @@ class PP_One_Page_Checkout {
 
 			$response_data           = self::refresh_fragments( $response_data );
 			$response_data['result'] = 'success';
-			do_action( 'woocommerce_ajax_added_to_cart', $product->id );
+			if ( $product->is_type( 'variation' ) ) {
+				$product_id = is_callable( array( $product, 'get_parent_id' ) ) ? $product->get_parent_id() : $product->get_parent(); // WC 3.0+
+			} else {
+				$product_id = $product->get_id();
+			}
+			do_action( 'woocommerce_ajax_added_to_cart', $product_id );
 
 		} else {
 			$response_data['result'] = 'failure';
@@ -1254,6 +1263,7 @@ class PP_One_Page_Checkout {
 			$params = apply_filters( 'wcopc_script_data', array(
 				'wcopc_nonce'                 => wp_create_nonce( __FILE__ ),
 				'wcopc_complete_order_prompt' => '<a class="wc-south opc-complete-order" href="#customer_details">' . __( 'Modify &amp; complete order below', 'wcopc' ) . '</a>',
+				'ajax_error_notice'           => '<div class="woocommerce-error">' . __( 'Error processing your request. Please try refreshing the page. Contact us if you continue to have issues.', 'wcopc' ) . '</div>',
 				'ajax_url'                    => WC()->ajax_url(),
 			) );
 
@@ -1277,6 +1287,53 @@ class PP_One_Page_Checkout {
 
 			wp_enqueue_style( 'woocommerce-one-page-checkout', self::$plugin_url . '/css/one-page-checkout.css' );
 
+			do_action( 'wcopc_enqueue_scripts' );
+
+		}
+	}
+
+	/**
+	 * Enqueue the WooCommerce single product styles & scripts if the page is using an OPC
+	 * shortcode and the product-single template.
+	 *
+	 * @since 1.4.1
+	 */
+	public static function maybe_enqueue_single_product_styles_scripts() {
+		global $post;
+
+		if ( ! empty( $post->post_content ) && false !== stripos( $post->post_content, '[woocommerce_one_page_checkout' ) && false !== stripos( $post->post_content, 'product-single' ) ) {
+
+			$handles = array(
+				array(
+					'theme_feature' => 'wc-product-gallery-zoom',
+					'script_handle' => 'zoom',
+				),
+				array(
+					'theme_feature' => 'wc-product-gallery-slider',
+					'script_handle' => 'flexslider',
+				),
+				array(
+					'theme_feature' => 'wc-product-gallery-slider',
+					'script_handle' => 'photoswipe-ui-default',
+					'style_handle'  => 'photoswipe-default-skin',
+				),
+			);
+
+			foreach( $handles as $handle_details ) {
+				if ( current_theme_supports( $handle_details['theme_feature'] ) ) {
+
+					wp_enqueue_script( $handle_details['script_handle'], '', array( 'jquery' ), WC_VERSION );
+
+					if ( isset( $handle_details['style_handle'] ) ) {
+
+						wp_enqueue_style( $handle_details['style_handle'], '', array(), WC_VERSION );
+
+						add_action( 'wp_footer', 'woocommerce_photoswipe' );
+					}
+				}
+			}
+
+			wp_enqueue_script( 'wc-single-product', '', array( 'jquery' ), WC_VERSION );
 		}
 	}
 
@@ -1329,13 +1386,21 @@ class PP_One_Page_Checkout {
 				$functions_to_ignore[] = 'is_checkout';
 			}
 
-			$function_array = apply_filters( 'wcopc_is_checkout_override_function_names', $functions_to_ignore );
+			$functions_to_ignore = apply_filters( 'wcopc_is_checkout_override_function_names', $functions_to_ignore );
 
-			// making sure we have an array
-			if ( is_array( $function_array ) && ! in_array( $backtrace[3]['function'], $function_array ) && ! in_array( $backtrace[4]['function'], $function_array ) && ! in_array( $backtrace[5]['function'], $function_array ) ) {
-				$page_id = self::$shortcode_page_id;
+			// An array of backtrace indexes to look for functions to ignore
+			$backtrace_indexes = apply_filters( 'wcopc_is_checkout_override_function_backtrace_indexes', array( 3, 4, 5, 6 ) );
+
+			// making sure we have arrays
+			if ( is_array( $functions_to_ignore ) && is_array( $backtrace_indexes ) ) {
+				// An array of function names in the backtrace at the ignored indexes
+				$backtrace_functions = array_intersect_key( wp_list_pluck( $backtrace, 'function' ), array_flip( $backtrace_indexes ) );
+
+				// If we don't find any functions which we ignore
+				if ( 0 == count( array_intersect( $backtrace_functions, $functions_to_ignore ) ) ) {
+					$page_id = self::$shortcode_page_id;
+				}
 			}
-
 		}
 
 		return $page_id;
@@ -1730,10 +1795,10 @@ class PP_One_Page_Checkout {
 			remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
 			remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 
-			$product = get_product();
+			$product = wc_get_product();
 
 			// show the shipping fields if needed
-			if ( ! empty( $product ) && 'yes' == $product->wcopc ) {
+			if ( ! empty( $product ) && 'yes' == wcopc_get_products_prop( $product, 'wcopc', '_' ) ) {
 				self::maybe_show_shipping( array( $product ) );
 			}
 		}
@@ -1818,6 +1883,19 @@ class PP_One_Page_Checkout {
 			$woocommerce_params['option_guest_checkout'] = 'yes';
 		}
 		return $woocommerce_params;
+	}
+
+	/**
+	 * Do not autofocus the First Name address field on OPC pages in WooCommerce 3.0 and newer to avoid the
+	 * browser scrolling to that field (and potentially past OPC product selection fields).
+	 */
+	public static function filter_default_address_fields( $fields ) {
+
+		if ( self::is_any_form_of_opc_page() && isset( $fields['first_name']['autofocus'] ) && true === $fields['first_name']['autofocus'] ) {
+			$fields['first_name']['autofocus'] = false;
+		}
+
+		return $fields;
 	}
 
 	/**

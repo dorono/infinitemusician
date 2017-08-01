@@ -14,7 +14,7 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Memberships to newer
  * versions in the future. If you wish to customize WooCommerce Memberships for your
- * needs please refer to http://docs.woothemes.com/document/woocommerce-memberships/ for more information.
+ * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @package   WC-Memberships/Templates
  * @author    SkyVerge
@@ -31,7 +31,7 @@ defined( 'ABSPATH' ) or exit;
  * @type \WP_Query $restricted_content Query results of posts and custom post types restricted to the membership
  * @type int $user_id The current user ID
  *
- * @version 1.6.2
+ * @version 1.7.1
  * @since 1.4.0
  */
 ?>
@@ -84,7 +84,7 @@ defined( 'ABSPATH' ) or exit;
 
 			// Determine if the content is currently accessible or not
 			$can_view_content = wc_memberships_user_can( $user_id, 'view', array( 'post' => $member_post->ID ) );
-			$view_start_time  = wc_memberships_get_user_access_start_time( $user_id, 'view', array( 'post' => $member_post->ID ) );
+			$view_start_time  = wc_memberships_adjust_date_by_timezone( wc_memberships_get_user_access_start_time( $user_id, 'view', array( 'post' => $member_post->ID ) ), 'timestamp', wc_timezone_string() );
 			?>
 
 			<tr class="membership-content">
@@ -112,7 +112,7 @@ defined( 'ABSPATH' ) or exit;
 							<?php if ( $can_view_content ) : ?>
 								<?php esc_html_e( 'Now', 'woocommerce-memberships' ); ?>
 							<?php else : ?>
-								<time datetime="<?php echo date( 'Y-m-d', $view_start_time ); ?>" title="<?php echo esc_attr( $view_start_time ); ?>"><?php echo date_i18n( get_option( 'date_format' ), $view_start_time ); ?></time>
+								<time datetime="<?php echo date( 'Y-m-d H:i:s', $view_start_time ); ?>" title="<?php echo esc_attr( $view_start_time ); ?>"><?php echo date_i18n( wc_date_format(), $view_start_time ); ?></time>
 							<?php endif; ?>
 						</td>
 

@@ -11,8 +11,18 @@
 .single-product div.product_meta,
 .single-product header,
 .single-product nav,
+.single-product .woocommerce-info.wc-memberships-member-discount-message,
 .woocommerce-shipping-fields {
 	display: none;
+}
+.single-product {
+	#page {
+		.onsale {
+			width: 100%;
+			position: relative;
+			right: 0;
+		}
+	}
 }
 #hero {
 	margin-bottom: 25px;

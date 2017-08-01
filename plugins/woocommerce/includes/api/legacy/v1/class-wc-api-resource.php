@@ -202,25 +202,19 @@ class WC_API_Resource {
 				// customer meta
 				$meta = (array) get_user_meta( $resource->ID );
 
-			} elseif ( is_a( $resource, 'WC_Product_Variation' ) ) {
-
-				// product variation meta
-				$meta = (array) get_post_meta( $resource->get_variation_id() );
-
 			} else {
 
 				// coupon/order/product meta
-				$meta = (array) get_post_meta( $resource->id );
+				$meta = (array) get_post_meta( $resource->get_id() );
 			}
 
-			foreach( $meta as $meta_key => $meta_value ) {
+			foreach ( $meta as $meta_key => $meta_value ) {
 
 				// don't add hidden meta by default
 				if ( ! is_protected_meta( $meta_key ) ) {
 					$data[ $meta_name ][ $meta_key ] = maybe_unserialize( $meta_value[0] );
 				}
 			}
-
 		}
 
 		return $data;
@@ -268,7 +262,6 @@ class WC_API_Resource {
 						unset( $data[ $data_field ][ $sub_field ] );
 					}
 				}
-
 			} else {
 
 				// remove non-matching top-level fields
@@ -309,7 +302,6 @@ class WC_API_Resource {
 		} else {
 
 			// delete order/coupon/product
-
 			$result = ( $force ) ? wp_delete_post( $id, true ) : wp_trash_post( $id );
 
 			if ( ! $result )
@@ -398,5 +390,4 @@ class WC_API_Resource {
 		else
 			return false;
 	}
-
 }

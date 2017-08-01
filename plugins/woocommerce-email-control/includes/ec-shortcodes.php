@@ -177,7 +177,7 @@ class EC_Shortcodes {
 		if ( isset( $ec_email_args['sent_to_admin'] ) && $ec_email_args['sent_to_admin'] ) {
 			
 			//Admin Order URL
-			$order_url = admin_url( 'post.php?post=' . $ec_email_args['order']->id . '&action=edit' );
+			$order_url = admin_url( 'post.php?post=' . ec_order_get_id( $ec_email_args['order'] ) . '&action=edit' );
 		}
 		else {
 			
@@ -215,7 +215,16 @@ class EC_Shortcodes {
 		}
 		
 		if ( self::check_display( $shortcode_args_modified, 'date' ) ) {
-			$content .= '<span class="ec_datetime">(' . sprintf( '<time datetime="%s">%s</time>', date_i18n( 'c', strtotime( $ec_email_args['order']->order_date ) ), date_i18n( wc_date_format(), strtotime( $ec_email_args['order']->order_date ) ) ) . ')</span>';
+			
+			$temp_date_created = ec_order_get_date_created( $ec_email_args['order'] );
+			
+			// `->format()` only since WC3.0.
+			if ( method_exists( $temp_date_created, 'format' ) ) {
+				$content .= '<span class="ec_datetime">(' . sprintf( '<time datetime="%s">%s</time>', $temp_date_created->format( 'c' ), wc_format_datetime( $temp_date_created ) ) . ')</span>';
+			}
+			else {
+				$content .= '<span class="ec_datetime">(' . sprintf( '<time datetime="%s">%s</time>', date_i18n( 'c', strtotime( $temp_date_created ) ), date_i18n( wc_date_format(), strtotime( $temp_date_created ) ) ) . ')</span>';
+			}
 			
 			// Add space.
 			$content .= " ";
@@ -700,15 +709,15 @@ class EC_Shortcodes {
 		self::ec_normalize_email_args();
 		
 		// s( $shortcode_args_modified['key'] );
-		// s( get_post_meta( $ec_email_args['order']->id, $shortcode_args_modified['key'], TRUE ) );
-		// s( get_post_meta( $ec_email_args['order']->id ) );
+		// s( get_post_meta( ec_order_get_id( $ec_email_args['order'] ), $shortcode_args_modified['key'], TRUE ) );
+		// s( get_post_meta( ec_order_get_id( $ec_email_args['order'] ) ) );
 		// exit();
 		
 		// Check if necessary email args exits
-		if ( ! isset( $shortcode_args_modified['key'] ) && ! isset( $ec_email_args['order']->id ) ) return;
+		if ( ! isset( $shortcode_args_modified['key'] ) && ! isset( $ec_email_args['order'] ) ) return;
 		
 		$content = get_post_meta(
-			$ec_email_args['order']->id,
+			ec_order_get_id( $ec_email_args['order'] ),
 			$shortcode_args_modified['key'],
 			TRUE
 		);
@@ -805,6 +814,7 @@ class EC_Shortcodes {
 		if ( isset( $ec_email_args['order'] ) ) {
 			
 			$order = $ec_email_args['order'];
+			$order_id = ec_order_get_id( $order );
 			
 			// Get Delivery Note.
 			$ec_email_args['delivery_note'] = $order->customer_note; // "The blue house at the end of the street".
@@ -825,7 +835,7 @@ class EC_Shortcodes {
 				$ec_email_args['coupon_code'] = implode( ', ', $coupons_list );
 			}
 			
-			if ( ( $user_id = get_post_meta( $order->id, '_customer_user', true ) ) ) {
+			if ( ( $user_id = get_post_meta( $order_id, '_customer_user', true ) ) ) {
 				
 				$user = get_user_by( 'id', $user_id );
 				
@@ -833,9 +843,9 @@ class EC_Shortcodes {
 				
 				if ( isset( $user->user_login ) ) $ec_email_args['user_login'] = $user->user_login ; // brentvr
 				if ( isset( $user->user_nicename ) ) $ec_email_args['user_nicename'] = $user->user_nicename ; // BrentVR
-				if ( $billing_email = get_post_meta( $order->id, '_billing_email', true ) ) $ec_email_args['email'] = $billing_email ; // brentvr@gmail.com
-				if ( $billing_first_name = get_post_meta( $order->id, '_billing_first_name', true ) ) $ec_email_args['first_name'] = $billing_first_name ; // Brent
-				if ( $billing_last_name = get_post_meta( $order->id, '_billing_last_name', true ) ) $ec_email_args['last_name'] = $billing_last_name ; // VanRensburg
+				if ( $billing_email = get_post_meta( $order_id, '_billing_email', true ) ) $ec_email_args['email'] = $billing_email ; // brentvr@gmail.com
+				if ( $billing_first_name = get_post_meta( $order_id, '_billing_first_name', true ) ) $ec_email_args['first_name'] = $billing_first_name ; // Brent
+				if ( $billing_last_name = get_post_meta( $order_id, '_billing_last_name', true ) ) $ec_email_args['last_name'] = $billing_last_name ; // VanRensburg
 			}
 			else{
 				
@@ -843,9 +853,9 @@ class EC_Shortcodes {
 				
 				$ec_email_args['user_login'] = ''; //$user->user_login; // brentvr
 				$ec_email_args['user_nicename'] = ''; //$user->user_nicename; // BrentVR
-				if ( $billing_email = get_post_meta( $order->id, '_billing_email', true ) ) $ec_email_args['email'] = get_post_meta( $order->id, '_billing_email', true ); // brentvr@gmail.com
-				if ( $billing_first_name = get_post_meta( $order->id, '_billing_first_name', true ) ) $ec_email_args['first_name'] = get_post_meta( $order->id, '_billing_first_name', true ); // Brent
-				if ( $billing_last_name = get_post_meta( $order->id, '_billing_last_name', true ) ) $ec_email_args['last_name'] = get_post_meta( $order->id, '_billing_last_name', true ); // VanRensburg
+				if ( $billing_email = get_post_meta( $order_id, '_billing_email', true ) ) $ec_email_args['email'] = get_post_meta( $order_id, '_billing_email', true ); // brentvr@gmail.com
+				if ( $billing_first_name = get_post_meta( $order_id, '_billing_first_name', true ) ) $ec_email_args['first_name'] = get_post_meta( $order_id, '_billing_first_name', true ); // Brent
+				if ( $billing_last_name = get_post_meta( $order_id, '_billing_last_name', true ) ) $ec_email_args['last_name'] = get_post_meta( $order_id, '_billing_last_name', true ); // VanRensburg
 			}
 		}
 		elseif ( isset( $ec_email_args['user_login'] ) ) {

@@ -55,14 +55,12 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 		$order_id_to_show = $latest_order;
 	}
 	
-	/**
-	 * Prep the order, and display an error message if there isn't one yet.
-	 */
-	
-	$order = new WC_Order( $order_id_to_show );
-	// $order = new WC_Order( 'test' );
-	
-	if ( ! $order->post ) :
+	if ( ! get_post( $order_id_to_show ) ) :
+		
+		/**
+		 * Display an error message if there isn't an order yet.
+		 */
+		
 		?>
 		<div class="email-preview pe-in-admin-page">
 			<div class="main-content">
@@ -112,6 +110,13 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 		<?php
 		
 	else :
+		
+		/**
+		 * Display the chosen email.
+		 */
+		
+		// prep the order.
+		$order = new WC_Order( $order_id_to_show );
 		
 		if ( ! empty( $mails ) ) {
 			foreach ( $mails as $mail ) {
@@ -214,7 +219,7 @@ global $wp_scripts, $woocommerce, $wpdb, $current_user, $order, $cxec_email_cont
 												<?php _e( "To Email", 'email-control' ) ; ?>
 											</div>
 											<div class="header-info-meta">
-												<span class="meta-value"><?php echo $order->billing_email ?></span>
+												<span class="meta-value"><?php echo ec_order_get_billing_email( $order ); ?></span>
 											</div>
 										</div>
 										

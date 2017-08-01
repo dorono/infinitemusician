@@ -91,7 +91,7 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 										</option>
 										
 										<?php
-										$ec_theme_selected = get_option("ec_template");
+										$ec_theme_selected = get_option( 'ec_template' );
 										foreach ( $ec_email_themes as $ec_email_theme_id => $ec_email_theme_args ) {
 											
 											$name = $ec_email_theme_args['name'];
@@ -191,11 +191,12 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 									// Show the orders.
 									foreach ( $order_collection as $order_item ) {
 										
+										// Get order object.
 										$order = new WC_Order( $order_item->ID );
+										
 										?>
-										<!-- <option value="<?php echo "['" . $order_item->ID . "','" . $order->billing_email . "']" ?>" <?php echo ( $order_item->ID == $show_order ) ? "selected" : "" ; ?> > -->
-										<option value="<?php echo $order_item->ID ?>" data-order-email="<?php echo $order->billing_email ?>" <?php echo ( $order_item->ID == $show_order ) ? "selected" : "" ; ?> >
-											<?php echo $order->get_order_number() ?> - <?php echo $order->billing_first_name ?> <?php echo $order->billing_last_name ?> (<?php echo $order->billing_email ?>)
+										<option value="<?php echo ec_order_get_id( $order ); ?>" data-order-email="<?php echo ec_order_get_billing_email( $order ); ?>" <?php echo ( ec_order_get_id( $order ) == $show_order ) ? "selected" : "" ; ?> >
+											<?php echo $order->get_order_number(); ?> - <?php echo ec_order_get_billing_first_name( $order ); ?> <?php echo ec_order_get_billing_last_name( $order ); ?> (<?php echo ec_order_get_billing_email( $order ); ?>)
 										</option>
 										<?php
 									}
@@ -246,11 +247,12 @@ global $wp_scripts, $woocommerce, $woocommerce, $current_user;
 						</label>
 						<div class="controls-field">
 							<div class="controls-inner-row">
-								<input type="text" class="" id="ec_send_email" name="ec_send_email" value="<?php echo $order->billing_email ?>" placeholder="somone@somewhere.com, ..." />
+								<input type="text" class="" id="ec_send_email" name="ec_send_email" value="<?php echo ec_order_get_billing_email( $order ); ?>" placeholder="somone@somewhere.com, ..." />
 								<button id="send_test" class="button send_test" name="send_test" type="button"><i class="cxectrl-icon-mail-alt"></i></button>
 							</div>
 						</div>
 					</div>
+					
 				</div>
 				<input type="hidden" class="" id="ec_approve_preview" name="ec_approve_preview" />
 			</form>

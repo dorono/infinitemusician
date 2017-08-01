@@ -49,17 +49,33 @@ function custom_remove_footer_credit () {
 function custom_storefront_credit() {
 	?>
 	<div class="site-info">
-		&copy; <?php echo get_bloginfo( 'name' ) . ' ' . get_the_date( 'Y' ); ?>
+		&copy; <?php echo get_bloginfo( 'name' ) . ' ' . date( 'Y' ); ?>
 	</div><!-- .site-info -->
 	<?php
 }
 
-//Possible future use for overriding jump to top of page
-// add_action( 'wp_enqueue_scripts', 'swap_onepage_checkout_js', 100 );
-//
-// function swap_onepage_checkout_js() {
-// 	wp_dequeue_script('woocommerce-one-page-checkout');
-// 	wp_enqueue_script('woocommerce-one-page-checkout-custom', '/wp-content/plugins/woocommerce-one-page-checkout/js/one-page-checkout-custom.js', array( 'jquery', 'wc-add-to-cart-variation' ), '1.0', true );
-//
-//
-// }
+if (!class_exists('WooCommerce'))
+{
+    exit;
+}// Exit if WooCommerce is not active
+
+// use http://localhost/checkout/order-received/428/?key=wc_order_58c6858771308 for testing JLWG on /order-received page
+function wh_CustomReadOrder($order_id)
+{
+  //getting order object
+  $order = wc_get_order($order_id);
+  $items = $order->get_items();
+
+  foreach ($items as $item_id => $item_data) {
+		if ($item_data['product_id'] == 11 || $item_data['product_id'] == 893) {
+			include 'inc/recommendation-jlwg.php';
+		}
+
+		if ($item_data['item_meta']['_product_id'][0] == 416) {
+			include 'inc/recommendation-bsp.php';
+		}
+
+  }
+}
+
+add_action('woocommerce_thankyou', 'wh_CustomReadOrder');

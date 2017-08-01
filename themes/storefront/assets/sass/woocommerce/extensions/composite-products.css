@@ -52,16 +52,6 @@
   display: block;
   margin-bottom: 1em; }
 
-.single-product div.product .component_selections .clear_component_options:before {
-  display: inline-block;
-  font: normal normal normal 1em / 1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  content: "\f021";
-  margin-right: 0.5407911001em; }
-
 .single-product div.product .component_selections .component_option_thumbnails .component_option_thumbnail {
   margin-left: 5px;
   /* v2.5.5 compat */

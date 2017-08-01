@@ -71,7 +71,7 @@ if ( ! function_exists( 'storefront_cart_link' ) ) {
 	 */
 	function storefront_cart_link() {
 		?>
-			<a class="cart-contents" href="<?php echo esc_url( WC()->cart->get_cart_url() ); ?>" title="<?php esc_attr_e( 'View your shopping cart', 'storefront' ); ?>">
+			<a class="cart-contents" href="<?php echo esc_url( wc_get_cart_url() ); ?>" title="<?php esc_attr_e( 'View your shopping cart', 'storefront' ); ?>">
 				<span class="amount"><?php echo wp_kses_data( WC()->cart->get_cart_subtotal() ); ?></span> <span class="count"><?php echo wp_kses_data( sprintf( _n( '%d item', '%d items', WC()->cart->get_cart_contents_count(), 'storefront' ), WC()->cart->get_cart_contents_count() ) );?></span>
 			</a>
 		<?php
@@ -135,7 +135,8 @@ if ( ! function_exists( 'storefront_upsell_display' ) ) {
 	 * @uses    woocommerce_upsell_display()
 	 */
 	function storefront_upsell_display() {
-		woocommerce_upsell_display( -1, 3 );
+		$columns = apply_filters( 'storefront_upsells_columns', 3 );
+		woocommerce_upsell_display( -1, $columns );
 	}
 }
 
@@ -159,6 +160,43 @@ if ( ! function_exists( 'storefront_sorting_wrapper_close' ) ) {
 	 * @return  void
 	 */
 	function storefront_sorting_wrapper_close() {
+		echo '</div>';
+	}
+}
+
+if ( ! function_exists( 'storefront_product_columns_wrapper' ) ) {
+	/**
+	 * Product columns wrapper
+	 *
+	 * @since   2.2.0
+	 * @return  void
+	 */
+	function storefront_product_columns_wrapper() {
+		$columns = storefront_loop_columns();
+		echo '<div class="columns-' . intval( $columns ) . '">';
+	}
+}
+
+if ( ! function_exists( 'storefront_loop_columns' ) ) {
+	/**
+	 * Default loop columns on product archives
+	 *
+	 * @return integer products per row
+	 * @since  1.0.0
+	 */
+	function storefront_loop_columns() {
+		return apply_filters( 'storefront_loop_columns', 3 ); // 3 products per row
+	}
+}
+
+if ( ! function_exists( 'storefront_product_columns_wrapper_close' ) ) {
+	/**
+	 * Product columns wrapper close
+	 *
+	 * @since   2.2.0
+	 * @return  void
+	 */
+	function storefront_product_columns_wrapper_close() {
 		echo '</div>';
 	}
 }
@@ -310,7 +348,7 @@ if ( ! function_exists( 'storefront_handheld_footer_bar_cart_link' ) ) {
 	 */
 	function storefront_handheld_footer_bar_cart_link() {
 		?>
-			<a class="footer-cart-contents" href="<?php echo esc_url( WC()->cart->get_cart_url() ); ?>" title="<?php esc_attr_e( 'View your shopping cart', 'storefront' ); ?>">
+			<a class="footer-cart-contents" href="<?php echo esc_url( wc_get_cart_url() ); ?>" title="<?php esc_attr_e( 'View your shopping cart', 'storefront' ); ?>">
 				<span class="count"><?php echo wp_kses_data( WC()->cart->get_cart_contents_count() );?></span>
 			</a>
 		<?php

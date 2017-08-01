@@ -14,11 +14,11 @@
  *
  * Do not edit or add to this file if you wish to upgrade WooCommerce Authorize.Net CIM Gateway to newer
  * versions in the future. If you wish to customize WooCommerce Authorize.Net CIM Gateway for your
- * needs please refer to http://docs.woothemes.com/document/authorize-net-cim/
+ * needs please refer to http://docs.woocommerce.com/document/authorize-net-cim/
  *
  * @package   WC-Gateway-Authorize-Net-CIM/API/Request
  * @author    SkyVerge
- * @copyright Copyright (c) 2011-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2011-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -66,7 +66,7 @@ class WC_Authorize_Net_CIM_API_Profile_Transaction_Request extends WC_Authorize_
 		$transaction_type = ( $type === 'auth_only' ) ? 'profileTransAuthOnly' : 'profileTransAuthCapture';
 
 		$this->request_data = array(
-			'refId'        => $this->order->id,
+			'refId'        => SV_WC_Order_Compatibility::get_prop( $this->order, 'id' ),
 			'transaction'  => array(
 				$transaction_type => array(
 					'amount'                    => $this->order->payment_total,
@@ -79,7 +79,7 @@ class WC_Authorize_Net_CIM_API_Profile_Transaction_Request extends WC_Authorize_
 					'order'                     => array(
 						'invoiceNumber'       => ltrim( $this->order->get_order_number(), _x( '#', 'hash before the order number', 'woocommerce-gateway-authorize-net-cim' ) ),
 						'description'         => SV_WC_Helper::str_truncate( $this->order->description, 255 ),
-						'purchaseOrderNumber' => SV_WC_Helper::str_truncate( preg_replace( '/\W/', '', $this->order->po_number ), 25 ),
+						'purchaseOrderNumber' => SV_WC_Helper::str_truncate( preg_replace( '/\W/', '', $this->order->payment->po_number ), 25 ),
 					),
 					'cardCode'                  => ! empty( $this->order->payment->csc ) ? $this->order->payment->csc : null,
 				)
@@ -100,11 +100,11 @@ class WC_Authorize_Net_CIM_API_Profile_Transaction_Request extends WC_Authorize_
 		$this->order = $order;
 
 		$this->request_data = array(
-			'refId'       => $this->order->id,
+			'refId'       => SV_WC_Order_Compatibility::get_prop( $this->order, 'id' ),
 			'transaction' => array(
 				'profileTransPriorAuthCapture' => array(
-					'amount'  => $order->capture_total,
-					'transId' => $order->authorize_net_cim_capture_trans_id,
+					'amount'  => $order->capture->amount,
+					'transId' => $order->capture->trans_id,
 				),
 			),
 			'extraOptions' => $this->get_extra_options(),
@@ -122,7 +122,7 @@ class WC_Authorize_Net_CIM_API_Profile_Transaction_Request extends WC_Authorize_
 		$this->order = $order;
 
 		$this->request_data = array(
-			'refId'       => $this->order->id,
+			'refId'       => SV_WC_Order_Compatibility::get_prop( $this->order, 'id' ),
 			'transaction' => array(
 				'profileTransRefund' => array(
 					'amount'                   => $order->refund->amount,
@@ -150,7 +150,7 @@ class WC_Authorize_Net_CIM_API_Profile_Transaction_Request extends WC_Authorize_
 		$this->order = $order;
 
 		$this->request_data = array(
-			'refId'       => $this->order->id,
+			'refId'       => SV_WC_Order_Compatibility::get_prop( $this->order, 'id' ),
 			'transaction' => array(
 				'profileTransVoid' => array(
 					'transId' => $order->refund->trans_id,
@@ -173,15 +173,15 @@ class WC_Authorize_Net_CIM_API_Profile_Transaction_Request extends WC_Authorize_
 
 		$options = array(
 			'x_solution_id'      => 'A1000065',
-			'x_customer_ip'      => $this->order->customer_ip_address,
-			'x_currency_code'    => $this->order->get_order_currency(),
+			'x_customer_ip'      => SV_WC_Order_Compatibility::get_prop( $this->order, 'customer_ip_address' ),
+			'x_currency_code'    => SV_WC_Order_Compatibility::get_prop( $this->order, 'currency', 'view' ),
 			// TODO: this can be improved by detecting certain failure conditions (AVS/CVV failures) and dynamically setting the duplicate window to 0 as needed @MR
 			'x_duplicate_window' => 0,
 			'x_delim_char' => '|',
 			'x_encap_char' => ':',
 		);
 
-		return http_build_query( $options );
+		return http_build_query( $options, '', '&' );
 	}
 
 

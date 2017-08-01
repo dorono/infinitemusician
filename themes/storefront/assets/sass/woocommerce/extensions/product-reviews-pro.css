@@ -135,10 +135,6 @@
 .woocommerce-page .star-rating-selector:not(:checked) label.checkbox {
   float: none; }
 
-.woocommerce .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--contributions a:before,
-.woocommerce-page .woocommerce-MyAccount-navigation li.woocommerce-MyAccount-navigation-link--contributions a:before {
-  content: "\f005"; }
-
 .woocommerce #wc-product-reviews-pro-modal #customer_login .col-1,
 .woocommerce #wc-product-reviews-pro-modal #customer_login .col-2,
 .woocommerce-page #wc-product-reviews-pro-modal #customer_login .col-1,

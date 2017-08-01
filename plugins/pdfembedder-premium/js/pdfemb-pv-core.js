@@ -83,13 +83,8 @@ jQuery(document).ready(function($) {
         this.vscrollbar = scrollbar == 'both' || scrollbar == 'vertical';
         this.hscrollbar = scrollbar == 'both' || scrollbar == 'horizontal';
 
-        var style = '';
-        if (this.vscrollbar) {
-            style += 'overflow-y: scroll;';
-        }
-        if (this.hscrollbar) {
-            style += 'overflow-x: scroll;';
-        }
+        var style = 'overflow-y: ' + (this.vscrollbar ? 'scroll' : 'hidden') + '; ';
+        style += 'overflow-x: ' + (this.hscrollbar ? 'scroll' : 'hidden') + '; ';
 
         divContainer.empty().append(
             $('<div></div>', {'class': 'pdfemb-pagescontainer', 'style': style}));
@@ -923,19 +918,55 @@ jQuery(document).ready(function($) {
         self.addMoreToolbar(toolbar);
 
         if (!fixed) {
+
             divContainer.on('mouseenter', function (e) {
-                    var htoolbar = divContainer.find('div.pdfemb-toolbar-hover');
-                    if (htoolbar.data('no-hover') !== true) {
-                        htoolbar.show();
-                    }
+                var htoolbar = divContainer.find('div.pdfemb-toolbar-hover');
+                if (htoolbar.data('no-hover') !== true) {
+                    htoolbar.show();
                 }
-            );
+            });
+
             divContainer.on('mouseleave',
                 function (e) {
                     var htoolbar = divContainer.find('div.pdfemb-toolbar-hover');
                     htoolbar.hide();
                 }
             );
+
+            divContainer.on('pdfembTouchTapped', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                // We seem to receive two tap events in quick succession, so toggle doesn't work
+                // - it just gets cancelled immediately.
+                // So set a timed lock on allowing the toggle.
+                if (self.locktaps) {
+                    return;
+                }
+                self.locktaps = true;
+
+                var htoolbar = divContainer.find('div.pdfemb-toolbar-hover');
+
+                var wanthide = htoolbar.is(':visible');
+
+                if (htoolbar.data('no-hover') == true) {
+                    wanthide = true;
+                }
+
+                if (wanthide) {
+                    htoolbar.hide();
+                }
+                else {
+                    htoolbar.show();
+                }
+
+                setTimeout(function() {
+                    // Release lock
+                    self.locktaps = false;
+                }, 250);
+
+            });
+
         }
 
         // Powered by
