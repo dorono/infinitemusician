@@ -73,7 +73,7 @@ function wh_CustomReadOrder($order_id)
   $items = $order->get_items();
 
   foreach ($items as $item_id => $item_data) {
-		if ($item_data['product_id'] == 11 || $item_data['product_id'] == 893) {
+		if ($item_data['product_id'] == 11) {
 			include 'inc/recommendation-jlwg.php';
 		}
 
