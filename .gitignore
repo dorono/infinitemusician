@@ -1,6 +1,7 @@
 .DS_Store
 cache/
 uploads/
+updraft/
 themes/homestore/dev/node_modules
 themes/homestore/dev/.sass-cache
 themes/homestore/dev/.tmp

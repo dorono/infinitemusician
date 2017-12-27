@@ -16,6 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Add PHP snippets here
  */
 
+// keeps user logged in for a year
+ add_filter( 'auth_cookie_expiration', 'keep_me_logged_in_for_1_year' );
+ function keep_me_logged_in_for_1_year( $expirein ) {
+    return 31556926; // 1 year in seconds
+ }
+
 // getting rid of JS fixed position thingie that was breaking the page at times
 add_action( 'wp_enqueue_scripts', 'jk_remove_sticky_checkout', 99 );
 
